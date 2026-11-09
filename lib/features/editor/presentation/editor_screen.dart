@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
+
+class EditorScreen extends ConsumerStatefulWidget {
+  final String noteId;
+  const EditorScreen({super.key, required this.noteId});
+
+  @override
+  ConsumerState<EditorScreen> createState() => _EditorScreenState();
+}
+
+class _EditorScreenState extends ConsumerState<EditorScreen> {
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController();
+    _contentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    ref.read(editorProvider(widget.noteId).notifier)
+      .updateContent(_titleController.text, _contentController.text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(editorProvider(widget.noteId));
+
+    if (!_initialized) {
+      _titleController.text = state.title;
+      _contentController.text = state.content;
+      _initialized = true;
+    }
+
+    return PopScope(
+      onPopInvoked: (didPop) async {
+        if (didPop) await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(state.isSaving ? 'Saving…' : 'Saved',
+            style: Theme.of(context).textTheme.labelLarge),
+          actions: [
+            IconButton(
+              tooltip: 'Draw',
+              icon: const Icon(Icons.brush),
+              onPressed: () => context.push('/drawing/${widget.noteId}'),
+            ),
+            IconButton(
+              tooltip: 'Save',
+              icon: const Icon(Icons.check),
+              onPressed: () async {
+                await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Note saved.')),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleController,
+                onChanged: (_) => _onTextChanged(),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold),
+                decoration: const InputDecoration(hintText: 'Note Title'),
+                maxLines: null,
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _contentController,
+                  onChanged: (_) => _onTextChanged(),
+                  style: Theme.of(context).textTheme.bodyLarge,
+                  decoration: const InputDecoration(hintText: 'Start writing…'),
+                  maxLines: null,
+                  expands: true,
+                  textAlignVertical: TextAlignVertical.top,
+                  keyboardType: TextInputType.multiline,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
