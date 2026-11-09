@@ -2,7 +2,7 @@ name: Android build
 
 on:
   push:
-    branches: [main, "fix/**"]
+    branches: ["fix/**"]
   pull_request:
   workflow_dispatch:
 
