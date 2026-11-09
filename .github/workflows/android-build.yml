@@ -19,6 +19,7 @@ jobs:
         run: |
           if [ ! -f android/gradlew ]; then
             flutter create --platforms=android --org com.marufallammahim --project-name mindvault_archive .
+            sed -i 's/com.marufallammahim.mindvault_archive/com.marufallammahim.mindvaultarchive/g' android/app/build.gradle
           fi
       - run: flutter pub get
       - run: dart run build_runner build --delete-conflicting-outputs
