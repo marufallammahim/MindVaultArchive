@@ -121,8 +121,10 @@ class ArchiveSearchService {
     final normalized = value.trim();
     if (normalized.isEmpty) return 'No preview text';
     final index = normalized.toLowerCase().indexOf(query);
-    final start = index < 0 ? 0 : (index - 55).clamp(0, normalized.length);
-    final end = (start + 180).clamp(0, normalized.length);
+    final start = index < 0
+        ? 0
+        : (index - 55).clamp(0, normalized.length).toInt();
+    final end = (start + 180).clamp(0, normalized.length).toInt();
     final prefix = start > 0 ? '…' : '';
     final suffix = end < normalized.length ? '…' : '';
     return '$prefix${normalized.substring(start, end)}$suffix';
