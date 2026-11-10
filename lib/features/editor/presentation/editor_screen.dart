@@ -414,7 +414,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           ],
         ),
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
           child: Column(
             children: [
               if (state.saveError != null)
@@ -444,8 +444,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 style: Theme.of(context)
                     .textTheme
                     .headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
-                decoration: const InputDecoration(hintText: 'Note Title'),
+                    ?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.8, height: 1.12),
+                decoration: const InputDecoration(hintText: 'Give this note a title', border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
                 maxLines: null,
               ),
               StreamBuilder<List<Category>>(
@@ -470,7 +470,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         isExpanded: true,
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.folder_outlined),
-                          hintText: 'No category',
+                          hintText: 'Add a category',
                         ),
                         items: [
                           const DropdownMenuItem<String?>(
