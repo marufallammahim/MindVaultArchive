@@ -77,6 +77,23 @@ void main() {
     );
   });
 
+  test('pin state persists and can be cleared', () async {
+    await database.saveNoteContent('pin-note', 'Pinned', 'Body');
+    await database.setPinned('pin-note', true);
+    var note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('pin-note')))
+        .getSingle();
+    expect(note.sortOrder, 1);
+
+    await database.setPinned('pin-note', false);
+    note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('pin-note')))
+        .getSingle();
+    expect(note.sortOrder, 0);
+  });
+
   test('note color is persisted and can be reset', () async {
     await database.saveNoteContent('color-note', 'Colored', 'Body');
     await database.setNoteColor('color-note', 0xFFFFF0D8);
