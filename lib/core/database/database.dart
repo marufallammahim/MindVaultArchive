@@ -107,7 +107,7 @@ class AppDatabase extends _$AppDatabase {
           id: id,
           title: normalizedTitle,
           details: Value(details.trim()),
-          priority: Value(priority.clamp(0, 2)),
+          priority: Value(priority.clamp(0, 2).toInt()),
           dueAt: Value(dueAt),
         ),
       );
@@ -116,7 +116,7 @@ class AppDatabase extends _$AppDatabase {
         existing.copyWith(
           title: normalizedTitle,
           details: details.trim(),
-          priority: priority.clamp(0, 2),
+          priority: priority.clamp(0, 2).toInt(),
           dueAt: Value(dueAt),
           updatedAt: DateTime.now(),
         ),
