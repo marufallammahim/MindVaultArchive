@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/features/archive/data/archive_transfer_service.dart';
+import 'package:mindvault_archive/features/archive/data/full_backup_service.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ArchiveToolsScreen extends ConsumerStatefulWidget {
@@ -83,6 +84,83 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
     }
   }
 
+  Future<void> _exportFullBackup() async {
+    setState(() => _busy = true);
+    try {
+      final bytes = await FullBackupService(ref.read(databaseProvider)).exportZip();
+      await Share.shareXFiles(
+        [
+          XFile.fromData(
+            bytes,
+            mimeType: 'application/zip',
+            name: 'mindvault-full-backup.zip',
+          ),
+        ],
+        text: 'MindVault Archive full backup',
+      );
+    } catch (error) {
+      if (mounted) _showMessage('Full backup failed: $error');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _importFullBackup() async {
+    try {
+      final selection = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['zip'],
+        withData: true,
+      );
+      if (selection == null || selection.files.isEmpty) return;
+      final bytes = selection.files.single.bytes;
+      if (bytes == null) {
+        _showMessage('Could not read the selected ZIP file.');
+        return;
+      }
+      if (!mounted) return;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Restore full backup?'),
+          content: const Text(
+            'The backup will be validated and its attachment checksums verified. '
+            'Existing notes, tasks and attachments with matching IDs will not '
+            'be overwritten. Continue?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Validate and restore'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !mounted) return;
+
+      setState(() => _busy = true);
+      final result =
+          await FullBackupService(ref.read(databaseProvider)).importZip(bytes);
+      if (!mounted) return;
+      _showMessage(
+        'Restored ${result.imported} notes, ${result.importedTasks} tasks and '
+        '${result.importedAttachments} attachments. Skipped '
+        '${result.skipped} notes, ${result.skippedTasks} tasks and '
+        '${result.skippedAttachments} attachments.',
+      );
+    } on FormatException catch (error) {
+      if (mounted) _showMessage('Backup rejected: ${error.message}');
+    } catch (error) {
+      if (mounted) _showMessage('Restore failed: $error');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _copyExport() async {
     final document = _exportDocument;
     if (document == null) return;
@@ -126,13 +204,36 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'Portable archive',
+            'Full device backup',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
           const Text(
-            'Export notes, categories, tags, tasks and revision history as versioned '
-            'JSON, or import a previous MindVault archive. Import validates '
+            'Create or restore a ZIP backup containing your archive data and '
+            'attachment files. Each attachment is checked with SHA-256 before '
+            'restore. Missing source files stop backup creation rather than '
+            'silently producing an incomplete archive.',
+          ),
+          const SizedBox(height: 12),
+          FilledButton.icon(
+            onPressed: _busy ? null : _exportFullBackup,
+            icon: const Icon(Icons.backup_outlined),
+            label: const Text('Create full ZIP backup'),
+          ),
+          OutlinedButton.icon(
+            onPressed: _busy ? null : _importFullBackup,
+            icon: const Icon(Icons.settings_backup_restore_outlined),
+            label: const Text('Restore full ZIP backup'),
+          ),
+          const Divider(height: 32),
+          Text(
+            'Portable JSON transfer',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Export note, category, tag, task and revision data as versioned '
+            'JSON, or import a previous MindVault JSON archive. Import validates '
             'the document before writing and protects existing records.',
           ),
           const SizedBox(height: 20),
@@ -200,10 +301,9 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           ],
           const SizedBox(height: 20),
           const Text(
-            'Format v5 includes notes, categories, tags, note-tag links, tasks linked to notes and note '
-            'revisions, plus timestamps and archive state. Attachment file bytes '
-            'and other binary assets are not included yet. This is not a full '
-            'device backup.',
+            'Format v5 includes notes, categories, tags, note-tag links, linked tasks and '
+            'note revisions. JSON-only transfer does not contain attachment '
+            'bytes; use the full ZIP backup above when you need media files.',
           ),
         ],
       ),
