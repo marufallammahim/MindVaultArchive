@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/core/database/database.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,6 +17,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
   String _query = '';
   bool _searchOpen = false;
+  String _view = 'all';
 
   @override
   void dispose() {
@@ -23,13 +25,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
+  void _selectView(String view) {
+    Navigator.pop(context);
+    setState(() {
+      _view = view;
+      _query = '';
+      _searchController.clear();
+    });
+  }
+
+  List<PopupMenuEntry<String>> _noteActions(Note note) {
+    if (_view == 'trash') {
+      return const [
+        PopupMenuItem(value: 'restore', child: Text('Restore')),
+        PopupMenuItem(value: 'delete', child: Text('Delete permanently')),
+      ];
+    }
+    return [
+      PopupMenuItem(
+        value: 'favorite',
+        child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
+      ),
+      PopupMenuItem(
+        value: 'archive',
+        child: Text(note.isArchived ? 'Unarchive' : 'Archive'),
+      ),
+      const PopupMenuItem(value: 'trash', child: Text('Move to trash')),
+    ];
+  }
+
+  Future<void> _handleNoteAction(
+    AppDatabase db,
+    Note note,
+    String action,
+  ) async {
+    switch (action) {
+      case 'favorite':
+        await db.setFavorite(note.id, !note.isFavorite);
+        break;
+      case 'archive':
+        await db.setArchived(note.id, !note.isArchived);
+        break;
+      case 'trash':
+        await db.setDeleted(note.id, true);
+        break;
+      case 'restore':
+        await db.setDeleted(note.id, false);
+        break;
+      case 'delete':
+        await db.permanentlyDeleteNote(note.id);
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final db = ref.watch(databaseProvider);
     final notesQuery = db.select(db.notes)
-      ..where(
-        (note) => note.isDeleted.equals(false) & note.isArchived.equals(false),
-      )
+      ..where((note) {
+        switch (_view) {
+          case 'favorites':
+            return note.isDeleted.equals(false) & note.isFavorite.equals(true);
+          case 'archive':
+            return note.isDeleted.equals(false) & note.isArchived.equals(true);
+          case 'trash':
+            return note.isDeleted.equals(true);
+          default:
+            return note.isDeleted.equals(false) & note.isArchived.equals(false);
+        }
+      })
       ..orderBy([(note) => OrderingTerm.desc(note.updatedAt)]);
 
     return Scaffold(
@@ -81,7 +145,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ListTile(
               leading: const Icon(Icons.home_outlined),
               title: const Text('All Notes'),
-              onTap: () => Navigator.pop(context),
+              selected: _view == 'all',
+              onTap: () => _selectView('all'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.star_outline),
+              title: const Text('Favorites'),
+              selected: _view == 'favorites',
+              onTap: () => _selectView('favorites'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.archive_outlined),
+              title: const Text('Archive'),
+              selected: _view == 'archive',
+              onTap: () => _selectView('archive'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline),
+              title: const Text('Trash'),
+              selected: _view == 'trash',
+              onTap: () => _selectView('trash'),
             ),
             ListTile(
               leading: const Icon(Icons.info_outline),
@@ -176,12 +259,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          note.title.isNotEmpty ? note.title : 'Untitled',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (note.isFavorite)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 5, top: 2),
+                                child: Icon(Icons.star, size: 16),
+                              ),
+                            Expanded(
+                              child: Text(
+                                note.title.isNotEmpty ? note.title : 'Untitled',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            PopupMenuButton<String>(
+                              padding: EdgeInsets.zero,
+                              tooltip: 'Note actions',
+                              onSelected: (action) =>
+                                  _handleNoteAction(db, note, action),
+                              itemBuilder: (context) => _noteActions(note),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         Expanded(
