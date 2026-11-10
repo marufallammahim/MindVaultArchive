@@ -86,9 +86,9 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Export your notes and categories as versioned JSON, or import a '
-            'previous MindVault JSON archive. Import validates the document '
-            'before writing and skips note IDs that already exist.',
+            'Export notes, categories, tags, tasks and revision history as versioned '
+            'JSON, or import a previous MindVault archive. Import validates '
+            'the document before writing and protects existing records.',
           ),
           const SizedBox(height: 20),
           FilledButton.icon(
@@ -113,8 +113,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           Text('Import archive', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 8),
           const Text(
-            'Paste the complete JSON document. Existing notes are never '
-            'overwritten. Categories are matched by stable ID.',
+            'Paste the complete JSON document. Existing notes and tasks are never '
+            'overwritten. Categories and tags are matched by stable ID.',
           ),
           const SizedBox(height: 12),
           TextField(
@@ -138,9 +138,10 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           ],
           const SizedBox(height: 20),
           const Text(
-            'Format v4 includes notes, categories, tags, tasks, revisions, timestamps, archive/trash '
-            'state, favorites and note colors. Attachment file bytes, audio, '
-            'drawings and other binary assets are not included yet.',
+            'Format v4 includes notes, categories, tags, note-tag links, tasks and note '
+            'revisions, plus timestamps and archive state. Attachment file bytes '
+            'and other binary assets are not included yet. This is not a full '
+            'device backup.',
           ),
         ],
       ),
