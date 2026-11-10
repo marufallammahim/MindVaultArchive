@@ -8,7 +8,7 @@ Use `[x]` only when evidence exists in code/tests/docs. A category is not comple
 - [ ] Architecture and navigation decisions reconciled with current source.
 - [x] Database schema/relationships, FK policy, indexes and migration chain audited in source; migration fixtures remain outstanding.
 - [ ] Data-safe migration and backup recovery tests.
-- [ ] Design tokens and shared component contract.
+- [x] Shared Material 3 design tokens refreshed for AMOLED black and dynamic accent colors; reusable component contract and adaptive UI audit remain outstanding.
 - [ ] Core note CRUD, autosave, draft recovery and editor acceptance tests.
 - [ ] Notebook/folder/tag organization and local search acceptance tests.
 - [ ] App lock threat model; distinguish screen gate from encryption.
@@ -66,3 +66,13 @@ F01 Partial; F02 Partial; F03 Partial; F04 Not started; F05 Partial; F06 Partial
 
 ## Evidence log
 Record commit SHA, environment, exact command, exit status and artifact path for each test run. Never infer a passing test from an old README statement.
+
+
+## Visual redesign progress (2026-11-11)
+- [x] Dark + true-black AMOLED is the first-run default; saved user preferences are preserved.
+- [x] Burgundy default accent, preset color palette and custom HEX accent selection persist locally.
+- [x] Profile display name and profile image can be edited from the home header and Settings.
+- [x] Notes dashboard and task list refreshed with reference-inspired colorful cards and navigation.
+- [x] Existing PIN access gate surfaced as Protector without misrepresenting it as encryption.
+- [ ] Rework and visually audit every remaining route (editor, search, archive, history, drawing, capture, insights, timeline, templates and security).
+- [ ] Add profile/theme persistence tests, run full analyzer and test suite, and confirm a successful Android debug APK artifact.
