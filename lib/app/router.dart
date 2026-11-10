@@ -6,6 +6,7 @@ import 'package:mindvault_archive/features/drawing/presentation/drawing_screen.d
 import 'package:mindvault_archive/features/settings/presentation/settings_screen.dart';
 import 'package:mindvault_archive/features/about/presentation/about_screen.dart';
 import 'package:mindvault_archive/features/archive/presentation/archive_tools_screen.dart';
+import 'package:mindvault_archive/features/tasks/presentation/tasks_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -27,6 +28,7 @@ final appRouter = GoRouter(
       builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
+    GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
     GoRoute(
       path: '/archive-tools',
       builder: (context, state) => const ArchiveToolsScreen(),
