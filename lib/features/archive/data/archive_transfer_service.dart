@@ -5,7 +5,7 @@ import 'package:mindvault_archive/core/database/database.dart';
 
 /// Portable, versioned JSON transfer for notes, categories and tasks.
 ///
-/// Format v2 includes task records and intentionally excludes attachment file bytes. It never
+/// Format v3 includes task records, tags and note-tag links; attachment file bytes are still excluded. It never
 /// serializes private device paths, and import never overwrites existing notes.
 class ArchiveTransferService {
   ArchiveTransferService(this._database);
@@ -77,7 +77,7 @@ class ArchiveTransferService {
             .toList(),
       },
       'limitations': <String>[
-        'Attachment file bytes are not included in format version 2.',
+        'Attachment file bytes are not included in format version 3.',
       ],
     };
 
