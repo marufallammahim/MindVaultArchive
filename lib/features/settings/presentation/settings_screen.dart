@@ -134,6 +134,29 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.insights_outlined),
+            title: const Text('Archive insights'),
+            subtitle: const Text('Review archive health, duplicate titles and broken links'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/insights'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.timeline_outlined),
+            title: const Text('Memory timeline'),
+            subtitle: const Text('Browse note and task activity in date order'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/timeline'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.code_outlined),
+            title: const Text('Developer notebook'),
+            subtitle: const Text('Keep reusable code snippets and commands'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/developer-notebook'),
+          ),
+          const SizedBox(height: 24),
+          const Divider(),
+          ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Categories'),
             subtitle: const Text(
