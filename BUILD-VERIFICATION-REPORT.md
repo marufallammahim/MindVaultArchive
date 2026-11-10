@@ -51,7 +51,7 @@ interpret the earlier successful run as verification of these newer changes.
 ## Known limitations
 - JSON transfer excludes binary attachment bytes and private local paths; it is
   not a complete device backup.
-- The editor is plain text, not a full block-based rich editor.
+- The editor supports Markdown authoring and rendered preview, not a full WYSIWYG block editor.
 - Search is local substring matching, not FTS5, semantic search or OCR.
 - Scheduled notifications, calendar, audio recording/transcription, OCR/PDF
   indexing, visual boards, encryption, app lock, remote sync, collaboration
