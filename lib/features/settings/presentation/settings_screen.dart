@@ -1,36 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mindvault_archive/main.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkTheme = false;
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Settings')),
-        body: ListView(
-          children: [
-            SwitchListTile(
-              title: const Text('Dark Theme preview'),
-              subtitle: const Text('Theme preference is currently session-only'),
-              value: _darkTheme,
-              onChanged: (value) => setState(() => _darkTheme = value),
-            ),
-            const ListTile(
-              title: Text('Typography'),
-              subtitle: Text('Font and reading-density preferences are not yet available'),
-            ),
-            const ListTile(
-              title: Text('Storage'),
-              subtitle: Text('Notes are stored locally on this device'),
-              leading: Icon(Icons.storage_outlined),
-            ),
-          ],
-        ),
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeModeProvider);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Settings')),
+      body: ListView(
+        children: [
+          const ListTile(
+            title: Text('Appearance'),
+            subtitle: Text('Choose how MindVault Archive looks'),
+          ),
+          RadioListTile<ThemeMode>(
+            title: const Text('System default'),
+            value: ThemeMode.system,
+            groupValue: mode,
+            onChanged: (value) => ref.read(themeModeProvider.notifier).state = value!,
+          ),
+          RadioListTile<ThemeMode>(
+            title: const Text('Light'),
+            value: ThemeMode.light,
+            groupValue: mode,
+            onChanged: (value) => ref.read(themeModeProvider.notifier).state = value!,
+          ),
+          RadioListTile<ThemeMode>(
+            title: const Text('Dark'),
+            value: ThemeMode.dark,
+            groupValue: mode,
+            onChanged: (value) => ref.read(themeModeProvider.notifier).state = value!,
+          ),
+          const Divider(),
+          const ListTile(
+            title: Text('Storage'),
+            subtitle: Text('Notes are stored locally on this device'),
+            leading: Icon(Icons.storage_outlined),
+          ),
+        ],
+      ),
+    );
+  }
 }
