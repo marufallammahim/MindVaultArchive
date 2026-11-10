@@ -51,12 +51,13 @@ class AppLockService {
     if (!RegExp(r'^\d{6}$').hasMatch(pin)) {
       throw ArgumentError.value(pin, 'pin', 'PIN must contain six digits.');
     }
+
     final saltBytes = List<int>.generate(
       16,
       (_) => Random.secure().nextInt(256),
     );
     final salt = base64UrlEncode(saltBytes);
-    final hash = sha256.convert(utf8.encode('$salt:$pin')).toString();
+    final hash = sha256.convert(utf8.encode(salt + ':' + pin)).toString();
 
     await _store.write(_saltKey, salt);
     await _store.write(_hashKey, hash);
@@ -66,12 +67,21 @@ class AppLockService {
   }
 
   Future<bool> verifyPin(String pin) async {
-    if (!RegExp(r'^\d{6}
+    if (!RegExp(r'^\d{6}$').hasMatch(pin)) return false;
+
+    final lockoutUntil = int.tryParse(await _store.read(_lockoutKey) ?? '');
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (lockoutUntil != null && lockoutUntil > now) return false;
+    if (lockoutUntil != null) {
+      await _store.delete(_lockoutKey);
+      await _store.delete(_attemptsKey);
+    }
+
     final salt = await _store.read(_saltKey);
     final expectedHash = await _store.read(_hashKey);
     if (salt == null || expectedHash == null) return false;
 
-    final actual = sha256.convert(utf8.encode('$salt:$pin')).bytes;
+    final actual = sha256.convert(utf8.encode(salt + ':' + pin)).bytes;
     final expected = _decodeHex(expectedHash);
     if (expected == null || expected.length != actual.length) return false;
 
@@ -79,6 +89,7 @@ class AppLockService {
     for (var index = 0; index < actual.length; index++) {
       difference |= actual[index] ^ expected[index];
     }
+
     if (difference == 0) {
       await _store.delete(_attemptsKey);
       await _store.delete(_lockoutKey);
@@ -102,6 +113,7 @@ class AppLockService {
   Future<Duration?> lockoutRemaining() async {
     final value = int.tryParse(await _store.read(_lockoutKey) ?? '');
     if (value == null) return null;
+
     final remaining = value - DateTime.now().millisecondsSinceEpoch;
     if (remaining <= 0) {
       await _store.delete(_lockoutKey);
@@ -118,53 +130,8 @@ class AppLockService {
     await _store.delete(_enabledKey);
     await _store.delete(_saltKey);
     await _store.delete(_hashKey);
-  }
-
-  List<int>? _decodeHex(String value) {
-    if (value.length != 64) return null;
-    try {
-      return List<int>.generate(
-        32,
-        (index) => int.parse(
-          value.substring(index * 2, index * 2 + 2),
-          radix: 16,
-        ),
-      );
-    } on FormatException {
-      return null;
-    }
-  }
-}
-).hasMatch(pin)) return false;
-    final lockoutUntil = int.tryParse(await _store.read(_lockoutKey) ?? '');
-    final now = DateTime.now().millisecondsSinceEpoch;
-    if (lockoutUntil != null && lockoutUntil > now) return false;
-    if (lockoutUntil != null) {
-      await _store.delete(_lockoutKey);
-      await _store.delete(_attemptsKey);
-    }
-    final salt = await _store.read(_saltKey);
-    final expectedHash = await _store.read(_hashKey);
-    if (salt == null || expectedHash == null) return false;
-
-    final actual = sha256.convert(utf8.encode('$salt:$pin')).bytes;
-    final expected = _decodeHex(expectedHash);
-    if (expected == null || expected.length != actual.length) return false;
-
-    var difference = 0;
-    for (var index = 0; index < actual.length; index++) {
-      difference |= actual[index] ^ expected[index];
-    }
-    return difference == 0;
-  }
-
-  Future<void> disablePin(String currentPin) async {
-    if (!await verifyPin(currentPin)) {
-      throw StateError('The current PIN is incorrect.');
-    }
-    await _store.delete(_enabledKey);
-    await _store.delete(_saltKey);
-    await _store.delete(_hashKey);
+    await _store.delete(_attemptsKey);
+    await _store.delete(_lockoutKey);
   }
 
   List<int>? _decodeHex(String value) {
