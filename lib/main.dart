@@ -9,6 +9,8 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return database;
 });
 
+final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const ProviderScope(child: MindVaultArchiveApp()));
