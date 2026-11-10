@@ -159,6 +159,22 @@ void main() {
     expect(importedRevision.title, 'Previous imported title');
   });
 
+  test('imports version 3 archives without revision sections', () async {
+    final legacy = <String, Object?>{
+      'format': ArchiveTransferService.formatName,
+      'version': 3,
+      'contents': {
+        'categories': <Object?>[],
+        'notes': <Object?>[],
+        'tasks': <Object?>[],
+        'tags': <Object?>[],
+        'noteTags': <Object?>[],
+      },
+    };
+    final result = await transfer.importJson(jsonEncode(legacy));
+    expect(result.importedRevisions, 0);
+  });
+
   test('imports version 1 archives without task or tag sections', () async {
     final legacy = <String, Object?>{
       'format': ArchiveTransferService.formatName,
