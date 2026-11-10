@@ -19,6 +19,7 @@ dependencies:
   path: ^1.8.3
   just_audio: ^0.9.36
   flutter_svg: ^2.0.9
+  flutter_markdown: ^0.7.3
   google_fonts: ^6.1.0
   intl: ^0.20.3
   uuid: ^4.2.2
