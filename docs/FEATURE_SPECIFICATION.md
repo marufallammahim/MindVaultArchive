@@ -43,6 +43,8 @@ only called implemented when the repository contains a usable local workflow.
 
 ## Partial
 
+- App lock provides a salted six-digit PIN gate using Android secure storage;
+  it is not database/file encryption and has no PIN recovery.
 - Search is local substring matching, not FTS5, semantic or OCR search.
 - Editor stores Markdown source and provides formatting shortcuts plus a
   selectable rendered preview; it is not a WYSIWYG block editor.
@@ -60,7 +62,7 @@ only called implemented when the repository contains a usable local workflow.
 
 - Scheduled notifications, recurrence and calendar views remain unimplemented.
 - Voice recording, audio playback/transcription and OCR/PDF indexing.
-- App lock, biometric vault and encrypted database/attachment storage.
+- Biometric unlock and encrypted database/attachment storage.
 - Local reminder notifications, recurrence, calendar, habits and project boards.
 - Visual canvas/whiteboard and graph exploration.
 - Cloud sync, WebDAV/Nextcloud provider and multi-device conflict resolution.
