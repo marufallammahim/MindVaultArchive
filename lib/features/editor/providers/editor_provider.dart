@@ -57,8 +57,7 @@ class EditorNotifier extends StateNotifier<EditorState> {
     try {
       final note = await (_db.select(
         _db.notes,
-      )..where((t) => t.id.equals(state.noteId)))
-          .getSingleOrNull();
+      )..where((t) => t.id.equals(state.noteId))).getSingleOrNull();
       if (!mounted) return;
       if (note != null) {
         state = state.copyWith(
@@ -161,5 +160,5 @@ class EditorNotifier extends StateNotifier<EditorState> {
 
 final editorProvider =
     StateNotifierProvider.family<EditorNotifier, EditorState, String>(
-  (ref, noteId) => EditorNotifier(ref.watch(databaseProvider), noteId),
-);
+      (ref, noteId) => EditorNotifier(ref.watch(databaseProvider), noteId),
+    );
