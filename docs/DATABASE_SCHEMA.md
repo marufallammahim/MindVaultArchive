@@ -1,6 +1,6 @@
 # Database Schema — current implementation
 
-The current Drift database is schema version 5.
+The current Drift database is schema version 6.
 
 ## Notes
 - `id` (primary key)
@@ -52,3 +52,9 @@ migration only adds the column for databases that already had the task table.
 Schema v5 adds nullable `Tasks.noteId`. Permanent note deletion clears linked
 task references before removing the note. Future additions must increment the
 schema version and include tested Drift migrations. Do not add tables only to match a planned feature list.
+
+
+## Search indexes (schema v6)
+- `notes_fts`: rebuildable FTS5 index for note title and body, keyed by unindexed note ID.
+- `tasks_fts`: rebuildable FTS5 index for task title and details, keyed by unindexed task ID.
+- SQLite triggers maintain both indexes on insert, update and delete. The source tables remain authoritative; indexes are rebuilt during migration.
