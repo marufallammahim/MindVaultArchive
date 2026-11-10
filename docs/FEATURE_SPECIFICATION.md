@@ -7,13 +7,14 @@ vision. A feature is not marked complete merely because a route or button exists
 
 - Offline SQLite notes using Drift.
 - Note creation and editing with debounced autosave and save-before-exit.
-- Favorites, archive, trash, restore and confirmed permanent deletion.
+- Favorites, pinning, archive, trash, restore and confirmed permanent deletion.
 - Category creation, rename, deletion, note assignment and category-filtered view.
 - Tag creation, rename, deletion and multi-tag note assignment.
 - Per-note color selection and tinted archive cards.
 - Quick Capture for fast local idea capture.
 - Local drawing canvas with PNG attachment metadata.
-- Title/body search over the loaded local note list.
+- Title/body substring search over the current archive view.
+- Lightweight `[[Note title]]` wikilinks with matching linked-note chips and live backlinks.
 - Light, dark and system theme selection with local persistence.
 - Offline task manager with title/details, due date, priority, completion state,
   editing and deletion.
@@ -26,11 +27,11 @@ vision. A feature is not marked complete merely because a route or button exists
 
 ## Partial
 
-- Search: local title/body substring matching; no FTS index, advanced filters
-  or OCR index.
+- Search: local title/body substring matching; no FTS index, semantic search,
+  advanced filters or OCR index.
 - Editor: plain text fields plus drawing attachments; not a block-based rich editor.
-- Organization: categories and tags exist; nested notebooks, smart views,
-  backlinks and knowledge graph are not implemented.
+- Organization: categories, tags, pinning and title-based links exist; nested
+  notebooks, smart views and a persistent graph database are not implemented.
 - Attachments: drawing metadata is stored locally; archive transfer does not
   package attachment bytes.
 - Security: app-level lock and encrypted database/attachments are not implemented.
@@ -40,10 +41,10 @@ vision. A feature is not marked complete merely because a route or button exists
 
 ## Not implemented yet
 
-Reminders/notifications, calendar, habits, projects, backlinks, knowledge graph,
-semantic search, OCR/PDF indexing, audio recording/transcription, handwriting,
-visual canvas boards, collaboration, cloud backup, WebDAV/Nextcloud sync,
-end-to-end encryption, and full importers for third-party archive formats.
+Reminders/notifications, calendar, habits, projects, semantic search, OCR/PDF
+indexing, audio recording/transcription, handwriting, visual canvas boards,
+collaboration, cloud backup, WebDAV/Nextcloud sync, end-to-end encryption,
+and full importers for third-party archive formats.
 
 ## External infrastructure required
 
