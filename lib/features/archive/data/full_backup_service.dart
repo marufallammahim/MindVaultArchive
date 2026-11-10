@@ -298,7 +298,9 @@ class FullBackupService {
   String _safeFilename(String value) {
     final base = p.basename(value.trim());
     final safe = base.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
-    return safe.isEmpty ? 'attachment.bin' : safe;
+    return safe.isEmpty || safe == '.' || safe == '..'
+        ? 'attachment.bin'
+        : safe;
   }
 
   DateTime _parseDate(String value) {
