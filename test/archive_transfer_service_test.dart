@@ -21,6 +21,8 @@ void main() {
   test('exports notes and categories as a versioned JSON archive', () async {
     await database.saveCategory('work', 'Work');
     await database.saveNoteContent('note-1', 'Research', 'Offline-first notes');
+    await database.saveTag('important', 'Important');
+    await database.setNoteTags('note-1', ['important']);
     await database.saveTask(
       id: 'task-1',
       title: 'Review archive',
@@ -36,6 +38,8 @@ void main() {
     expect((contents['notes'] as List).single['documentContent'],
         'Offline-first notes');
     expect((contents['tasks'] as List).single['title'], 'Review archive');
+    expect((contents['tags'] as List).single['name'], 'Important');
+    expect((contents['noteTags'] as List).single['tagId'], 'important');
   });
 
   test('imports archive and skips colliding note IDs without overwriting',
@@ -82,6 +86,21 @@ void main() {
             'sortOrder': 2,
           }
         ],
+        'tags': [
+          {
+            'id': 'priority',
+            'name': 'Priority',
+            'color': null,
+            'createdAt': DateTime.utc(2026).toIso8601String(),
+          }
+        ],
+        'noteTags': [
+          {
+            'noteId': 'new-id',
+            'tagId': 'priority',
+            'createdAt': DateTime.utc(2026).toIso8601String(),
+          }
+        ],
         'tasks': [
           {
             'id': 'task-imported',
@@ -102,6 +121,7 @@ void main() {
     expect(result.imported, 1);
     expect(result.skipped, 1);
     expect(result.importedTasks, 1);
+    expect(result.importedTags, 1);
 
     final existing = await (database.select(database.notes)
           ..where((note) => note.id.equals('same-id')))
@@ -116,6 +136,10 @@ void main() {
           ..where((task) => task.id.equals('task-imported')))
         .getSingle();
     expect(importedTask.title, 'Imported task');
+    final importedTagLink = await (database.select(database.noteTags)
+          ..where((link) => link.noteId.equals('new-id')))
+        .getSingle();
+    expect(importedTagLink.tagId, 'priority');
   });
 
   test('rejects invalid archive before changing local data', () async {
