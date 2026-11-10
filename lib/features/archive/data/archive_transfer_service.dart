@@ -13,7 +13,7 @@ class ArchiveTransferService {
   final AppDatabase _database;
 
   static const formatName = 'mindvault-archive';
-  static const formatVersion = 4;
+  static const formatVersion = 5;
 
   Future<String> exportJson() async {
     final categories = await _database.select(_database.categories).get();
@@ -76,6 +76,7 @@ class ArchiveTransferService {
                   'id': item.id,
                   'title': item.title,
                   'details': item.details,
+                  'noteId': item.noteId,
                   'dueAt': item.dueAt?.toUtc().toIso8601String(),
                   'priority': item.priority,
                   'isCompleted': item.isCompleted,
@@ -104,6 +105,7 @@ class ArchiveTransferService {
         (decoded['version'] != 1 &&
             decoded['version'] != 2 &&
             decoded['version'] != 3 &&
+            decoded['version'] != 4 &&
             decoded['version'] != formatVersion)) {
       throw const FormatException('Unsupported MindVault archive format.');
     }
@@ -174,6 +176,11 @@ class ArchiveTransferService {
     final taskIds = parsedTasks.map((item) => item.id).toSet();
     if (taskIds.length != parsedTasks.length) {
       throw const FormatException('Archive contains duplicate task IDs.');
+    }
+    for (final task in parsedTasks) {
+      if (task.noteId != null && !noteIds.contains(task.noteId)) {
+        throw const FormatException('Archive contains a task linked to a missing note.');
+      }
     }
 
     var imported = 0;
@@ -302,6 +309,25 @@ class ArchiveTransferService {
         importedRevisions++;
       }
 
+      final revisionNoteIds = parsedRevisions
+          .map((item) => item.noteId)
+          .where((id) => !skippedNoteIds.contains(id))
+          .toSet();
+      for (final noteId in revisionNoteIds) {
+        final history = await (_database.select(_database.noteRevisions)
+              ..where((item) => item.noteId.equals(noteId))
+              ..orderBy([
+                (item) => OrderingTerm.desc(item.createdAt),
+              ]))
+            .get();
+        if (history.length > 30) {
+          final expiredIds = history.skip(30).map((item) => item.id).toList();
+          await (_database.delete(_database.noteRevisions)
+                ..where((item) => item.id.isIn(expiredIds)))
+              .go();
+        }
+      }
+
       for (final task in parsedTasks) {
         final existing = await (_database.select(_database.tasks)
               ..where((row) => row.id.equals(task.id)))
@@ -315,6 +341,7 @@ class ArchiveTransferService {
                 id: task.id,
                 title: task.title,
                 details: Value(task.details),
+                noteId: Value(task.noteId),
                 dueAt: Value(task.dueAt),
                 priority: Value(task.priority),
                 isCompleted: Value(task.isCompleted),
@@ -474,6 +501,7 @@ class ArchiveTransferService {
     final id = value['id'];
     final title = value['title'];
     final details = value['details'];
+    final noteId = value['noteId'];
     final dueAt = value['dueAt'];
     final priority = value['priority'];
     final completed = value['isCompleted'];
@@ -483,6 +511,7 @@ class ArchiveTransferService {
         title is! String ||
         title.trim().isEmpty ||
         details is! String ||
+        (noteId != null && noteId is! String) ||
         (dueAt != null && dueAt is! String) ||
         priority is! int ||
         completed is! bool ||
@@ -493,6 +522,7 @@ class ArchiveTransferService {
       id: id,
       title: title,
       details: details,
+      noteId: noteId as String?,
       dueAt: dueAt == null ? null : _date(dueAt),
       priority: priority.clamp(0, 2).toInt(),
       isCompleted: completed,
@@ -583,6 +613,7 @@ class _ArchiveTask {
     required this.id,
     required this.title,
     required this.details,
+    required this.noteId,
     required this.dueAt,
     required this.priority,
     required this.isCompleted,
@@ -594,6 +625,7 @@ class _ArchiveTask {
   final String id;
   final String title;
   final String details;
+  final String? noteId;
   final DateTime? dueAt;
   final int priority;
   final bool isCompleted;
