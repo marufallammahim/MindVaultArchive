@@ -8,7 +8,7 @@ import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
 import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final String noteId;
