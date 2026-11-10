@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' hide Column;
@@ -9,6 +10,7 @@ import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
 import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:share_plus/share_plus.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final String noteId;
@@ -42,6 +44,41 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     ref
         .read(editorProvider(widget.noteId).notifier)
         .updateContent(_titleController.text, _contentController.text);
+  }
+
+
+  Future<void> _shareMarkdown() async {
+    final saved = await ref
+        .read(editorProvider(widget.noteId).notifier)
+        .forceSave();
+    if (!mounted) return;
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Save the note before exporting it.')),
+      );
+      return;
+    }
+    final title = _titleController.text.trim();
+    final safeName = (title.isEmpty ? 'mindvault-note' : title)
+        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '-');
+    final markdown = '# ${title.isEmpty ? 'Untitled' : title}\n\n${_contentController.text}';
+    try {
+      await Share.shareXFiles(
+        [
+          XFile.fromData(
+            utf8.encode(markdown),
+            mimeType: 'text/markdown',
+            name: '$safeName.md',
+          ),
+        ],
+        text: 'Exported from MindVault Archive',
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not export Markdown: $error')),
+      );
+    }
   }
 
   @override
@@ -87,6 +124,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
           ),
           actions: [
+            IconButton(
+              tooltip: 'Export or share Markdown',
+              icon: const Icon(Icons.ios_share_outlined),
+              onPressed: _shareMarkdown,
+            ),
             IconButton(
               tooltip: _previewMode ? 'Edit Markdown' : 'Preview Markdown',
               icon: Icon(
