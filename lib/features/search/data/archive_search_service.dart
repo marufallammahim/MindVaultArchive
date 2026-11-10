@@ -38,7 +38,11 @@ class ArchiveSearchService {
     if (query.isEmpty) return const [];
 
     final safeLimit = limit.clamp(1, 500).toInt();
-    final ftsQuery = _toFtsQuery(query);
+    // SQL wildcard characters are meaningful only to the metadata LIKE
+    // query below. Do not pass them through FTS tokenization, where they can
+    // be treated as token separators and produce unrelated prefix matches.
+    final hasLikeWildcard = RegExp(r'[%_\\\\]').hasMatch(query);
+    final ftsQuery = hasLikeWildcard ? '' : _toFtsQuery(query);
     // LIKE treats '%' and '_' as wildcards. Escape user input so metadata
     // searches behave as literal substring matches, just like FTS search.
     final escapedQuery = query
