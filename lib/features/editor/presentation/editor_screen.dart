@@ -46,11 +46,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         .updateContent(_titleController.text, _contentController.text);
   }
 
-
   Future<void> _shareMarkdown() async {
-    final saved = await ref
-        .read(editorProvider(widget.noteId).notifier)
-        .forceSave();
+    final saved =
+        await ref.read(editorProvider(widget.noteId).notifier).forceSave();
     if (!mounted) return;
     if (!saved) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,7 +59,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final title = _titleController.text.trim();
     final safeName = (title.isEmpty ? 'mindvault-note' : title)
         .replaceAll(RegExp(r'[\\/:*?"<>|]'), '-');
-    final markdown = '# ${title.isEmpty ? 'Untitled' : title}\n\n${_contentController.text}';
+    final markdown =
+        '# ${title.isEmpty ? 'Untitled' : title}\n\n${_contentController.text}';
     try {
       await Share.shareXFiles(
         [
