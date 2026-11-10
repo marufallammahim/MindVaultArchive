@@ -322,7 +322,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           .where((note) =>
                               note.id != widget.noteId &&
                               note.documentContent.toLowerCase().contains(
-                                    '[[' + currentTitle.toLowerCase() + ']]',
+                                    '[[${currentTitle.toLowerCase()}]]',
                                   ))
                           .toList();
                   if (linkedNotes.isEmpty && backlinks.isEmpty) {
