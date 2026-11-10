@@ -57,23 +57,53 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
 fi
 
 # AndroidX AAR metadata is checked against each Android module's compile SDK.
-# Flutter plugins may still default to an older API level, so enforce API 36
-# for every Android application/library module after its Android plugin loads.
+# Set API 36 on the app and every Android plugin/library module. Flutter's
+# current scaffold uses a Kotlin-DSL root build file, while older projects use
+# Groovy; support both so plugins such as share_plus do not remain on API 33.
+GRADLE_MARKER="MINDVAULT_COMPILE_SDK_ENFORCEMENT"
 ROOT_GRADLE="android/build.gradle"
-if [[ -f "$ROOT_GRADLE" ]] && ! grep -q "MINDVAULT_COMPILE_SDK_ENFORCEMENT" "$ROOT_GRADLE"; then
+ROOT_GRADLE_KTS="android/build.gradle.kts"
+
+if [[ -f "$ROOT_GRADLE" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE"; then
   cat >> "$ROOT_GRADLE" <<'GRADLE'
 
 // MINDVAULT_COMPILE_SDK_ENFORCEMENT
 subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                compileSdkVersion 36
+    afterEvaluate { target ->
+        def androidExtension = target.extensions.findByName("android")
+        if (androidExtension != null) {
+            def setter = androidExtension.class.methods.find {
+                (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
+                it.parameterCount == 1
+            }
+            if (setter != null) {
+                setter.invoke(androidExtension, 36)
             }
         }
     }
 }
 GRADLE
+elif [[ -f "$ROOT_GRADLE_KTS" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE_KTS"; then
+  cat >> "$ROOT_GRADLE_KTS" <<'GRADLE'
+
+// MINDVAULT_COMPILE_SDK_ENFORCEMENT
+subprojects {
+    val targetProject = this
+    afterEvaluate {
+        val androidExtension = targetProject.extensions.findByName("android")
+        if (androidExtension != null) {
+            val setter = androidExtension.javaClass.methods.firstOrNull {
+                (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
+                    it.parameterCount == 1
+            }
+            setter?.invoke(androidExtension, 36)
+        }
+    }
+}
+GRADLE
+elif [[ ! -f "$ROOT_GRADLE" && ! -f "$ROOT_GRADLE_KTS" ]]; then
+  echo "Android root Gradle build file is missing after scaffolding." >&2
+  exit 1
 fi
 
 # Ensure the Gradle wrapper can be executed on Linux runners.
