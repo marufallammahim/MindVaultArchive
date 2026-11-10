@@ -44,22 +44,27 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 ## Work completed in this session
 - Verified repository and write permission.
 - Confirmed existing branch and used it; no branch creation.
-- Inspected pubspec, README, feature specification, roadmap, database schema, router, providers, theme, backup docs and Android Gradle config.
+- Inspected pubspec, README, feature specification, roadmap, database schema, router, providers, theme, backup docs, Android manifest and CI workflows.
 - Committed the master specification and implementation/design documentation listed above.
+- Audited the complete current Drift schema/migration code, FTS5 triggers, search service and related database/search/archive tests.
+- Fixed SQL `LIKE` wildcard handling in category/tag search by escaping backslash, `%` and `_`; punctuation-only terms are excluded from FTS query construction while metadata substring search remains available.
+- Added regression coverage for literal percent, underscore and backslash metadata searches in `test/archive_search_service_test.dart`.
+- GitHub Actions Android CI was triggered by the source/test commits; latest observed run was queued. No pass/fail result is claimed yet.
+- Latest source/test work is on the same existing branch; no branch was created and `main` was not changed.
 
 ## Exact next steps
-1. Verify current remote head on the existing feature branch before the next write.
-2. Inspect all remaining source, tests, Android manifest and actual GitHub workflow files; inspect complete database migrations and FTS query implementation.
-3. Run Flutter commands in a real Flutter environment or inspect actual Actions runs: `flutter pub get`, build_runner, format, analyze, tests and debug APK. Do not infer passing status.
-4. Fix the highest-priority P0 data-integrity issues with migration fixtures before expanding schema.
-5. Implement one tested P0/P1 slice at a time; preserve existing data and update docs/checkpoint with each commit.
-6. Push/verify only the existing feature branch. Never force-push or write directly to main.
+1. Inspect the current Android CI and code-quality workflow results for the latest branch head; fix any format/analyze/test/build failures.
+2. Add and run real migration fixtures for schema versions 1–5, including existing task rows and FTS index rebuilds; do not add SQL foreign keys until orphan handling and migration recovery are proven.
+3. Continue the P0 data-safety audit across archive import, full backup restore, attachments and editor autosave/recovery.
+4. Implement one tested P0/P1 source slice at a time; preserve existing user data and update docs/checkpoint with each commit.
+5. Verify only the existing feature branch. Never create another branch, force-push, or write directly to `main`.
 
 ## Verification in this session
 - Repository access and push permission: PASS.
 - Existing feature branch found: PASS.
-- Documentation files written on feature branch: PASS (verify latest head before further work).
-- Full source audit: IN PROGRESS.
-- Flutter/Dart commands executed in this session: NONE.
+- Documentation files written on feature branch: PASS.
+- Search source fix and regression tests committed: PASS (execution still pending).
+- Database source/migration and FTS logic audit: PASS; migration fixture tests remain outstanding.
+- GitHub Actions Android CI: triggered; latest observed run queued, result pending.
+- Flutter/Dart commands executed directly in this session: NONE.
 - Android APK generated in this session: NO.
-- Feature source implementation in this session: NO; this session's repository changes are specification/architecture documentation.
