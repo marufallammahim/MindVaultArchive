@@ -2,65 +2,46 @@
 
 Updated: 2026-11-10
 
-## Repository and branch
+## Current source
 - Repository: `marufallammahim/MindVaultArchive`
 - Working branch: `feature/ultimate-all-in-one-mindvault`
 - Android application ID: `com.marufallammahim.mindvaultarchive`
 - Android compile SDK: 36
 
-## Last verified CI checkpoint
-Commit `34ab8a1bbe72601e587ecf22c4009d1585f30e08` completed the repository's
-three historical GitHub Actions workflows successfully:
-- Drift code generation and Dart formatting passed.
-- Flutter static analysis passed with no issues.
-- Flutter tests: 17 passed.
-- Android debug APK built and uploaded.
-- Release-mode APK and AAB candidate built and signature-verified with an
-  ephemeral CI-only test key.
-- Debug and release-candidate artifacts were uploaded for that checkpoint.
+## Latest verified quality checkpoint
+Feature branch head `8649d7af5eb2475211701a795e457ed120920ff6` passed the Code Quality workflow:
 
-The ephemeral CI key is not a permanent owner-controlled publishing identity.
-Those artifacts are not the final F-Droid publishing build.
+- Flutter dependency resolution: passed.
+- Drift code generation for schema v4: passed.
+- Dart formatting: passed (25 files, 0 changes).
+- Flutter static analysis: passed with no issues.
+- Flutter tests: **21 passed**.
+- Tests cover task CRUD, category/tag assignment, note color, pinning, revision restore/retention, archive v1/v3 compatibility and archive v4 transfer.
 
-## Changes requiring a fresh CI run
-The following source changes are newer than the verified checkpoint:
-- Archive transfer v4 with notes, categories, tags, tag links, tasks and
-  revision history.
-- Archive import validation and duplicate-record protection.
-- Offline global search across note titles/bodies, category names, tag names,
-  and task titles/details.
-- Search UI, route and home-screen entry points.
-- Search service tests covering case-insensitive matching, categories, tags,
-  tasks, deleted-note exclusion and result limits.
-- Documentation refresh for actual implementation status.
+## Android build status for the same branch head
+The latest Android CI and Android Build workflows have completed source verification successfully. At the time of this report update:
+- Android debug APK build: in progress.
+- Release-mode APK build: in progress.
+- Release-mode AAB build: queued after APK.
+- CI signature verification and artifact upload: pending.
 
-The latest branch head has not yet been verified by a completed CI run. Do not
-interpret the earlier successful run as verification of these newer changes.
+Do not claim these APK/AAB outputs exist until the workflows complete and artifacts are visible.
 
-## Current implemented functionality
-- Offline notes, debounced autosave and save-before-exit.
-- Favorites, pinning, archive, trash, restore and permanent deletion.
-- Categories, tags, note colors, wikilinks and backlinks.
-- Quick Capture and five starter templates.
-- Offline tasks with due dates, priorities and completion.
-- Note revision history with up to 30 snapshots and restore.
-- Local drawing canvas and attachment metadata.
-- Home search and global offline search.
-- Versioned JSON archive transfer v4.
+## Implemented in this branch
+- Offline-first Drift/SQLite notes, autosave, favorites, pinning, archive/trash lifecycle.
+- Category assignment/filtering, tag management and multi-tag note assignment.
+- Per-note color, quick capture, five starter templates and offline tasks.
+- Lightweight title-based wikilinks and live backlinks.
+- Version history with up to 30 prior snapshots per note and restore.
+- Versioned JSON transfer v4 for notes, categories, tags, tag links, tasks and revisions; v1-v3 remain importable.
+- Transactional import validation and duplicate note/task protection.
+- Updated architecture, database, backup, security, AI, sync, UI and roadmap documentation.
 
-## Known limitations
-- JSON transfer excludes binary attachment bytes and private local paths; it is
-  not a complete device backup.
-- The editor supports Markdown authoring and rendered preview, not a full WYSIWYG block editor.
-- Search is local substring matching, not FTS5, semantic search or OCR.
-- Scheduled notifications, calendar, audio recording/transcription, OCR/PDF
-  indexing, visual boards, encryption, app lock, remote sync, collaboration
-  and AI provider integration are not yet implemented.
-- Full Bengali localization and device accessibility testing remain outstanding.
-- No production signing key or cloud/AI provider is configured.
+## Explicit limitations
+- JSON transfer v4 does not include attachment bytes or binary media and is not a full archive backup.
+- Rich block editing, nested notebooks, calendar, reminders, OCR, PDF annotation, audio recording/transcription, encryption, app lock, remote sync, cloud backup, collaboration and AI provider integration are not yet implemented.
+- Full Bengali localization and comprehensive device accessibility testing remain outstanding.
+- No production signing key is present in the repository.
 
-## Required next verification
-Run the Android CI workflow on the latest branch commit and confirm dependency
-resolution, Drift generation, formatting, analysis, all tests and debug APK
-build. Check the workflow's actual result and uploaded artifact before claiming
-a release candidate is available.
+## External infrastructure
+Cloud sync, collaboration and cloud AI require real provider infrastructure and user authorization. No such service is configured at this time.
