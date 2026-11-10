@@ -13,7 +13,7 @@ class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   static const _palette = <Color>[
-    Color(0xFF7A1735),
+    Color(0xFF5A0719),
     Color(0xFFB64D69),
     Color(0xFFE97855),
     Color(0xFFFFC94A),
@@ -512,7 +512,7 @@ class _CustomColorDialogState extends State<_CustomColorDialog> {
             textCapitalization: TextCapitalization.characters,
             decoration: const InputDecoration(
               labelText: 'HEX color',
-              hintText: '#7A1735',
+              hintText: '#5A0719',
               counterText: '',
             ),
             onChanged: (_) => setState(() {}),
