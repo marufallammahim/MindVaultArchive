@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Shared design system inspired by the supplied AMOLED notebook references.
 class AppTheme {
-  static const defaultBrand = Color(0xFF7A1735);
+  static const defaultBrand = Color(0xFF5A0719);
   static const brandLight = Color(0xFFB64D69);
   static const darkSurface = Color(0xFF101014);
   static const darkCard = Color(0xFF1B1A20);
