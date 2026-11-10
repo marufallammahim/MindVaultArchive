@@ -49,7 +49,9 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Audited the complete current Drift schema/migration code, FTS5 triggers, search service and related database/search/archive tests.
 - Fixed SQL `LIKE` wildcard handling in category/tag search by escaping backslash, `%` and `_`; punctuation-only terms are excluded from FTS query construction while metadata substring search remains available.
 - Added regression coverage for literal percent, underscore and backslash metadata searches in `test/archive_search_service_test.dart`.
-- GitHub Actions Android CI was triggered by the source/test commits; latest observed run was queued. No pass/fail result is claimed yet.
+- Fixed a revision-restore race: reloading the editor now cancels a pending debounce, waits for queued writes, and resets the saving state; opening revision history first forces the current note to save.
+- Added `test/editor_provider_test.dart` to ensure a pending stale autosave cannot overwrite restored revision content.
+- GitHub Actions Android CI, Code Quality and formatter workflows were triggered by source/test commits; latest observed runs were queued/pending. No pass/fail result is claimed yet.
 - Latest source/test work is on the same existing branch; no branch was created and `main` was not changed.
 
 ## Exact next steps
