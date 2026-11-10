@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:signature/signature.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:mindvault_archive/main.dart';
+import 'package:mindvault_archive/app/providers.dart';
 
 class DrawingScreen extends ConsumerStatefulWidget {
   final String noteId;
