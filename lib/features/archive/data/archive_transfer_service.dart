@@ -207,12 +207,11 @@ class ArchiveTransferService {
         final existing = await (_database.select(_database.tags)
               ..where((row) => row.id.equals(tag.id)))
             .getSingleOrNull();
-        if (existing == null) {
-          importedTags++;
-        } else {
+        if (existing != null) {
           skippedTags++;
+          continue;
         }
-        await _database.into(_database.tags).insertOnConflictUpdate(
+        await _database.into(_database.tags).insert(
               TagsCompanion.insert(
                 id: tag.id,
                 name: tag.name,
@@ -220,6 +219,7 @@ class ArchiveTransferService {
                 createdAt: Value(tag.createdAt),
               ),
             );
+        importedTags++;
       }
 
       final availableTags = await _database.select(_database.tags).get();
