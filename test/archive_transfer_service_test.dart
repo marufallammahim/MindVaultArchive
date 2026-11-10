@@ -21,6 +21,7 @@ void main() {
   test('exports notes and categories as a versioned JSON archive', () async {
     await database.saveCategory('work', 'Work');
     await database.saveNoteContent('note-1', 'Research', 'Offline-first notes');
+    await database.saveNoteContent('note-1', 'Research updated', 'Updated body');
     await database.saveTag('important', 'Important');
     await database.setNoteTags('note-1', ['important']);
     await database.saveTask(
@@ -36,7 +37,8 @@ void main() {
     final contents = document['contents'] as Map;
     expect((contents['categories'] as List).single['name'], 'Work');
     expect((contents['notes'] as List).single['documentContent'],
-        'Offline-first notes');
+        'Updated body');
+    expect((contents['revisions'] as List).single['title'], 'Research');
     expect((contents['tasks'] as List).single['title'], 'Review archive');
     expect((contents['tags'] as List).single['name'], 'Important');
     expect((contents['noteTags'] as List).single['tagId'], 'important');
@@ -94,6 +96,15 @@ void main() {
             'createdAt': DateTime.utc(2026).toIso8601String(),
           }
         ],
+        'revisions': [
+          {
+            'id': 'revision-1',
+            'noteId': 'new-id',
+            'title': 'Previous imported title',
+            'documentContent': 'Previous imported body',
+            'createdAt': DateTime.utc(2026).toIso8601String(),
+          }
+        ],
         'noteTags': [
           {
             'noteId': 'new-id',
@@ -122,6 +133,7 @@ void main() {
     expect(result.skipped, 1);
     expect(result.importedTasks, 1);
     expect(result.importedTags, 1);
+    expect(result.importedRevisions, 1);
 
     final existing = await (database.select(database.notes)
           ..where((note) => note.id.equals('same-id')))
@@ -140,6 +152,10 @@ void main() {
           ..where((link) => link.noteId.equals('new-id')))
         .getSingle();
     expect(importedTagLink.tagId, 'priority');
+    final importedRevision = await (database.select(database.noteRevisions)
+          ..where((revision) => revision.id.equals('revision-1')))
+        .getSingle();
+    expect(importedRevision.title, 'Previous imported title');
   });
 
   test('imports version 1 archives without task or tag sections', () async {
