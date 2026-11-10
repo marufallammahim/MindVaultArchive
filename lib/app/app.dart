@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/app/router.dart';
 import 'package:mindvault_archive/app/theme.dart';
-import 'package:mindvault_archive/main.dart';
 
 class MindVaultArchiveApp extends ConsumerWidget {
   const MindVaultArchiveApp({super.key});
