@@ -12,6 +12,7 @@ import 'package:mindvault_archive/features/capture/presentation/quick_capture_sc
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 import 'package:mindvault_archive/features/history/presentation/revision_history_screen.dart';
 import 'package:mindvault_archive/features/search/presentation/archive_search_screen.dart';
+import 'package:mindvault_archive/features/security/presentation/app_lock_settings_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -55,6 +56,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/search',
       builder: (context, state) => const ArchiveSearchScreen(),
+    ),
+    GoRoute(
+      path: '/app-lock',
+      builder: (context, state) => const AppLockSettingsScreen(),
     ),
     GoRoute(
       path: '/archive-tools',
