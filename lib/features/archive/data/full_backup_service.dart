@@ -63,7 +63,7 @@ class FullBackupService {
       }
 
       final safeName = _safeFilename(attachment.filename);
-      final archivePath = 'attachments/$' + 'attachment.id/' + safeName;
+      final archivePath = 'attachments/' + attachment.id + '/' + safeName;
       zip.addFile(ArchiveFile(archivePath, bytes.length, bytes));
 
       manifestAttachments.add({
@@ -193,8 +193,7 @@ class FullBackupService {
         throw const FormatException('Backup attachment fields are invalid.');
       }
 
-      final expectedPath =
-          'attachments/$' + 'id/' + _safeFilename(filename);
+      final expectedPath = 'attachments/' + id + '/' + _safeFilename(filename);
       if (archivePath != expectedPath) {
         throw const FormatException('Backup attachment path does not match its ID.');
       }
