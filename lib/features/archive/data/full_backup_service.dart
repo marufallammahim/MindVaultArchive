@@ -51,7 +51,7 @@ class FullBackupService {
       final source = File(attachment.localPath);
       if (!await source.exists()) {
         throw StateError(
-          'Attachment "${{attachment.filename}" is missing. Backup stopped '
+          'Attachment "' + attachment.filename + '" is missing. Backup stopped '
           'to avoid creating an incomplete archive.',
         );
       }
@@ -70,7 +70,7 @@ class FullBackupService {
         'id': attachment.id,
         'noteId': attachment.noteId,
         'type': attachment.type,
-        'filename': attachment.filename,
+        'filename': p.basename(attachment.filename),
         'duration': attachment.duration,
         'documentPosition': attachment.documentPosition,
         'createdAt': attachment.createdAt.toUtc().toIso8601String(),
@@ -227,7 +227,7 @@ class FullBackupService {
     try {
       for (final item in prepared) {
         final uniqueName =
-            '${{item.id}_' + const Uuid().v4() + '_' + _safeFilename(item.filename);
+            item.id + '_' + const Uuid().v4() + '_' + _safeFilename(item.filename);
         final target = File(p.join(attachmentDirectory.path, uniqueName));
         await target.writeAsBytes(item.bytes, flush: true);
         createdFiles[item.id] = target;
