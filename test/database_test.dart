@@ -31,6 +31,19 @@ void main() {
     },
   );
 
+  test('tags can be assigned to notes and safely deleted', () async {
+    await database.saveTag('important', 'Important');
+    await database.setNoteTags('tagged-note', ['important']);
+    var links = await database.select(database.noteTags).get();
+    expect(links.single.noteId, 'tagged-note');
+    expect(links.single.tagId, 'important');
+
+    await database.deleteTag('important');
+    links = await database.select(database.noteTags).get();
+    expect(links, isEmpty);
+    expect(await database.select(database.tags).get(), isEmpty);
+  });
+
   test('note category assignment validates and persists', () async {
     await database.saveCategory('ideas', 'Ideas');
     await database.setNoteCategory('note-category', 'ideas');
