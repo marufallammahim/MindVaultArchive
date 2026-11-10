@@ -1,53 +1,67 @@
 # Build Verification Report
 
-Date: 2026-11-10
+Updated: 2026-11-10
 
-## Environment
-- Python 3.13: available; used to generate, validate, and package the project.
-- Java: OpenJDK 21 available.
-- Flutter SDK: unavailable in the build environment.
-- Dart SDK: unavailable.
-- Android SDK: not detected.
-- iOS/Xcode: unavailable (Linux environment).
+## Scope
+This report describes the repository state on `feature/mindvault-archive-implementation`.
+It does not claim that an APK or AAB has been built successfully.
 
-## Checks actually performed
-- Generated 73 source, configuration, test, documentation, and branding files.
-- Parsed pubspec.yaml, analysis_options.yaml, and all three GitHub Actions workflow YAML files.
-- Parsed Android manifest/styles, iOS Info.plist/storyboard, generated SVG illustration, and native preparation scripts.
-- Verified required source/configuration paths, Android package ID, iOS microphone usage description, and branding assets.
-- ZIP integrity and required-path checks passed.
+## Environment limitation
+Flutter, Dart, Android SDK, and Xcode are not available through the GitHub
+connector execution environment used for these edits. No local Flutter
+compilation, analyzer, formatter, or device test is claimed.
 
-## Flutter/Dart/build results
-| Check | Result |
+## Changes committed in this repair pass
+- Added `tool/regenerate_platforms.sh`. CI regenerates native scaffolding
+  when Android Gradle wrapper/settings or the iOS Xcode project are missing.
+- The script enforces Android application ID and iOS bundle ID
+  `com.marufallammahim.mindvaultarchive`, and adds microphone permission /
+  usage disclosure.
+- Added a Flutter unit test for light/dark Material 3 theme configuration.
+- Fixed CI formatting commands so they do not reference a missing
+  `integration_test/` directory.
+- Added Drift code generation to Android CI and Android build jobs before
+  compilation so `database.g.dart` is generated.
+- Implemented local title/body search on the home screen.
+- Connected Settings theme selection to app-wide Riverpod theme state.
+- Fixed the editor loading race so the asynchronous database read completes
+  before controllers initialize and saving is enabled.
+
+## Current implementation status
+Implemented:
+- Flutter app entry point, routing, splash, home, editor, settings, and about.
+- Drift SQLite schema for notes, categories, and attachment metadata.
+- Debounced note auto-save.
+- Local title/content search.
+- Light, dark, and system theme selection (currently session-only).
+- Drawing canvas UI with undo/redo/clear controls.
+
+Still incomplete:
+- Drawing export, persistence, attachment preview, and reopening an existing
+  drawing are not implemented.
+- Voice recording and inline audio playback are not yet wired into the editor;
+  dependencies are present but this feature is incomplete.
+- Category/tag management screens and category assignment are incomplete.
+- Favorites, archive, trash, restore, and permanent-delete flows are not yet
+  exposed as complete user workflows.
+- Backup/restore including attachment files is not implemented.
+- Rich-text editing is currently a plain text editor.
+- Bengali localization is incomplete.
+- A full integration-test suite is not present.
+
+## Automated checks
+| Check | Status |
 |---|---|
-| flutter pub get | Not run — Flutter unavailable |
-| dart format | Not run — Dart unavailable |
-| flutter analyze | Not run — Flutter unavailable |
-| flutter test | Not run — Flutter unavailable |
-| Android debug APK | Not built locally |
-| Android release APK | Not built locally |
-| Android AAB | Not built locally |
-| iOS build | Not run — Xcode unavailable |
+| GitHub source updates | Committed successfully |
+| Flutter dependency resolution | Not run here |
+| Dart formatting | Not run here |
+| Flutter analyze | Not run here |
+| Flutter unit tests | Not run here |
+| Android debug APK | Not built here |
+| Android release APK | Not built here |
+| Android App Bundle | Not built here |
+| iOS build | Not run here |
 
-## Implemented foundation
-- SQLite note storage and debounced editor auto-save.
-- Home dashboard, search, favorites, archive, trash/restore, and permanent-delete confirmation.
-- Category management.
-- Local voice recording and audio attachment records.
-- CustomPainter drawing canvas with local stroke storage.
-- Light/dark/system theme selection.
-- JSON export/import for notes and categories.
-- User-provided logo integration.
-- Android CI, Android APK/AAB artifact workflow, code-quality workflow.
-
-## Known limitations
-- Rich formatting is lightweight Markdown-style insertion, not a complete WYSIWYG engine.
-- Tags do not yet have a complete database relationship or management UI.
-- Recording pause/resume and waveform controls are incomplete.
-- Existing drawings cannot yet be reopened into an editable stroke session.
-- Backup does not bundle audio/drawing files.
-- Bengali translation catalog is incomplete.
-- Workflows have not yet been run on GitHub.
-
-## Native project generation
-The CI workflows invoke tool/regenerate_platforms.sh to generate full Android/iOS scaffolding using the Flutter SDK, then apply app identity, permissions, and branding. A successful GitHub Actions run is still required to validate actual builds.
+The three GitHub Actions workflows are configured for branch pushes, pull
+requests, and manual dispatch. A successful GitHub Actions run is still
+required before this project can be described as build-verified.
