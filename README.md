@@ -15,24 +15,27 @@ and SQLite.
 - Local SQLite notes with title/body search.
 - Note editing with debounced auto-save, retryable save errors and save-before-exit.
 - Favorites, archive, trash, restore and permanent deletion.
-- Category create, rename and safe delete.
+- Category create, rename, delete, note assignment and category filtering.
 - Local drawing canvas and drawing attachment metadata.
+- Offline tasks with due dates, priorities and completion state.
+- Starter templates for journals, meetings, projects, study and developer notes.
 - Light, dark and system theme preference.
-- Versioned JSON transfer for notes and categories.
-- Import validation, transactional writes and duplicate note-ID protection.
+- Versioned JSON transfer v2 for notes, categories and tasks.
+- Import validation, transactional writes and duplicate record protection.
 - Flutter CI for formatting, analysis, tests and Android debug builds.
 
 ## Important archive-transfer limitation
-The JSON transfer v1 includes note and category metadata/content but does not
-include attachment file bytes, audio, drawings or other binary assets. It is
-not yet a full archive backup. See [Backup and Restore](docs/BACKUP_RESTORE.md).
+The JSON transfer includes note, category and task content/metadata but does
+not include attachment file bytes, audio, drawings or other binary assets. It
+is not yet a full archive backup. See [Backup and Restore](docs/BACKUP_RESTORE.md).
 
 ## Not yet implemented
 Remote synchronization, cloud backup, encrypted database/attachments, app lock,
-rich block editor, full Bengali localization, OCR/PDF indexing, audio recording,
-tasks/reminders, backlinks/knowledge graph, collaboration and AI archive search.
-No cloud or AI provider is configured. See [Feature Specification](docs/FEATURE_SPECIFICATION.md)
-and [Roadmap](docs/ROADMAP.md) for the accurate status.
+rich block editor, tags, nested notebooks, full Bengali localization, OCR/PDF
+indexing, audio recording, reminders/notifications, backlinks/knowledge graph,
+collaboration and AI archive search. No cloud or AI provider is configured.
+See [Feature Specification](docs/FEATURE_SPECIFICATION.md) and
+[Roadmap](docs/ROADMAP.md) for accurate status.
 
 ## Setup
 ```bash
@@ -49,8 +52,8 @@ flutter test
 flutter build apk --debug
 ```
 
-The `Android CI` workflow runs these checks on pushes and pull requests. Use
-the GitHub Actions result for the exact commit to confirm the outcome.
+The `Android CI` workflow runs on pushes and pull requests. Use the GitHub
+Actions result for the exact commit to confirm the outcome.
 
 ## Android production release
 Production release builds require your own private Android signing keystore.
