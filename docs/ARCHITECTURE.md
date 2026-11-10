@@ -31,7 +31,9 @@ Do not delete or recreate the user's database during an application upgrade.
 - Global search loads local notes, categories, tags, note-tag relations and
   tasks, then performs case-insensitive substring matching on-device.
 - Archive transfer validates the document before opening a transaction and
-  protects existing note/task IDs from overwrite.
+  protects existing note/task IDs from overwrite. Full ZIP backup verifies
+  attachment checksums and restores files to new app-private paths; attachment
+  metadata is inserted within the archive import transaction.
 
 ## Transfer and attachment boundary
 
