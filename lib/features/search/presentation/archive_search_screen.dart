@@ -105,7 +105,8 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                   },
                   icon: const Icon(Icons.close),
                 ),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
               ),
             ),
           ),

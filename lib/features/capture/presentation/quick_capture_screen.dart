@@ -134,7 +134,10 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
               hintText: 'Give this thought a title…',
               border: InputBorder.none,
             ),
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.7),
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.7),
           ),
           const Divider(),
           TextField(

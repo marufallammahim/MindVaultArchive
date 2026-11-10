@@ -131,7 +131,12 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                   'text';
               return Card(
                   child: ListTile(
-                leading: const CircleAvatar(backgroundColor: Theme.of(context).colorScheme.primaryContainer, foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer, child: Icon(Icons.code)),
+                leading: const CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    child: Icon(Icons.code)),
                 title: Text(note.title.substring(7),
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 subtitle: Text(language),

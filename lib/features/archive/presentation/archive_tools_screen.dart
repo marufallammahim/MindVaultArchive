@@ -199,7 +199,10 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
         children: [
           Text(
             'Full device backup',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -222,7 +225,10 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           const Divider(height: 28),
           Text(
             'Portable JSON transfer',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
           ),
           const SizedBox(height: 8),
           const Text(

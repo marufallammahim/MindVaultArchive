@@ -441,11 +441,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               TextField(
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.8, height: 1.12),
-                decoration: const InputDecoration(hintText: 'Give this note a title', border: InputBorder.none, contentPadding: EdgeInsets.symmetric(vertical: 12)),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                    height: 1.12),
+                decoration: const InputDecoration(
+                    hintText: 'Give this note a title',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12)),
                 maxLines: null,
               ),
               StreamBuilder<List<Category>>(

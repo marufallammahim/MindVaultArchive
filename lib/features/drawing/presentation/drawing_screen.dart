@@ -109,8 +109,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
         ),
         body: Signature(
           controller: _controller,
-          backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerLow,
+          backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(

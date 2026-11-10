@@ -69,7 +69,12 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                   final entry = entries[index];
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(backgroundColor: Theme.of(context).colorScheme.primaryContainer, foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer, child: Icon(entry.icon)),
+                    leading: CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).colorScheme.primaryContainer,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimaryContainer,
+                        child: Icon(entry.icon)),
                     title: Text(entry.title,
                         maxLines: 1, overflow: TextOverflow.ellipsis),
                     subtitle: Text(
