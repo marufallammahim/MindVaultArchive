@@ -9,6 +9,7 @@ import 'package:mindvault_archive/features/archive/presentation/archive_tools_sc
 import 'package:mindvault_archive/features/tasks/presentation/tasks_screen.dart';
 import 'package:mindvault_archive/features/templates/presentation/templates_screen.dart';
 import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
+import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -38,6 +39,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/capture',
       builder: (context, state) => const QuickCaptureScreen(),
+    ),
+    GoRoute(
+      path: '/tags',
+      builder: (context, state) => const TagsScreen(),
     ),
     GoRoute(
       path: '/archive-tools',
