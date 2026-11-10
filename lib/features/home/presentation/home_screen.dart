@@ -205,6 +205,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             ListTile(
+              leading: const Icon(Icons.auto_awesome_outlined),
+              title: const Text('Templates'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/templates');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.checklist_rounded),
               title: const Text('Tasks'),
               onTap: () {
