@@ -82,12 +82,26 @@ void main() {
             'sortOrder': 2,
           }
         ],
+        'tasks': [
+          {
+            'id': 'task-imported',
+            'title': 'Imported task',
+            'details': 'Imported details',
+            'dueAt': null,
+            'priority': 2,
+            'isCompleted': false,
+            'createdAt': DateTime.utc(2026).toIso8601String(),
+            'updatedAt': DateTime.utc(2026).toIso8601String(),
+            'completedAt': null,
+          }
+        ],
       },
     };
 
     final result = await transfer.importJson(jsonEncode(archive));
     expect(result.imported, 1);
     expect(result.skipped, 1);
+    expect(result.importedTasks, 1);
 
     final existing = await (database.select(database.notes)
           ..where((note) => note.id.equals('same-id')))
@@ -98,6 +112,10 @@ void main() {
         .getSingle();
     expect(imported.categoryId, 'work');
     expect(imported.isFavorite, isTrue);
+    final importedTask = await (database.select(database.tasks)
+          ..where((task) => task.id.equals('task-imported')))
+        .getSingle();
+    expect(importedTask.title, 'Imported task');
   });
 
   test('rejects invalid archive before changing local data', () async {
