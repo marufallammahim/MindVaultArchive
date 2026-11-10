@@ -14,18 +14,19 @@ and SQLite.
 ## Current features
 - Local SQLite notes with title/body search.
 - Note editing with debounced auto-save, retryable save errors and save-before-exit.
-- Favorites, archive, trash, restore and permanent deletion.
+- Favorites, pinning, archive, trash, restore and permanent deletion.
 - Category create, rename, delete, note assignment and category filtering.
 - Tag management and multi-tag note assignment.
 - Per-note color palette and tinted note cards.
 - Quick Capture for ideas and thoughts.
+- Lightweight `[[Note title]]` links and live backlinks.
 - Local drawing canvas and drawing attachment metadata.
 - Offline tasks with due dates, priorities and completion state.
 - Starter templates for journals, meetings, projects, study and developer notes.
 - Light, dark and system theme preference.
 - Versioned JSON transfer v3 for notes, categories, tags, tag links and tasks.
 - Import validation, transactional writes and duplicate record protection.
-- Flutter CI for formatting, analysis, tests and Android debug builds.
+- Flutter CI for formatting, analysis, tests and Android builds.
 
 ## Important archive-transfer limitation
 The JSON transfer includes note, category, tag and task content/metadata but
@@ -35,8 +36,8 @@ It is not yet a full archive backup. See [Backup and Restore](docs/BACKUP_RESTOR
 ## Not yet implemented
 Remote synchronization, cloud backup, encrypted database/attachments, app lock,
 rich block editor, nested notebooks, full Bengali localization, OCR/PDF
-indexing, audio recording, reminders/notifications, backlinks/knowledge graph,
-collaboration and AI archive search. No cloud or AI provider is configured.
+indexing, audio recording, reminders/notifications, visual boards, collaboration
+and AI archive search. No cloud or AI provider is configured.
 See [Feature Specification](docs/FEATURE_SPECIFICATION.md) and
 [Roadmap](docs/ROADMAP.md) for accurate status.
 
