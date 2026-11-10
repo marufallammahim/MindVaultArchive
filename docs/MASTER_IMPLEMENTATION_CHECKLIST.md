@@ -6,7 +6,7 @@ Use `[x]` only when evidence exists in code/tests/docs. A category is not comple
 - [x] Existing repository and feature branch access verified.
 - [ ] Complete all master specification documents and gate review.
 - [ ] Architecture and navigation decisions reconciled with current source.
-- [ ] Database schema/relationships, FK policy, indexes and migrations audited.
+- [x] Database schema/relationships, FK policy, indexes and migration chain audited in source; migration fixtures remain outstanding.
 - [ ] Data-safe migration and backup recovery tests.
 - [ ] Design tokens and shared component contract.
 - [ ] Core note CRUD, autosave, draft recovery and editor acceptance tests.
