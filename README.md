@@ -23,8 +23,8 @@ and SQLite.
 - Drawing canvas with local PNG attachment metadata.
 - Home search plus global offline search across notes, categories, tags and tasks.
 - System/light/dark theme preference and Material 3 burgundy branding.
-- Versioned JSON archive v5 for notes, categories, tags, tag links, tasks and
-  note revisions; v1-v4 remain importable.
+- Versioned JSON archive v5 for notes, categories, tags, tag links, note-linked
+  tasks and note revisions; v1-v4 remain importable.
 - Transactional import validation and duplicate record protection.
 
 ## Important limitations
