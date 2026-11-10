@@ -1,12 +1,7 @@
 name: Temporary Dart Format Repair
 
 on:
-  push:
-    branches:
-      - feature/ultimate-all-in-one-mindvault
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: write

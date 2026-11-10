@@ -13,6 +13,9 @@ import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 import 'package:mindvault_archive/features/history/presentation/revision_history_screen.dart';
 import 'package:mindvault_archive/features/search/presentation/archive_search_screen.dart';
 import 'package:mindvault_archive/features/security/presentation/app_lock_settings_screen.dart';
+import 'package:mindvault_archive/features/insights/presentation/archive_insights_screen.dart';
+import 'package:mindvault_archive/features/timeline/presentation/archive_timeline_screen.dart';
+import 'package:mindvault_archive/features/developer/presentation/developer_notebook_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -65,5 +68,14 @@ final appRouter = GoRouter(
       path: '/archive-tools',
       builder: (context, state) => const ArchiveToolsScreen(),
     ),
+    GoRoute(
+        path: '/insights',
+        builder: (context, state) => const ArchiveInsightsScreen()),
+    GoRoute(
+        path: '/timeline',
+        builder: (context, state) => const ArchiveTimelineScreen()),
+    GoRoute(
+        path: '/developer-notebook',
+        builder: (context, state) => const DeveloperNotebookScreen()),
   ],
 );

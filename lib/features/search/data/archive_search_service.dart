@@ -38,8 +38,19 @@ class ArchiveSearchService {
     if (query.isEmpty) return const [];
 
     final safeLimit = limit.clamp(1, 500).toInt();
-    final ftsQuery = _toFtsQuery(query);
-    final likeQuery = '%${query.toLowerCase()}%';
+    // SQL wildcard characters are meaningful only to the metadata LIKE
+    // query below. Do not pass them through FTS tokenization, where they can
+    // be treated as token separators and produce unrelated prefix matches.
+    final hasLikeWildcard = RegExp(r'[%_\\\\]').hasMatch(query);
+    final ftsQuery = hasLikeWildcard ? '' : _toFtsQuery(query);
+    // LIKE treats '%' and '_' as wildcards. Escape user input so metadata
+    // searches behave as literal substring matches, just like FTS search.
+    final escapedQuery = query
+        .toLowerCase()
+        .replaceAll('\\', '\\\\')
+        .replaceAll('%', '\\%')
+        .replaceAll('_', '\\_');
+    final likeQuery = '%$escapedQuery%';
 
     final noteConditions = <String>[];
     final noteVariables = <Variable<Object>>[];
@@ -50,8 +61,8 @@ class ArchiveSearchService {
       noteVariables.add(Variable.withString(ftsQuery));
     }
     noteConditions
-      ..add('LOWER(categories.name) LIKE ?')
-      ..add('LOWER(tags.name) LIKE ?');
+      ..add('LOWER(categories.name) LIKE ? ESCAPE char(92)')
+      ..add('LOWER(tags.name) LIKE ? ESCAPE char(92)');
     noteVariables
       ..add(Variable.withString(likeQuery))
       ..add(Variable.withString(likeQuery));
@@ -163,7 +174,11 @@ class ArchiveSearchService {
         .trim()
         .split(RegExp(r'\s+'))
         .map((term) => term.replaceAll('"', '').trim())
-        .where((term) => term.isNotEmpty)
+        .where(
+          (term) =>
+              term.isNotEmpty &&
+              RegExp(r'[A-Za-z0-9\u0080-\uFFFF]').hasMatch(term),
+        )
         .map((term) => '"$term"*');
     return terms.join(' AND ');
   }

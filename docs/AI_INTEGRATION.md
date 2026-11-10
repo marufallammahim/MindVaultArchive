@@ -1,11 +1,24 @@
 # AI Integration
 
-No AI provider is currently configured or called by the application.
+**Status:** Architecture only; no provider is configured.
 
-A future integration must use provider interfaces and explicit per-request
-consent before note contents leave the device. Locked/private content must not
-be transmitted. API credentials must be user-configured and stored securely.
-Answers grounded in the archive must cite note IDs/titles and distinguish
-retrieved source text from model-generated conclusions.
+## Interfaces
 
-Core notes, search and editing must remain usable with AI disabled or offline.
+- `AIProvider`: generate text, summarize, answer with supplied context and report model/capabilities.
+- `EmbeddingProvider`: create embeddings for explicitly selected content.
+- `ContextRetriever`: retrieve authorized local notes and return source IDs/snippets.
+- `AIConsentPolicy`: verify user consent for the provider and scope before any external transmission.
+
+## Workflow
+
+User request → consent and privacy checks → retrieve permitted note context → provider request → validate response/source references → show answer with citations → user may open original notes. AI output must be visually distinguishable from source text.
+
+## Rules
+
+- AI is optional; local notes/search continue if unavailable.
+- Locked notes and unauthorized records are excluded.
+- Never transmit archive-wide content by default.
+- Never fabricate source references; each citation must resolve to a note.
+- API keys use secure storage and are never logged.
+- Provide provider selection, local-only mode, history deletion and consent revocation.
+- Local AI requires model/runtime resources and device capability verification; do not promise compatibility without testing.

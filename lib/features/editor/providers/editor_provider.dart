@@ -64,10 +64,16 @@ class EditorNotifier extends StateNotifier<EditorState> {
         state = state.copyWith(
           title: note.title,
           content: note.documentContent,
+          isSaving: false,
           isLoaded: true,
+          clearSaveError: true,
         );
       } else {
-        state = state.copyWith(isLoaded: true);
+        state = state.copyWith(
+          isSaving: false,
+          isLoaded: true,
+          clearSaveError: true,
+        );
       }
     } catch (error) {
       if (mounted) {
@@ -79,7 +85,12 @@ class EditorNotifier extends StateNotifier<EditorState> {
     }
   }
 
-  Future<void> reloadFromDatabase() => _loadNote();
+  Future<void> reloadFromDatabase() async {
+    // An older debounce must never overwrite a revision restored elsewhere.
+    _debounce?.cancel();
+    await _saveQueue;
+    await _loadNote();
+  }
 
   void updateContent(String title, String content) {
     if (!mounted) return;
