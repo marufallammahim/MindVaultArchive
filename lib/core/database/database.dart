@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -73,6 +74,18 @@ class NoteTags extends Table {
   Set<Column> get primaryKey => {noteId, tagId};
 }
 
+@DataClassName('NoteRevision')
+class NoteRevisions extends Table {
+  TextColumn get id => text()();
+  TextColumn get noteId => text()();
+  TextColumn get title => text()();
+  TextColumn get documentContent => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DataClassName('Attachment')
 class Attachments extends Table {
   TextColumn get id => text()();
@@ -89,12 +102,12 @@ class Attachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Notes, Categories, Attachments, Tasks, Tags, NoteTags])
+@DriftDatabase(tables: [Notes, Categories, Attachments, Tasks, Tags, NoteTags, NoteRevisions])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -106,6 +119,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 3) {
             await m.createTable(tags);
             await m.createTable(noteTags);
+          }
+          if (from < 4) {
+            await m.createTable(noteRevisions);
           }
         },
         beforeOpen: (details) async {
@@ -294,8 +310,21 @@ class AppDatabase extends _$AppDatabase {
   Future<void> permanentlyDeleteNote(String id) {
     return transaction(() async {
       await (delete(attachments)..where((item) => item.noteId.equals(id))).go();
+      await (delete(noteTags)..where((item) => item.noteId.equals(id))).go();
+      await (delete(noteRevisions)..where((item) => item.noteId.equals(id))).go();
       await (delete(notes)..where((note) => note.id.equals(id))).go();
     });
+  }
+
+  Future<void> restoreRevision(String noteId, String revisionId) async {
+    final revision = await (select(noteRevisions)
+          ..where((item) =>
+              item.id.equals(revisionId) & item.noteId.equals(noteId)))
+        .getSingleOrNull();
+    if (revision == null) {
+      throw ArgumentError.value(revisionId, 'revisionId', 'Revision not found.');
+    }
+    await saveNoteContent(noteId, revision.title, revision.documentContent);
   }
 
   Future<void> saveCategory(String id, String name) async {
@@ -331,6 +360,28 @@ class AppDatabase extends _$AppDatabase {
       )..where((t) => t.id.equals(id)))
           .getSingleOrNull();
       if (existing != null) {
+        if (existing.title != title || existing.documentContent != content) {
+          await into(noteRevisions).insert(
+            NoteRevisionsCompanion.insert(
+              id: const Uuid().v4(),
+              noteId: id,
+              title: existing.title,
+              documentContent: existing.documentContent,
+            ),
+          );
+          final history = await (select(noteRevisions)
+                ..where((revision) => revision.noteId.equals(id))
+                ..orderBy([
+                  (revision) => OrderingTerm.desc(revision.createdAt),
+                ]))
+              .get();
+          if (history.length > 30) {
+            final expiredIds = history.skip(30).map((item) => item.id).toList();
+            await (delete(noteRevisions)
+                  ..where((revision) => revision.id.isIn(expiredIds)))
+                .go();
+          }
+        }
         await update(notes).replace(
           existing.copyWith(
             title: title,
