@@ -138,6 +138,35 @@ class AppDatabase extends _$AppDatabase {
     return (delete(tasks)..where((task) => task.id.equals(id))).go();
   }
 
+  Future<void> setNoteCategory(String noteId, String? categoryId) async {
+    if (categoryId != null) {
+      final category = await (select(categories)
+            ..where((item) => item.id.equals(categoryId)))
+          .getSingleOrNull();
+      if (category == null) {
+        throw ArgumentError.value(categoryId, 'categoryId', 'Category not found.');
+      }
+    }
+    final existing = await (select(notes)
+          ..where((note) => note.id.equals(noteId)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await into(notes).insert(
+        NotesCompanion.insert(
+          id: noteId,
+          categoryId: Value(categoryId),
+        ),
+      );
+    } else {
+      await (update(notes)..where((note) => note.id.equals(noteId))).write(
+        NotesCompanion(
+          categoryId: Value(categoryId),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+    }
+  }
+
   Future<void> setFavorite(String id, bool value) {
     return (update(notes)..where((note) => note.id.equals(id))).write(
       NotesCompanion(
