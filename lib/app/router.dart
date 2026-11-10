@@ -68,8 +68,14 @@ final appRouter = GoRouter(
       path: '/archive-tools',
       builder: (context, state) => const ArchiveToolsScreen(),
     ),
-    GoRoute(path: '/insights', builder: (context, state) => const ArchiveInsightsScreen()),
-    GoRoute(path: '/timeline', builder: (context, state) => const ArchiveTimelineScreen()),
-    GoRoute(path: '/developer-notebook', builder: (context, state) => const DeveloperNotebookScreen()),
+    GoRoute(
+        path: '/insights',
+        builder: (context, state) => const ArchiveInsightsScreen()),
+    GoRoute(
+        path: '/timeline',
+        builder: (context, state) => const ArchiveTimelineScreen()),
+    GoRoute(
+        path: '/developer-notebook',
+        builder: (context, state) => const DeveloperNotebookScreen()),
   ],
 );

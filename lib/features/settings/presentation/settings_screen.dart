@@ -136,7 +136,8 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.insights_outlined),
             title: const Text('Archive insights'),
-            subtitle: const Text('Review archive health, duplicate titles and broken links'),
+            subtitle: const Text(
+                'Review archive health, duplicate titles and broken links'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/insights'),
           ),
