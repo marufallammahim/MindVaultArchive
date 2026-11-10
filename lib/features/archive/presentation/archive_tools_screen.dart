@@ -56,7 +56,7 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
       if (!mounted) return;
       _importController.clear();
       _showMessage(
-        'Imported ${result.imported} notes, ${result.importedTasks} tasks and ${result.importedTags} tags; skipped ${result.skipped} notes, ${result.skippedTasks} tasks and ${result.skippedTags} existing tags.',
+        'Imported ${result.imported} notes, ${result.importedTasks} tasks, ${result.importedTags} tags and ${result.importedRevisions} revisions; skipped ${result.skipped} notes, ${result.skippedTasks} tasks, ${result.skippedTags} tags and ${result.skippedRevisions} revisions.',
       );
     } on FormatException catch (error) {
       _showMessage('Archive not imported: ${error.message}');
@@ -138,7 +138,7 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           ],
           const SizedBox(height: 20),
           const Text(
-            'Format v3 includes notes, categories, tags, tasks, timestamps, archive/trash '
+            'Format v4 includes notes, categories, tags, tasks, revisions, timestamps, archive/trash '
             'state, favorites and note colors. Attachment file bytes, audio, '
             'drawings and other binary assets are not included yet.',
           ),
