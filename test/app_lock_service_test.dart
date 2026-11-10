@@ -16,18 +16,6 @@ class _MemorySecureStore implements SecureValueStore {
   Future<void> delete(String key) async {
     values.remove(key);
   }
-  test('temporarily locks after five incorrect PIN attempts', () async {
-    final service = AppLockService(store: _MemorySecureStore());
-    await service.setPin('593817');
-
-    for (var attempt = 0; attempt < 5; attempt++) {
-      expect(await service.verifyPin('000000'), isFalse);
-    }
-
-    expect(await service.lockoutRemaining(), isNotNull);
-    expect(await service.verifyPin('593817'), isFalse);
-  });
-
 }
 
 void main() {
@@ -58,5 +46,17 @@ void main() {
     await service.disablePin('731904');
     expect(await service.isEnabled(), isFalse);
     expect(await service.verifyPin('731904'), isFalse);
+  });
+
+  test('temporarily locks after five incorrect PIN attempts', () async {
+    final service = AppLockService(store: _MemorySecureStore());
+    await service.setPin('593817');
+
+    for (var attempt = 0; attempt < 5; attempt++) {
+      expect(await service.verifyPin('000000'), isFalse);
+    }
+
+    expect(await service.lockoutRemaining(), isNotNull);
+    expect(await service.verifyPin('593817'), isFalse);
   });
 }
