@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 
-/// Portable, versioned JSON transfer for notes, categories and tasks.
+/// Portable, versioned JSON transfer for notes, categories, tags, tasks and revisions.
 ///
-/// Format v3 includes task records, tags and note-tag links; attachment file bytes are still excluded. It never
+/// Format v4 includes note revision history; attachment file bytes are still excluded. It never
 /// serializes private device paths, and import never overwrites existing notes.
 class ArchiveTransferService {
   ArchiveTransferService(this._database);
@@ -86,7 +86,7 @@ class ArchiveTransferService {
             .toList(),
       },
       'limitations': <String>[
-        'Attachment file bytes are not included in format version 3.',
+        'Attachment file bytes are not included in format version 4.',
       ],
     };
 
@@ -103,6 +103,7 @@ class ArchiveTransferService {
         decoded['format'] != formatName ||
         (decoded['version'] != 1 &&
             decoded['version'] != 2 &&
+            decoded['version'] != 3 &&
             decoded['version'] != formatVersion)) {
       throw const FormatException('Unsupported MindVault archive format.');
     }
@@ -122,7 +123,8 @@ class ArchiveTransferService {
         rawNotes is! List ||
         rawTasks is! List ||
         rawTags is! List ||
-        rawNoteTags is! List) {
+        rawNoteTags is! List ||
+        rawRevisions is! List) {
       throw const FormatException('Archive categories or notes are invalid.');
     }
 
