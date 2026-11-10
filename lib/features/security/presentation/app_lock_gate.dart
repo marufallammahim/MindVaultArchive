@@ -10,8 +10,7 @@ class AppLockGate extends StatefulWidget {
   State<AppLockGate> createState() => _AppLockGateState();
 }
 
-class _AppLockGateState extends State<AppLockGate>
-    with WidgetsBindingObserver {
+class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   final _service = AppLockService();
   bool _loading = true;
   bool _enabled = false;
@@ -95,9 +94,7 @@ class _AppLockGateState extends State<AppLockGate>
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Material(
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return const Material(child: Center(child: CircularProgressIndicator()));
     }
     if (_storageError) {
       return Scaffold(
@@ -250,9 +247,7 @@ class _UnlockScreenState extends State<_UnlockScreen> {
                           ? const SizedBox(
                               width: 18,
                               height: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Text('Unlock'),
                     ),

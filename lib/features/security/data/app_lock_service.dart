@@ -11,9 +11,7 @@ abstract interface class SecureValueStore {
 }
 
 class FlutterSecureValueStore implements SecureValueStore {
-  const FlutterSecureValueStore([
-    this._storage = const FlutterSecureStorage(),
-  ]);
+  const FlutterSecureValueStore([this._storage = const FlutterSecureStorage()]);
 
   final FlutterSecureStorage _storage;
 
@@ -34,7 +32,7 @@ class FlutterSecureValueStore implements SecureValueStore {
 /// attachment files, and must never be described as vault encryption.
 class AppLockService {
   AppLockService({SecureValueStore? store})
-      : _store = store ?? const FlutterSecureValueStore();
+    : _store = store ?? const FlutterSecureValueStore();
 
   static const _enabledKey = 'mindvault.app_lock.enabled';
   static const _saltKey = 'mindvault.app_lock.salt';
@@ -44,8 +42,7 @@ class AppLockService {
 
   final SecureValueStore _store;
 
-  Future<bool> isEnabled() async =>
-      await _store.read(_enabledKey) == 'true';
+  Future<bool> isEnabled() async => await _store.read(_enabledKey) == 'true';
 
   Future<void> setPin(String pin) async {
     if (!RegExp(r'^\d{6}$').hasMatch(pin)) {
@@ -139,10 +136,8 @@ class AppLockService {
     try {
       return List<int>.generate(
         32,
-        (index) => int.parse(
-          value.substring(index * 2, index * 2 + 2),
-          radix: 16,
-        ),
+        (index) =>
+            int.parse(value.substring(index * 2, index * 2 + 2), radix: 16),
       );
     } on FormatException {
       return null;

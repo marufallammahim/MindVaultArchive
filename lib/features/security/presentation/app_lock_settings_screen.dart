@@ -11,8 +11,7 @@ class AppLockSettingsScreen extends ConsumerStatefulWidget {
       _AppLockSettingsScreenState();
 }
 
-class _AppLockSettingsScreenState
-    extends ConsumerState<AppLockSettingsScreen> {
+class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
   final _service = AppLockService();
   late Future<bool> _enabledFuture;
 
@@ -72,8 +71,9 @@ class _AppLockSettingsScreenState
       }
     }
 
-    final first =
-        await _askPin(changing ? 'Choose a new PIN' : 'Create app PIN');
+    final first = await _askPin(
+      changing ? 'Choose a new PIN' : 'Create app PIN',
+    );
     if (first == null) {
       _message('Enter exactly six digits.');
       return;
@@ -110,9 +110,7 @@ class _AppLockSettingsScreenState
 
   void _message(String value) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(value)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
   }
 
   @override
