@@ -33,3 +33,29 @@ Branch: `feature/ultimate-all-in-one-mindvault`
 - Source-level review completed for the screens and services listed above.
 - Runtime Flutter analysis, widget tests, Android build, and device QA must be run in CI or a Flutter environment before calling this release-ready.
 - No claim of successful APK generation is made by this audit.
+
+
+## Reference-aligned screen polish pass (2026-11-11)
+
+The following presentation files received screen-level compactness and visual hierarchy refinements while retaining their existing database queries, callbacks, navigation destinations, and save/restore operations:
+- Tasks: denser task cards, reduced gaps/padding, compact card shape, clearer To-do title casing.
+- Quick Capture: refined editor spacing and title hierarchy; draft/save behavior unchanged.
+- Search: compact search header and result spacing; search service and debounce flow unchanged.
+- Tags: denser list layout and theme-role icon treatment; create/rename/delete actions unchanged.
+- Archive Transfer: compact section rhythm and consistent heading hierarchy; backup/import/export services unchanged.
+- Revision History: compact revision list and consistent list spacing; restore action unchanged.
+- Insights: tighter report layout and stronger heading hierarchy; metrics remain computed from local database streams.
+- Timeline: compact chronology spacing and theme-based entry icon surfaces; note navigation unchanged.
+- Developer Notebook: compact snippet list and theme-based icon surface; snippet creation and editor navigation unchanged.
+- About: compact spacing and accent-aware brand icon.
+- Note Editor: cleaner title field, spacing, and category affordance; autosave, attachments, Markdown preview/export, linked tasks, revision restore, drawing, and note-color actions retained.
+- Drawing: refined canvas surface and toolbar spacing; save-to-note attachment flow retained.
+
+## Research basis
+- Flutter adaptive UI guidance recommends measuring available constraints and choosing layouts appropriate to the available space rather than stretching phone layouts across large windows.
+- Material 3 guidance recommends consistent semantic color roles and explicit contrast between foreground and container colors.
+
+## Current verification
+- GitHub source changes are committed to the existing feature branch.
+- The latest Android CI, Code Quality, and Dart formatting runs have been queued for commit `595786325e54293b1ab0be585fa6b122d5ab8d4e`; no successful result is available yet.
+- Individual-device visual QA and screenshot comparison remain outstanding. This pass is a compactness and shared-style refinement, not a claim of pixel-identical replication.
