@@ -59,3 +59,9 @@ The following presentation files received screen-level compactness and visual hi
 - GitHub source changes are committed to the existing feature branch.
 - The latest Android CI, Code Quality, and Dart formatting runs have been queued for commit `595786325e54293b1ab0be585fa6b122d5ab8d4e`; no successful result is available yet.
 - Individual-device visual QA and screenshot comparison remain outstanding. This pass is a compactness and shared-style refinement, not a claim of pixel-identical replication.
+
+
+## CI follow-up after formatter commit
+- GitHub Actions formatter workflow committed the Dart formatting corrections in commit `aac57b6ea24bbf3188f47685889b4f7b3fd54a0e`.
+- The earlier Code Quality and Android CI failures were caused by the formatter check detecting those pending style changes before the formatter workflow's commit landed. They did not reach analyzer, tests, APK build, or artifact upload.
+- A new source commit is being used to trigger fresh validation against the formatted branch head.
