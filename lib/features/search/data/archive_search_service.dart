@@ -56,8 +56,9 @@ class ArchiveSearchService {
       ..add(Variable.withString(likeQuery))
       ..add(Variable.withString(likeQuery));
 
-    final noteRows = await _database.customSelect(
-      '''
+    final noteRows = await _database
+        .customSelect(
+          '''
       SELECT DISTINCT notes.id
       FROM notes
       LEFT JOIN categories ON categories.id = notes.category_id
@@ -68,25 +69,22 @@ class ArchiveSearchService {
       ORDER BY notes.updated_at DESC
       LIMIT ?
       ''',
-      variables: [
-        ...noteVariables,
-        Variable.withInt(safeLimit),
-      ],
-      readsFrom: {
-        _database.notes,
-        _database.categories,
-        _database.noteTags,
-        _database.tags,
-      },
-    ).get();
+          variables: [...noteVariables, Variable.withInt(safeLimit)],
+          readsFrom: {
+            _database.notes,
+            _database.categories,
+            _database.noteTags,
+            _database.tags,
+          },
+        )
+        .get();
 
     final noteIds = noteRows.map((row) => row.read<String>('id')).toList();
     final noteRecords = noteIds.isEmpty
         ? <Note>[]
         : await (_database.select(
             _database.notes,
-          )..where((note) => note.id.isIn(noteIds)))
-            .get();
+          )..where((note) => note.id.isIn(noteIds))).get();
 
     final categories = await _database.select(_database.categories).get();
     final tags = await _database.select(_database.tags).get();
@@ -104,8 +102,9 @@ class ArchiveSearchService {
 
     final results = <ArchiveSearchResult>[];
     for (final note in noteRecords) {
-      final category =
-          note.categoryId == null ? null : categoryById[note.categoryId!];
+      final category = note.categoryId == null
+          ? null
+          : categoryById[note.categoryId!];
       results.add(
         ArchiveSearchResult(
           kind: ArchiveSearchKind.note,
@@ -120,27 +119,29 @@ class ArchiveSearchService {
     }
 
     if (ftsQuery.isNotEmpty) {
-      final taskRows = await _database.customSelect(
-        '''
+      final taskRows = await _database
+          .customSelect(
+            '''
         SELECT task_id
         FROM tasks_fts
         WHERE tasks_fts MATCH ?
         ORDER BY rank
         LIMIT ?
         ''',
-        variables: [
-          Variable.withString(ftsQuery),
-          Variable.withInt(safeLimit),
-        ],
-        readsFrom: {_database.tasks},
-      ).get();
-      final taskIds =
-          taskRows.map((row) => row.read<String>('task_id')).toList();
+            variables: [
+              Variable.withString(ftsQuery),
+              Variable.withInt(safeLimit),
+            ],
+            readsFrom: {_database.tasks},
+          )
+          .get();
+      final taskIds = taskRows
+          .map((row) => row.read<String>('task_id'))
+          .toList();
       if (taskIds.isNotEmpty) {
         final taskRecords = await (_database.select(
           _database.tasks,
-        )..where((task) => task.id.isIn(taskIds)))
-            .get();
+        )..where((task) => task.id.isIn(taskIds))).get();
         for (final task in taskRecords) {
           results.add(
             ArchiveSearchResult(
@@ -181,8 +182,9 @@ class ArchiveSearchService {
       final found = lower.indexOf(term);
       if (found >= 0 && (index < 0 || found < index)) index = found;
     }
-    final start =
-        index < 0 ? 0 : (index - 55).clamp(0, normalized.length).toInt();
+    final start = index < 0
+        ? 0
+        : (index - 55).clamp(0, normalized.length).toInt();
     final end = (start + 180).clamp(0, normalized.length).toInt();
     final prefix = start > 0 ? '…' : '';
     final suffix = end < normalized.length ? '…' : '';

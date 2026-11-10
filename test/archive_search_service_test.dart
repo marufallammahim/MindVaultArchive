@@ -90,20 +90,22 @@ void main() {
     expect(await search.search('replacement'), hasLength(1));
   });
 
-  test('FTS indexes task titles and details and remove deleted tasks',
-      () async {
-    await database.saveTask(
-      id: 'indexed-task',
-      title: 'Prepare release',
-      details: 'Inspect generated artifacts',
-      priority: 1,
-    );
+  test(
+    'FTS indexes task titles and details and remove deleted tasks',
+    () async {
+      await database.saveTask(
+        id: 'indexed-task',
+        title: 'Prepare release',
+        details: 'Inspect generated artifacts',
+        priority: 1,
+      );
 
-    expect(await search.search('generated'), hasLength(1));
+      expect(await search.search('generated'), hasLength(1));
 
-    await database.deleteTask('indexed-task');
-    expect(await search.search('generated'), isEmpty);
-  });
+      await database.deleteTask('indexed-task');
+      expect(await search.search('generated'), isEmpty);
+    },
+  );
 
   test('supports token-prefix matching and a global result limit', () async {
     await database.saveNoteContent(
