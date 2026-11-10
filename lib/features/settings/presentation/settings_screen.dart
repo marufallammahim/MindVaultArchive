@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' show OrderingTerm;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:uuid/uuid.dart';
@@ -193,6 +194,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           const Divider(),
+          ListTile(
+            leading: const Icon(Icons.inventory_2_outlined),
+            title: const Text('Archive transfer'),
+            subtitle: const Text('Export or import a portable JSON archive'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/archive-tools'),
+          ),
+          const SizedBox(height: 8),
           const ListTile(
             title: Text('Storage'),
             subtitle: Text('Notes are stored locally on this device'),
