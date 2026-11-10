@@ -1,46 +1,65 @@
 # MindVault Archive — Execution Resume Checkpoint
 
-This file is the durable hand-off point for interrupted development sessions. Update it after each meaningful commit and before ending a work session.
-
 ## Repository identity
 - Canonical repository: https://github.com/marufallammahim/MindVaultArchive
-- User-supplied URL: https://github.com/marufallammahim/MindVaultArchive-.git (GitHub resolves this to the canonical repository name above).
+- User-supplied URL: https://github.com/marufallammahim/MindVaultArchive-.git (resolves to canonical repository name above).
 - Existing working branch: `feature/ultimate-all-in-one-mindvault`
 - Default branch: `main`
-- Rule: continue on the existing working branch; do not create another branch, do not force-push, do not modify `main` directly.
-- Verified account permission: admin/maintain/push.
-- Last inspected repository commit: `9c3c3ff690627c536670927265f358db21aecdae` (merge commit visible in recent repository history; re-check actual branch head before next write).
+- Rules: continue on the existing working branch; do not create another branch, do not force-push, do not modify `main` directly.
+- Verified GitHub permission: admin/maintain/push.
+- Original branch preserved; no new branch created.
 
-## Product baseline
-Flutter Android app; Riverpod; GoRouter; Drift/SQLite; Android application ID `com.marufallammahim.mindvaultarchive`. Existing documented functionality includes offline notes/autosave, categories/tags, favorites/pin/archive/trash, wikilinks/backlinks, Quick Capture, five templates, note-linked tasks, revisions, Markdown authoring/preview, drawing, FTS5 token/prefix search, optional PIN screen gate, JSON archive and ZIP backup/restore.
+## Product baseline verified
+Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android application ID `com.marufallammahim.mindvaultarchive`. Current code/docs show offline notes/autosave, categories/tags, favorites/pin/archive/trash, title-based wikilinks/backlinks, Quick Capture, five templates, note-linked tasks, revisions, Markdown authoring/preview, drawing, FTS5 note/task search, optional PIN access gate, JSON archive v5 and ZIP backup/restore with SHA-256 attachment checks.
 
-## Known limitations to preserve accurately
-- PIN gate is not database or attachment encryption.
+## Documentation committed on this branch
+- `docs/MASTER_FEATURE_SPECIFICATION.md` — all 22 feature categories and truthful baseline statuses.
+- `docs/FEATURE_SCREEN_MAPPING.md` — screen/workflow inventory and navigation rules.
+- `docs/OFFLINE_ONLINE_FEATURE_MATRIX.md` — local/device/hybrid/backend classification.
+- `docs/MASTER_IMPLEMENTATION_CHECKLIST.md` — P0–P5 checklist and 22-category status.
+- `docs/EXECUTION_STATE.md` — this resumable hand-off checkpoint.
+- `docs/NAVIGATION_ARCHITECTURE.md`
+- `docs/DATABASE_RELATIONSHIPS.md` — distinguishes logical references from SQL-enforced foreign keys.
+- `docs/FLUTTER_DEPENDENCY_PLAN.md`
+- `docs/BACKEND_ARCHITECTURE.md`
+- `docs/SECURITY_ENCRYPTION_ARCHITECTURE.md`
+- `docs/IMPLEMENTATION_ROADMAP.md`
+- `docs/FEATURE_ACCEPTANCE_CRITERIA.md`
+- `docs/SYNC_PROTOCOL.md`
+- `docs/AI_INTEGRATION.md`
+- `docs/API_DOCUMENTATION.md`
+- `docs/DEVELOPMENT_GUIDE.md`
+- Updated `docs/ARCHITECTURE.md` to match the inspected schema v6, FTS5, archive v5 and current routes.
+
+## Known limitations that must not be misreported
+- PIN gate is not database/attachment encryption.
 - No remote sync, cloud AI or collaboration provider is configured.
-- Search is not semantic or OCR search.
+- Search is FTS5 token/prefix search for notes/tasks, not semantic/OCR/PDF search.
 - Editor is not a full WYSIWYG block editor.
-- Notebooks/nested folders, OCR/PDF indexing, calendar/reminders, habits, visual boards and broad third-party importers are incomplete.
-- Database foreign-key coverage and migration safety need a source-level audit.
+- Database relationship references are not yet declared as SQL foreign keys.
+- Notebooks/nested folders, reminders/calendar, OCR/PDF indexing, audio capture/transcription, visual boards, semantic search and broad third-party importers are incomplete.
+- `pubspec.lock` was not found at the inspected branch path; verify tracking and generate/commit it through a real Flutter environment.
+- Existing GoRouter is a flat route list; adaptive shell navigation/route guards are not complete.
 
 ## Work completed in this session
-- Verified canonical repository and write permission.
-- Confirmed existing branch `feature/ultimate-all-in-one-mindvault`; no new branch was created.
-- Inspected current `pubspec.yaml`, README, existing feature specification and roadmap, and searched source inventory.
-- Added master specification, feature-screen mapping, offline/online matrix, master checklist and this resume checkpoint (update this section with resulting commit hashes after successful writes).
+- Verified repository and write permission.
+- Confirmed existing branch and used it; no branch creation.
+- Inspected pubspec, README, feature specification, roadmap, database schema, router, providers, theme, backup docs and Android Gradle config.
+- Committed the master specification and implementation/design documentation listed above.
 
 ## Exact next steps
-1. Re-check branch head and ensure it still points to the expected history before modifying.
-2. Inspect existing docs and source modules: `lib/core/database/database.dart`, schema, router, theme, providers, editor, home, settings, archive services and Android manifest.
-3. Reconcile existing docs (`ARCHITECTURE.md`, `DATABASE_SCHEMA.md`, `DATABASE_RELATIONSHIPS.md`, `BACKUP_RESTORE.md`, `ROADMAP.md`, `UI_DESIGN_SYSTEM.md`) with actual code; do not duplicate existing useful docs.
-4. Complete remaining required documents: `NAVIGATION_ARCHITECTURE.md`, `DATABASE_RELATIONSHIPS.md`, `FLUTTER_DEPENDENCY_PLAN.md`, `BACKEND_ARCHITECTURE.md`, `SECURITY_ENCRYPTION_ARCHITECTURE.md`, `IMPLEMENTATION_ROADMAP.md`, `FEATURE_ACCEPTANCE_CRITERIA.md`, `SYNC_PROTOCOL.md`, `AI_INTEGRATION.md`, `API_DOCUMENTATION.md`, `DEVELOPMENT_GUIDE.md`.
-5. Implement one P0/P1 slice at a time; preserve existing data and test each slice.
-6. Run the exact Flutter verification commands in CI or an available Flutter environment. GitHub file editing alone cannot run Flutter commands; use Actions results or a real Flutter environment.
-7. Commit/push only to the existing branch, verify remote head, and update this checkpoint with commit SHA, tests, artifacts and remaining work.
+1. Verify current remote head on the existing feature branch before the next write.
+2. Inspect all remaining source, tests, Android manifest and actual GitHub workflow files; inspect complete database migrations and FTS query implementation.
+3. Run Flutter commands in a real Flutter environment or inspect actual Actions runs: `flutter pub get`, build_runner, format, analyze, tests and debug APK. Do not infer passing status.
+4. Fix the highest-priority P0 data-integrity issues with migration fixtures before expanding schema.
+5. Implement one tested P0/P1 slice at a time; preserve existing data and update docs/checkpoint with each commit.
+6. Push/verify only the existing feature branch. Never force-push or write directly to main.
 
-## Current verification
-- Repository access: PASS.
-- Existing branch found: PASS.
-- Source-level complete inspection: NOT YET.
-- Flutter commands executed in this session: NONE.
-- Android build generated in this session: NO.
-- Feature implementation beyond documentation in this session: NO.
+## Verification in this session
+- Repository access and push permission: PASS.
+- Existing feature branch found: PASS.
+- Documentation files written on feature branch: PASS (verify latest head before further work).
+- Full source audit: IN PROGRESS.
+- Flutter/Dart commands executed in this session: NONE.
+- Android APK generated in this session: NO.
+- Feature source implementation in this session: NO; this session's repository changes are specification/architecture documentation.
