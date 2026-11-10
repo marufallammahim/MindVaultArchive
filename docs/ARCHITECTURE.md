@@ -18,7 +18,7 @@ Feature-first source layout:
 ## Persistence
 
 The local Drift database is the source of truth. The current schema version is
-5 and includes notes, categories, attachments, tasks, tags, note-tag links and
+6 and includes notes, categories, attachments, tasks, tags, note-tag links and
 note revisions. Tasks may optionally reference a note; permanent note deletion
 clears that reference before removing the note. Schema upgrades are additive and must include migration tests.
 Do not delete or recreate the user's database during an application upgrade.
