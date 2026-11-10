@@ -104,6 +104,20 @@ void main() {
         revisions.any((revision) => revision.title == 'Second title'), isTrue);
   });
 
+  test('revision history is bounded to the latest 30 snapshots', () async {
+    await database.saveNoteContent('bounded-history', 'Version 0', 'Body 0');
+    for (var index = 1; index <= 35; index++) {
+      await database.saveNoteContent(
+        'bounded-history',
+        'Version $index',
+        'Body $index',
+      );
+    }
+    final revisions = await (database.select(database.noteRevisions)
+      ..where((revision) => revision.noteId.equals('bounded-history'))).get();
+    expect(revisions, hasLength(30));
+  });
+
   test('pin state persists and can be cleared', () async {
     await database.saveNoteContent('pin-note', 'Pinned', 'Body');
     await database.setPinned('pin-note', true);
