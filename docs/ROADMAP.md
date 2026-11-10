@@ -10,23 +10,26 @@
 - Per-note color selection, quick capture and drawing canvas.
 - Title-based wikilinks and live backlinks.
 - Version history with bounded retention and restore.
-- Offline tasks with priorities, due dates and completion state.
+- Offline tasks with priorities, due dates, completion and optional note links.
 - Five reusable note starter templates.
-- JSON transfer v4 for notes, categories, tags, note-tag links, tasks and
-  revision history, with v1-v3 import compatibility.
-- Transactional validation and duplicate record protection.
+- Markdown authoring toolbar and selectable rendered preview.
+- Global offline search across notes, categories, tags and tasks.
+- JSON archive v5 for notes, tags, tasks and revisions.
+- Full ZIP backup/restore for attachment bytes with SHA-256 validation.
+- Optional six-digit app access PIN using Android secure storage.
+- Transactional import validation and duplicate record protection.
 
 ## Next engineering milestones
 
-1. Attachment-aware full backup with checksums and safe restore staging.
-2. Nested notebooks and smart views.
-3. Full-text and semantic search with incremental indexing.
-4. Block document editor, markdown preview and version history diff.
-5. Local notifications for task reminders and calendar views.
-6. Local encryption and app lock.
-7. Sync outbox plus a real provider implementation.
-8. OCR/PDF/audio pipelines.
-9. AI provider interfaces with explicit per-request consent.
+1. SQLite FTS5 search, query filters and ranking.
+2. Nested notebooks, smart views and saved searches.
+3. Block editor with drag/drop, tables and embeds.
+4. Local notifications, recurring tasks and calendar views.
+5. Authenticated encryption for the database and attachments, with key recovery.
+6. Biometric unlock as an optional convenience layer.
+7. Sync outbox, conflict resolution and a real provider implementation.
+8. OCR, PDF annotation and audio recording/transcription pipelines.
+9. AI provider interfaces with explicit per-request consent and archive citations.
 10. Visual boards and persistent knowledge graph.
 11. Third-party importers/exporters and collaboration providers.
 12. Complete Bengali localization and accessibility review.
