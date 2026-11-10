@@ -1,0 +1,103 @@
+name: Signed Android Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  signed-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Verify signing secrets are configured
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in KEYSTORE_B64 STORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing GitHub Actions secret for ${name}. Follow docs/ANDROID_RELEASE_SIGNING.md."
+              exit 1
+            fi
+          done
+
+      - name: Restore private signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "$KEYSTORE_B64" | base64 --decode > android/app/upload-keystore.jks
+          test -s android/app/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=$STORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+          chmod 600 android/app/upload-keystore.jks android/key.properties
+
+      - name: Install dependencies and generate Drift code
+        run: |
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Enforce formatting, analyze and test
+        run: |
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze
+          flutter test
+
+      - name: Build signed release APK
+        run: flutter build apk --release
+
+      - name: Build signed Android App Bundle
+        run: flutter build appbundle --release
+
+      - name: Verify APK and AAB signatures
+        run: |
+          set -euo pipefail
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          AAB="build/app/outputs/bundle/release/app-release.aab"
+          test -s "$APK"
+          test -s "$AAB"
+          APKSIGNER="$(find "$ANDROID_SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          jarsigner -verify -verbose -certs "$AAB" >/tmp/aab-signature-check.txt
+          grep -q 'jar verified' /tmp/aab-signature-check.txt
+          mkdir -p dist
+          cp "$APK" dist/MindVaultArchive-release.apk
+          cp "$AAB" dist/MindVaultArchive-release.aab
+          sha256sum dist/* > dist/SHA256SUMS.txt
+          printf 'commit=%s\nversion=%s\n' "$GITHUB_SHA" "$(grep '^version:' pubspec.yaml | awk '{print $2}')" > dist/build-info.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mindvault-archive-signed-release-${{ github.sha }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 90
