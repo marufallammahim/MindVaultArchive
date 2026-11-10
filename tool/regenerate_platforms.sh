@@ -56,6 +56,73 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
   fi
 fi
 
+# Ensure Gradle plugin transitive dependencies can be resolved from the
+# official Google Maven and Maven Central repositories. Flutter's generated
+# settings file may otherwise leave Kotlin DSL/plugin artifacts restricted to
+# the Gradle Plugin Portal on some SDK/Gradle combinations.
+python3 - <<'PY'
+from pathlib import Path
+import re
+
+candidates = [Path("android/settings.gradle"), Path("android/settings.gradle.kts")]
+settings = next((p for p in candidates if p.is_file()), None)
+if settings is None:
+    raise SystemExit("Android settings.gradle(.kts) is missing after scaffolding")
+
+text = settings.read_text(encoding="utf-8")
+start = re.search(r"(?m)^\\s*pluginManagement\\s*\\{", text)
+if not start:
+    raise SystemExit("Could not find pluginManagement block in Android settings")
+
+def matching_brace(source, opening):
+    depth = 0
+    quote = None
+    escaped = False
+    for i in range(opening, len(source)):
+        ch = source[i]
+        if quote:
+            if escaped:
+                escaped = False
+            elif ch == "\\\\":
+                escaped = True
+            elif ch == quote:
+                quote = None
+            continue
+        if ch in ("'", '"'):
+            quote = ch
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return i
+    raise SystemExit("Unbalanced braces in Android settings file")
+
+pm_open = text.find("{", start.start())
+pm_close = matching_brace(text, pm_open)
+block = text[pm_open + 1:pm_close]
+repo_match = re.search(r"(?m)^\\s*repositories\\s*\\{", block)
+if not repo_match:
+    raise SystemExit("Could not find pluginManagement.repositories block")
+repo_open = pm_open + 1 + block.find("{", repo_match.start())
+repo_close = matching_brace(text, repo_open)
+repo_block = text[repo_open + 1:repo_close]
+required = []
+for declaration in ("google()", "mavenCentral()"):
+    if not re.search(r"(?m)^\\s*" + re.escape(declaration) + r"\\s*$", repo_block):
+        required.append("        " + declaration)
+if required:
+    insertion = "\\n" + "\\n".join(required) + "\\n"
+    text = text[:repo_close] + insertion + text[repo_close:]
+    settings.write_text(text, encoding="utf-8")
+print("Gradle plugin repositories verified: Google Maven + Maven Central")
+PY
+
+# Keep root project dependency repositories explicit as well.
+if [[ -f android/build.gradle ]]; then
+  grep -q 'google()' android/build.gradle || sed -i '/allprojects[[:space:]]*{/a\\    repositories { google(); mavenCentral() }' android/build.gradle
+fi
+
 # The app module's compileSdk is pinned to API 36 in
 # android/app/build.gradle. Do not mutate third-party plugin build files here:
 # Flutter resolves plugin packages only after "flutter pub get".
