@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -61,16 +60,22 @@ class DeveloperNotebookScreen extends ConsumerWidget {
     if (saved != true ||
         cleanTitle.isEmpty ||
         cleanCode.trim().isEmpty ||
-        !context.mounted) return;
+        !context.mounted) {
+      return;
+    }
     final id = const Uuid().v4();
     try {
       await ref.read(databaseProvider).saveNoteContent(id, '[Code] $cleanTitle',
           'Language: $cleanLanguage\n\n\u0060\u0060\u0060$cleanLanguage\n$cleanCode\n\u0060\u0060\u0060');
-      if (context.mounted) context.push('/editor/$id');
+      if (context.mounted) {
+        context.push('/editor/$id');
+      }
     } catch (error) {
-      if (context.mounted)
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not save snippet: $error')));
+          SnackBar(content: Text('Could not save snippet: $error')),
+        );
+      }
     }
   }
 
@@ -88,11 +93,14 @@ class DeveloperNotebookScreen extends ConsumerWidget {
         stream: (db.select(db.notes)..where((n) => n.isDeleted.equals(false)))
             .watch(),
         builder: (context, snapshot) {
-          if (snapshot.hasError)
+          if (snapshot.hasError) {
             return Center(
-                child: Text('Could not load snippets: ${snapshot.error}'));
-          if (!snapshot.hasData)
+              child: Text('Could not load snippets: ${snapshot.error}'),
+            );
+          }
+          if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           final snippets = snapshot.data!
               .where((n) => n.title.startsWith('[Code] '))
               .toList()

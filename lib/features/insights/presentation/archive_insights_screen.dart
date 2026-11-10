@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -97,7 +96,7 @@ class ArchiveInsightsScreen extends ConsumerWidget {
                           icon: Icons.archive_outlined),
                       _Metric(
                           label: 'Words stored',
-                          value: '${words}',
+                          value: '$words',
                           icon: Icons.menu_book_outlined),
                       _Metric(
                           label: 'New this week',

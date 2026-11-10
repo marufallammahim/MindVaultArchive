@@ -527,7 +527,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         const Spacer(),
                         Text(readingMinutes == 0
                             ? 'Less than 1 min'
-                            : '${readingMinutes} min read'),
+                            : '$readingMinutes min read'),
                       ],
                     ),
                   );

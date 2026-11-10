@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,19 +16,25 @@ class ArchiveTimelineScreen extends ConsumerWidget {
         stream: (db.select(db.notes)..where((n) => n.isDeleted.equals(false)))
             .watch(),
         builder: (context, noteSnapshot) {
-          if (noteSnapshot.hasError)
+          if (noteSnapshot.hasError) {
             return _TimelineMessage(
-                'Could not load notes: ${noteSnapshot.error}');
-          if (!noteSnapshot.hasData)
+              'Could not load notes: ${noteSnapshot.error}',
+            );
+          }
+          if (!noteSnapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
+          }
           return StreamBuilder<List<VaultTask>>(
             stream: db.select(db.tasks).watch(),
             builder: (context, taskSnapshot) {
-              if (taskSnapshot.hasError)
+              if (taskSnapshot.hasError) {
                 return _TimelineMessage(
-                    'Could not load tasks: ${taskSnapshot.error}');
-              if (!taskSnapshot.hasData)
+                  'Could not load tasks: ${taskSnapshot.error}',
+                );
+              }
+              if (!taskSnapshot.hasData) {
                 return const Center(child: CircularProgressIndicator());
+              }
               final entries = <_TimelineEntry>[
                 for (final note in noteSnapshot.data!)
                   _TimelineEntry(
