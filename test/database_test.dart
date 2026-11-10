@@ -44,6 +44,18 @@ void main() {
     expect(await database.select(database.tags).get(), isEmpty);
   });
 
+  test('tag names and assignments validate', () async {
+    await expectLater(
+      database.saveTag('empty-tag', '   '),
+      throwsArgumentError,
+    );
+    await expectLater(
+      database.setNoteTags('note-with-bad-tag', ['missing']),
+      throwsArgumentError,
+    );
+    expect(await database.select(database.tags).get(), isEmpty);
+  });
+
   test('note category assignment validates and persists', () async {
     await database.saveCategory('ideas', 'Ideas');
     await database.setNoteCategory('note-category', 'ideas');
