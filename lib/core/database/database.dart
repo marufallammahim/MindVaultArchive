@@ -238,6 +238,15 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  Future<void> setPinned(String id, bool pinned) {
+    return (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(
+        sortOrder: Value(pinned ? 1 : 0),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
   Future<void> setNoteColor(String id, int? color) async {
     final existing = await (select(notes)..where((note) => note.id.equals(id)))
         .getSingleOrNull();
