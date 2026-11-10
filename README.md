@@ -22,6 +22,7 @@ and SQLite.
   quotes, links and code snippets, plus rendered preview.
 - Drawing canvas with local PNG attachment metadata.
 - Home search plus global offline search across notes, categories, tags and tasks.
+- Optional six-digit app lock using Android secure storage (screen gate only).
 - System/light/dark theme preference and Material 3 burgundy branding.
 - Versioned JSON archive v5 for notes, categories, tags, tag links, note-linked
   tasks and note revisions; v1-v4 remain importable.
@@ -37,7 +38,7 @@ not semantic search. The editor supports Markdown authoring and preview, but is 
 See [Feature Specification](docs/FEATURE_SPECIFICATION.md).
 
 ## Not yet implemented
-Encrypted vault/app lock, full attachment backup, reminders/notifications,
+Encrypted database/attachments, biometric unlock, reminders/notifications,
 calendar, audio recording/transcription, OCR/PDF indexing, visual boards,
 remote sync, cloud backup, collaboration and AI archive search. No cloud or AI
 provider is configured. See [Roadmap](docs/ROADMAP.md).
