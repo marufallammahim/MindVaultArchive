@@ -167,6 +167,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onTap: () => _selectView('trash'),
             ),
             ListTile(
+              leading: const Icon(Icons.checklist_rounded),
+              title: const Text('Tasks'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/tasks');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.info_outline),
               title: const Text('About'),
               onTap: () {
