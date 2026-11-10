@@ -40,16 +40,13 @@ class TagsScreen extends ConsumerWidget {
     controller.dispose();
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     try {
-      await ref.read(databaseProvider).saveTag(
-            tag?.id ?? const Uuid().v4(),
-            name,
-            color: tag?.color,
-          );
+      await ref
+          .read(databaseProvider)
+          .saveTag(tag?.id ?? const Uuid().v4(), name, color: tag?.color);
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not save tag: $error')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Could not save tag: $error')));
     }
   }
 
@@ -98,7 +95,8 @@ class TagsScreen extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-                child: Text('Could not load tags: ${snapshot.error}'));
+              child: Text('Could not load tags: ${snapshot.error}'),
+            );
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());

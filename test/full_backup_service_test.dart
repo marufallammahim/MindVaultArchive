@@ -16,9 +16,12 @@ void main() {
   setUp(() async {
     sourceDatabase = AppDatabase(NativeDatabase.memory());
     targetDatabase = AppDatabase(NativeDatabase.memory());
-    sourceDirectory = await Directory.systemTemp.createTemp('mindvault-source-');
-    restoreDirectory =
-        await Directory.systemTemp.createTemp('mindvault-restore-');
+    sourceDirectory = await Directory.systemTemp.createTemp(
+      'mindvault-source-',
+    );
+    restoreDirectory = await Directory.systemTemp.createTemp(
+      'mindvault-restore-',
+    );
   });
 
   tearDown(() async {
@@ -41,7 +44,9 @@ void main() {
     final drawing = File(p.join(sourceDirectory.path, 'drawing.png'));
     final originalBytes = <int>[137, 80, 78, 71, 13, 10, 26, 10, 1, 2, 3];
     await drawing.writeAsBytes(originalBytes);
-    await sourceDatabase.into(sourceDatabase.attachments).insert(
+    await sourceDatabase
+        .into(sourceDatabase.attachments)
+        .insert(
           AttachmentsCompanion.insert(
             id: 'drawing-attachment',
             noteId: 'backup-note',
@@ -60,89 +65,100 @@ void main() {
 
     expect(result.imported, 1);
     expect(result.importedAttachments, 1);
-    final restoredNote = await (targetDatabase.select(targetDatabase.notes)
-          ..where((note) => note.id.equals('backup-note')))
-        .getSingle();
+    final restoredNote = await (targetDatabase.select(
+      targetDatabase.notes,
+    )..where((note) => note.id.equals('backup-note'))).getSingle();
     expect(restoredNote.title, 'Drawing note');
 
-    final restoredAttachment =
-        await (targetDatabase.select(targetDatabase.attachments)
-              ..where((item) => item.id.equals('drawing-attachment')))
-            .getSingle();
+    final restoredAttachment = await (targetDatabase.select(
+      targetDatabase.attachments,
+    )..where((item) => item.id.equals('drawing-attachment'))).getSingle();
     final restoredFile = File(restoredAttachment.localPath);
     expect(await restoredFile.exists(), isTrue);
     expect(await restoredFile.readAsBytes(), originalBytes);
   });
 
-  test('full backup refuses to silently omit missing attachment files', () async {
-    await sourceDatabase.saveNoteContent(
-      'missing-file-note',
-      'Missing file',
-      'This backup must fail.',
-    );
-    await sourceDatabase.into(sourceDatabase.attachments).insert(
-          AttachmentsCompanion.insert(
-            id: 'missing-attachment',
-            noteId: 'missing-file-note',
-            type: 'audio',
-            localPath: p.join(sourceDirectory.path, 'not-found.m4a'),
-            filename: 'not-found.m4a',
-          ),
-        );
+  test(
+    'full backup refuses to silently omit missing attachment files',
+    () async {
+      await sourceDatabase.saveNoteContent(
+        'missing-file-note',
+        'Missing file',
+        'This backup must fail.',
+      );
+      await sourceDatabase
+          .into(sourceDatabase.attachments)
+          .insert(
+            AttachmentsCompanion.insert(
+              id: 'missing-attachment',
+              noteId: 'missing-file-note',
+              type: 'audio',
+              localPath: p.join(sourceDirectory.path, 'not-found.m4a'),
+              filename: 'not-found.m4a',
+            ),
+          );
 
-    await expectLater(
-      FullBackupService(sourceDatabase).exportZip(),
-      throwsA(isA<StateError>()),
-    );
-  });
+      await expectLater(
+        FullBackupService(sourceDatabase).exportZip(),
+        throwsA(isA<StateError>()),
+      );
+    },
+  );
 
-  test('full backup skips colliding attachment IDs without overwriting', () async {
-    await sourceDatabase.saveNoteContent(
-      'collision-note',
-      'Source note',
-      'Backup body',
-    );
-    final sourceFile = File(p.join(sourceDirectory.path, 'source.bin'));
-    await sourceFile.writeAsBytes([1, 2, 3, 4]);
-    await sourceDatabase.into(sourceDatabase.attachments).insert(
-          AttachmentsCompanion.insert(
-            id: 'same-attachment',
-            noteId: 'collision-note',
-            type: 'file',
-            localPath: sourceFile.path,
-            filename: 'source.bin',
-          ),
-        );
+  test(
+    'full backup skips colliding attachment IDs without overwriting',
+    () async {
+      await sourceDatabase.saveNoteContent(
+        'collision-note',
+        'Source note',
+        'Backup body',
+      );
+      final sourceFile = File(p.join(sourceDirectory.path, 'source.bin'));
+      await sourceFile.writeAsBytes([1, 2, 3, 4]);
+      await sourceDatabase
+          .into(sourceDatabase.attachments)
+          .insert(
+            AttachmentsCompanion.insert(
+              id: 'same-attachment',
+              noteId: 'collision-note',
+              type: 'file',
+              localPath: sourceFile.path,
+              filename: 'source.bin',
+            ),
+          );
 
-    await targetDatabase.saveNoteContent(
-      'collision-note',
-      'Local note',
-      'Keep local content',
-    );
-    final localFile = File(p.join(restoreDirectory.path, 'local.bin'));
-    await localFile.writeAsBytes([9, 9, 9]);
-    await targetDatabase.into(targetDatabase.attachments).insert(
-          AttachmentsCompanion.insert(
-            id: 'same-attachment',
-            noteId: 'collision-note',
-            type: 'file',
-            localPath: localFile.path,
-            filename: 'local.bin',
-          ),
-        );
+      await targetDatabase.saveNoteContent(
+        'collision-note',
+        'Local note',
+        'Keep local content',
+      );
+      final localFile = File(p.join(restoreDirectory.path, 'local.bin'));
+      await localFile.writeAsBytes([9, 9, 9]);
+      await targetDatabase
+          .into(targetDatabase.attachments)
+          .insert(
+            AttachmentsCompanion.insert(
+              id: 'same-attachment',
+              noteId: 'collision-note',
+              type: 'file',
+              localPath: localFile.path,
+              filename: 'local.bin',
+            ),
+          );
 
-    final zip = await FullBackupService(sourceDatabase).exportZip();
-    final result = await FullBackupService(
-      targetDatabase,
-      restoreDirectory: restoreDirectory,
-    ).importZip(zip);
+      final zip = await FullBackupService(sourceDatabase).exportZip();
+      final result = await FullBackupService(
+        targetDatabase,
+        restoreDirectory: restoreDirectory,
+      ).importZip(zip);
 
-    expect(result.skipped, 1);
-    expect(result.skippedAttachments, 1);
-    final note = await (targetDatabase.select(targetDatabase.notes)
-          ..where((item) => item.id.equals('collision-note')))
-        .getSingle();
-    expect(note.title, 'Local note');
-    expect(await localFile.readAsBytes(), [9, 9, 9]);
-  });
+      expect(result.skipped, 1);
+      expect(result.skippedAttachments, 1);
+      final note = await (targetDatabase.select(
+        targetDatabase.notes,
+      )..where((item) => item.id.equals('collision-note'))).getSingle();
+      expect(note.title, 'Local note');
+      expect(await localFile.readAsBytes(), [9, 9, 9]);
+    },
+  );
 }

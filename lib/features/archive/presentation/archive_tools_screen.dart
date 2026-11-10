@@ -47,16 +47,13 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
     final document = _exportDocument;
     if (document == null) return;
     try {
-      await Share.shareXFiles(
-        [
-          XFile.fromData(
-            utf8.encode(document),
-            mimeType: 'application/json',
-            name: 'mindvault-archive.json',
-          ),
-        ],
-        text: 'MindVault Archive JSON export',
-      );
+      await Share.shareXFiles([
+        XFile.fromData(
+          utf8.encode(document),
+          mimeType: 'application/json',
+          name: 'mindvault-archive.json',
+        ),
+      ], text: 'MindVault Archive JSON export');
     } catch (error) {
       if (mounted) _showMessage('Could not share archive: $error');
     }
@@ -87,17 +84,15 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
   Future<void> _exportFullBackup() async {
     setState(() => _busy = true);
     try {
-      final bytes = await FullBackupService(ref.read(databaseProvider)).exportZip();
-      await Share.shareXFiles(
-        [
-          XFile.fromData(
-            bytes,
-            mimeType: 'application/zip',
-            name: 'mindvault-full-backup.zip',
-          ),
-        ],
-        text: 'MindVault Archive full backup',
-      );
+      final bytes = await FullBackupService(ref.read(databaseProvider))
+          .exportZip();
+      await Share.shareXFiles([
+        XFile.fromData(
+          bytes,
+          mimeType: 'application/zip',
+          name: 'mindvault-full-backup.zip',
+        ),
+      ], text: 'MindVault Archive full backup');
     } catch (error) {
       if (mounted) _showMessage('Full backup failed: $error');
     } finally {
@@ -143,8 +138,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
       if (confirmed != true || !mounted) return;
 
       setState(() => _busy = true);
-      final result =
-          await FullBackupService(ref.read(databaseProvider)).importZip(bytes);
+      final result = await FullBackupService(ref.read(databaseProvider))
+          .importZip(bytes);
       if (!mounted) return;
       _showMessage(
         'Restored ${result.imported} notes, ${result.importedTasks} tasks and '
@@ -191,9 +186,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -261,10 +255,7 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            SelectableText(
-              _exportDocument!,
-              maxLines: 12,
-            ),
+            SelectableText(_exportDocument!, maxLines: 12),
           ],
           const SizedBox(height: 28),
           Text('Import archive', style: Theme.of(context).textTheme.titleLarge),

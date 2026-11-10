@@ -22,7 +22,10 @@ void main() {
     await database.saveCategory('work', 'Work');
     await database.saveNoteContent('note-1', 'Research', 'Offline-first notes');
     await database.saveNoteContent(
-        'note-1', 'Research updated', 'Updated body');
+      'note-1',
+      'Research updated',
+      'Updated body',
+    );
     await database.saveTag('important', 'Important');
     await database.setNoteTags('note-1', ['important']);
     await database.saveTask(
@@ -39,7 +42,9 @@ void main() {
     final contents = document['contents'] as Map;
     expect((contents['categories'] as List).single['name'], 'Work');
     expect(
-        (contents['notes'] as List).single['documentContent'], 'Updated body');
+      (contents['notes'] as List).single['documentContent'],
+      'Updated body',
+    );
     expect((contents['revisions'] as List).single['title'], 'Research');
     expect((contents['tasks'] as List).single['title'], 'Review archive');
     expect((contents['tasks'] as List).single['noteId'], 'note-1');
@@ -47,121 +52,123 @@ void main() {
     expect((contents['noteTags'] as List).single['tagId'], 'important');
   });
 
-  test('imports archive and skips colliding note IDs without overwriting',
-      () async {
-    await database.saveNoteContent('same-id', 'Local title', 'Local content');
-    final archive = <String, Object?>{
-      'format': ArchiveTransferService.formatName,
-      'version': ArchiveTransferService.formatVersion,
-      'exportedAt': DateTime.utc(2026).toIso8601String(),
-      'contents': {
-        'categories': [
-          {
-            'id': 'work',
-            'name': 'Work',
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-            'updatedAt': DateTime.utc(2026).toIso8601String(),
-          }
-        ],
-        'notes': [
-          {
-            'id': 'same-id',
-            'title': 'Remote title',
-            'documentContent': 'Remote content',
-            'categoryId': 'work',
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-            'updatedAt': DateTime.utc(2026).toIso8601String(),
-            'isFavorite': true,
-            'isArchived': false,
-            'isDeleted': false,
-            'color': null,
-            'sortOrder': 0,
-          },
-          {
-            'id': 'new-id',
-            'title': 'Imported',
-            'documentContent': 'New content',
-            'categoryId': 'work',
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-            'updatedAt': DateTime.utc(2026).toIso8601String(),
-            'isFavorite': true,
-            'isArchived': false,
-            'isDeleted': false,
-            'color': null,
-            'sortOrder': 2,
-          }
-        ],
-        'tags': [
-          {
-            'id': 'priority',
-            'name': 'Priority',
-            'color': null,
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-          }
-        ],
-        'revisions': [
-          {
-            'id': 'revision-1',
-            'noteId': 'new-id',
-            'title': 'Previous imported title',
-            'documentContent': 'Previous imported body',
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-          }
-        ],
-        'noteTags': [
-          {
-            'noteId': 'new-id',
-            'tagId': 'priority',
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-          }
-        ],
-        'tasks': [
-          {
-            'id': 'task-imported',
-            'title': 'Imported task',
-            'details': 'Imported details',
-            'noteId': 'new-id',
-            'dueAt': null,
-            'priority': 2,
-            'isCompleted': false,
-            'createdAt': DateTime.utc(2026).toIso8601String(),
-            'updatedAt': DateTime.utc(2026).toIso8601String(),
-            'completedAt': null,
-          }
-        ],
-      },
-    };
+  test(
+    'imports archive and skips colliding note IDs without overwriting',
+    () async {
+      await database.saveNoteContent('same-id', 'Local title', 'Local content');
+      final archive = <String, Object?>{
+        'format': ArchiveTransferService.formatName,
+        'version': ArchiveTransferService.formatVersion,
+        'exportedAt': DateTime.utc(2026).toIso8601String(),
+        'contents': {
+          'categories': [
+            {
+              'id': 'work',
+              'name': 'Work',
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+              'updatedAt': DateTime.utc(2026).toIso8601String(),
+            },
+          ],
+          'notes': [
+            {
+              'id': 'same-id',
+              'title': 'Remote title',
+              'documentContent': 'Remote content',
+              'categoryId': 'work',
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+              'updatedAt': DateTime.utc(2026).toIso8601String(),
+              'isFavorite': true,
+              'isArchived': false,
+              'isDeleted': false,
+              'color': null,
+              'sortOrder': 0,
+            },
+            {
+              'id': 'new-id',
+              'title': 'Imported',
+              'documentContent': 'New content',
+              'categoryId': 'work',
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+              'updatedAt': DateTime.utc(2026).toIso8601String(),
+              'isFavorite': true,
+              'isArchived': false,
+              'isDeleted': false,
+              'color': null,
+              'sortOrder': 2,
+            },
+          ],
+          'tags': [
+            {
+              'id': 'priority',
+              'name': 'Priority',
+              'color': null,
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+            },
+          ],
+          'revisions': [
+            {
+              'id': 'revision-1',
+              'noteId': 'new-id',
+              'title': 'Previous imported title',
+              'documentContent': 'Previous imported body',
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+            },
+          ],
+          'noteTags': [
+            {
+              'noteId': 'new-id',
+              'tagId': 'priority',
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+            },
+          ],
+          'tasks': [
+            {
+              'id': 'task-imported',
+              'title': 'Imported task',
+              'details': 'Imported details',
+              'noteId': 'new-id',
+              'dueAt': null,
+              'priority': 2,
+              'isCompleted': false,
+              'createdAt': DateTime.utc(2026).toIso8601String(),
+              'updatedAt': DateTime.utc(2026).toIso8601String(),
+              'completedAt': null,
+            },
+          ],
+        },
+      };
 
-    final result = await transfer.importJson(jsonEncode(archive));
-    expect(result.imported, 1);
-    expect(result.skipped, 1);
-    expect(result.importedTasks, 1);
-    expect(result.importedTags, 1);
-    expect(result.importedRevisions, 1);
+      final result = await transfer.importJson(jsonEncode(archive));
+      expect(result.imported, 1);
+      expect(result.skipped, 1);
+      expect(result.importedTasks, 1);
+      expect(result.importedTags, 1);
+      expect(result.importedRevisions, 1);
 
-    final existing = await (database.select(database.notes)
-          ..where((note) => note.id.equals('same-id')))
-        .getSingle();
-    expect(existing.title, 'Local title');
-    final imported = await (database.select(database.notes)
-          ..where((note) => note.id.equals('new-id')))
-        .getSingle();
-    expect(imported.categoryId, 'work');
-    expect(imported.isFavorite, isTrue);
-    final importedTask = await (database.select(database.tasks)
-          ..where((task) => task.id.equals('task-imported')))
-        .getSingle();
-    expect(importedTask.title, 'Imported task');
-    expect(importedTask.noteId, 'new-id');
-    final importedTagLink = await (database.select(database.noteTags)
-          ..where((link) => link.noteId.equals('new-id')))
-        .getSingle();
-    expect(importedTagLink.tagId, 'priority');
-    final importedRevision = await (database.select(database.noteRevisions)
-          ..where((revision) => revision.id.equals('revision-1')))
-        .getSingle();
-    expect(importedRevision.title, 'Previous imported title');
-  });
+      final existing = await (database.select(
+        database.notes,
+      )..where((note) => note.id.equals('same-id'))).getSingle();
+      expect(existing.title, 'Local title');
+      final imported = await (database.select(
+        database.notes,
+      )..where((note) => note.id.equals('new-id'))).getSingle();
+      expect(imported.categoryId, 'work');
+      expect(imported.isFavorite, isTrue);
+      final importedTask = await (database.select(
+        database.tasks,
+      )..where((task) => task.id.equals('task-imported'))).getSingle();
+      expect(importedTask.title, 'Imported task');
+      expect(importedTask.noteId, 'new-id');
+      final importedTagLink = await (database.select(
+        database.noteTags,
+      )..where((link) => link.noteId.equals('new-id'))).getSingle();
+      expect(importedTagLink.tagId, 'priority');
+      final importedRevision = await (database.select(
+        database.noteRevisions,
+      )..where((revision) => revision.id.equals('revision-1'))).getSingle();
+      expect(importedRevision.title, 'Previous imported title');
+    },
+  );
 
   test('imports version 4 task records without optional note links', () async {
     final legacy = <String, Object?>{
@@ -181,14 +188,14 @@ void main() {
             'createdAt': DateTime.utc(2026).toIso8601String(),
             'updatedAt': DateTime.utc(2026).toIso8601String(),
             'completedAt': null,
-          }
+          },
         ],
       },
     };
     await transfer.importJson(jsonEncode(legacy));
-    final task = await (database.select(database.tasks)
-          ..where((item) => item.id.equals('legacy-task')))
-        .getSingle();
+    final task = await (database.select(
+      database.tasks,
+    )..where((item) => item.id.equals('legacy-task'))).getSingle();
     expect(task.noteId, isNull);
   });
 

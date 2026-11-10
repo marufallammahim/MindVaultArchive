@@ -67,8 +67,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final router = GoRouter.of(context);
-        final saved =
-            await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+        final saved = await ref
+            .read(editorProvider(widget.noteId).notifier)
+            .forceSave();
         if (!mounted) return;
         if (saved) router.pop();
       },
@@ -78,13 +79,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             state.saveError != null
                 ? 'Save failed'
                 : state.isSaving
-                    ? 'Saving…'
-                    : 'Saved',
+                ? 'Saving…'
+                : 'Saved',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: state.saveError != null
-                      ? Theme.of(context).colorScheme.error
-                      : null,
-                ),
+              color: state.saveError != null
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+            ),
           ),
           actions: [
             IconButton(
@@ -103,8 +104,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Version history',
               icon: const Icon(Icons.history),
               onPressed: () async {
-                final restored =
-                    await context.push<bool>('/history/${widget.noteId}');
+                final restored = await context.push<bool>(
+                  '/history/${widget.noteId}',
+                );
                 if (restored != true || !mounted) return;
                 await ref
                     .read(editorProvider(widget.noteId).notifier)
@@ -120,7 +122,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               icon: const Icon(Icons.palette_outlined),
               onSelected: (value) async {
                 await db.setNoteColor(
-                    widget.noteId, value == -1 ? null : value);
+                  widget.noteId,
+                  value == -1 ? null : value,
+                );
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(value: -1, child: Text('Default color')),
@@ -146,8 +150,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content:
-                        Text(saved ? 'Note saved.' : 'Could not save note.'),
+                    content: Text(
+                      saved ? 'Note saved.' : 'Could not save note.',
+                    ),
                   ),
                 );
               },
@@ -182,31 +187,31 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               TextField(
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
+                style: Theme.of(context).textTheme.headlineMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
               ),
               StreamBuilder<List<Category>>(
-                stream: (db.select(db.categories)
-                      ..orderBy(
-                          [(category) => OrderingTerm.asc(category.name)]))
-                    .watch(),
+                stream:
+                    (db.select(db.categories)..orderBy([
+                          (category) => OrderingTerm.asc(category.name),
+                        ]))
+                        .watch(),
                 builder: (context, categoriesSnapshot) {
                   final categories = categoriesSnapshot.data ?? [];
                   return StreamBuilder<Note?>(
-                    stream: (db.select(db.notes)
-                          ..where((note) => note.id.equals(widget.noteId)))
-                        .watchSingleOrNull(),
+                    stream:
+                        (db.select(db.notes)
+                              ..where((note) => note.id.equals(widget.noteId)))
+                            .watchSingleOrNull(),
                     builder: (context, noteSnapshot) {
                       final selectedId = noteSnapshot.data?.categoryId;
                       return DropdownButtonFormField<String?>(
                         initialValue:
                             categories.any((item) => item.id == selectedId)
-                                ? selectedId
-                                : null,
+                            ? selectedId
+                            : null,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.folder_outlined),
@@ -228,13 +233,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             : (value) async {
                                 try {
                                   await db.setNoteCategory(
-                                      widget.noteId, value);
+                                    widget.noteId,
+                                    value,
+                                  );
                                 } catch (error) {
                                   if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                        content: Text(
-                                            'Could not assign category: $error')),
+                                      content: Text(
+                                        'Could not assign category: $error',
+                                      ),
+                                    ),
                                   );
                                 }
                               },
@@ -244,15 +253,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 },
               ),
               StreamBuilder<List<Tag>>(
-                stream: (db.select(db.tags)
-                      ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
-                    .watch(),
+                stream: (db.select(
+                  db.tags,
+                )..orderBy([(tag) => OrderingTerm.asc(tag.name)])).watch(),
                 builder: (context, tagsSnapshot) {
                   final tags = tagsSnapshot.data ?? [];
                   return StreamBuilder<List<NoteTag>>(
-                    stream: (db.select(db.noteTags)
-                          ..where((item) => item.noteId.equals(widget.noteId)))
-                        .watch(),
+                    stream:
+                        (db.select(db.noteTags)..where(
+                              (item) => item.noteId.equals(widget.noteId),
+                            ))
+                            .watch(),
                     builder: (context, selectedSnapshot) {
                       final selectedIds = (selectedSnapshot.data ?? [])
                           .map((item) => item.tagId)
@@ -272,8 +283,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                         for (final tag in tags)
                                           FilterChip(
                                             label: Text(tag.name),
-                                            selected:
-                                                selectedIds.contains(tag.id),
+                                            selected: selectedIds.contains(
+                                              tag.id,
+                                            ),
                                             onSelected: (selected) async {
                                               final next = {...selectedIds};
                                               if (selected) {
@@ -288,8 +300,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                                 );
                                               } catch (error) {
                                                 if (!context.mounted) return;
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
                                                   SnackBar(
                                                     content: Text(
                                                       'Could not update tags: $error',
@@ -315,13 +328,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 },
               ),
               StreamBuilder<List<VaultTask>>(
-                stream: (db.select(db.tasks)
-                      ..where((task) => task.noteId.equals(widget.noteId))
-                      ..orderBy([
-                        (task) => OrderingTerm.asc(task.dueAt),
-                        (task) => OrderingTerm.desc(task.updatedAt),
-                      ]))
-                    .watch(),
+                stream:
+                    (db.select(db.tasks)
+                          ..where((task) => task.noteId.equals(widget.noteId))
+                          ..orderBy([
+                            (task) => OrderingTerm.asc(task.dueAt),
+                            (task) => OrderingTerm.desc(task.updatedAt),
+                          ]))
+                        .watch(),
                 builder: (context, taskSnapshot) {
                   final tasks = taskSnapshot.data ?? [];
                   if (tasks.isEmpty) return const SizedBox.shrink();
@@ -334,10 +348,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           ListTile(
                             leading: Checkbox(
                               value: task.isCompleted,
-                              onChanged: (value) => db.setTaskCompleted(
-                                task.id,
-                                value ?? false,
-                              ),
+                              onChanged: (value) =>
+                                  db.setTaskCompleted(task.id, value ?? false),
                             ),
                             title: Text(
                               task.title,
@@ -369,21 +381,27 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       .where((title) => title.isNotEmpty)
                       .toSet();
                   final linkedNotes = allNotes
-                      .where((note) =>
-                          note.id != widget.noteId &&
-                          matches.any((title) =>
-                              note.title.trim().toLowerCase() ==
-                              title.toLowerCase()))
+                      .where(
+                        (note) =>
+                            note.id != widget.noteId &&
+                            matches.any(
+                              (title) =>
+                                  note.title.trim().toLowerCase() ==
+                                  title.toLowerCase(),
+                            ),
+                      )
                       .toList();
                   final backlinks = currentTitle.isEmpty
                       ? <Note>[]
                       : allNotes
-                          .where((note) =>
-                              note.id != widget.noteId &&
-                              note.documentContent.toLowerCase().contains(
+                            .where(
+                              (note) =>
+                                  note.id != widget.noteId &&
+                                  note.documentContent.toLowerCase().contains(
                                     '[[${currentTitle.toLowerCase()}]]',
-                                  ))
-                          .toList();
+                                  ),
+                            )
+                            .toList();
                   if (linkedNotes.isEmpty && backlinks.isEmpty) {
                     return const SizedBox.shrink();
                   }
@@ -424,9 +442,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                               for (final note in backlinks)
                                 ActionChip(
                                   avatar: const Icon(Icons.reply, size: 16),
-                                  label: Text(note.title.isEmpty
-                                      ? 'Untitled'
-                                      : note.title),
+                                  label: Text(
+                                    note.title.isEmpty
+                                        ? 'Untitled'
+                                        : note.title,
+                                  ),
                                   onPressed: () =>
                                       context.push('/editor/${note.id}'),
                                 ),

@@ -30,14 +30,17 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     if (title.isEmpty && content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Write a title or capture an idea first.')),
+          content: Text('Write a title or capture an idea first.'),
+        ),
       );
       return;
     }
     setState(() => _saving = true);
     final id = const Uuid().v4();
     try {
-      await ref.read(databaseProvider).saveNoteContent(
+      await ref
+          .read(databaseProvider)
+          .saveNoteContent(
             id,
             title.isEmpty ? 'Quick capture' : title,
             content,
@@ -54,9 +57,8 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
       }
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Capture failed: $error')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Capture failed: $error')));
     } finally {
       if (mounted) setState(() => _saving = false);
     }

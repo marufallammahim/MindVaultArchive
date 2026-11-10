@@ -35,10 +35,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: MarkdownToolbar(
-            controller: controller,
-            onChanged: () {},
-          ),
+          body: MarkdownToolbar(controller: controller, onChanged: () {}),
         ),
       ),
     );

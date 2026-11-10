@@ -35,9 +35,8 @@ final appRouter = GoRouter(
     GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
     GoRoute(
       path: '/tasks',
-      builder: (context, state) => TasksScreen(
-        noteId: state.uri.queryParameters['noteId'],
-      ),
+      builder: (context, state) =>
+          TasksScreen(noteId: state.uri.queryParameters['noteId']),
     ),
     GoRoute(
       path: '/templates',
@@ -47,15 +46,11 @@ final appRouter = GoRouter(
       path: '/capture',
       builder: (context, state) => const QuickCaptureScreen(),
     ),
-    GoRoute(
-      path: '/tags',
-      builder: (context, state) => const TagsScreen(),
-    ),
+    GoRoute(path: '/tags', builder: (context, state) => const TagsScreen()),
     GoRoute(
       path: '/history/:id',
-      builder: (context, state) => RevisionHistoryScreen(
-        noteId: state.pathParameters['id']!,
-      ),
+      builder: (context, state) =>
+          RevisionHistoryScreen(noteId: state.pathParameters['id']!),
     ),
     GoRoute(
       path: '/search',

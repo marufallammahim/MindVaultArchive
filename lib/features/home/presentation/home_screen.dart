@@ -208,16 +208,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Text('CATEGORIES'),
             ),
             StreamBuilder<List<Category>>(
-              stream: (db.select(db.categories)
-                    ..orderBy([(category) => OrderingTerm.asc(category.name)]))
-                  .watch(),
+              stream:
+                  (db.select(db.categories)..orderBy([
+                        (category) => OrderingTerm.asc(category.name),
+                      ]))
+                      .watch(),
               builder: (context, snapshot) => Column(
                 children: [
                   for (final category in snapshot.data ?? [])
                     ListTile(
                       leading: const Icon(Icons.folder_outlined),
                       title: Text(category.name),
-                      selected: _view == 'category' &&
+                      selected:
+                          _view == 'category' &&
                           _selectedCategoryId == category.id,
                       onTap: () => _selectCategory(category.id),
                     ),
@@ -288,12 +291,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final notes = query.isEmpty
               ? allNotes
               : allNotes
-                  .where(
-                    (note) =>
-                        note.title.toLowerCase().contains(query) ||
-                        note.documentContent.toLowerCase().contains(query),
-                  )
-                  .toList();
+                    .where(
+                      (note) =>
+                          note.title.toLowerCase().contains(query) ||
+                          note.documentContent.toLowerCase().contains(query),
+                    )
+                    .toList();
 
           if (notes.isEmpty) {
             return Center(
@@ -370,9 +373,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 note.title.isNotEmpty ? note.title : 'Untitled',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleMedium
+                                style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                             ),

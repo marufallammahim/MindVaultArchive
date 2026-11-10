@@ -22,9 +22,9 @@ void main() {
       dueAt: DateTime.utc(2026, 12, 1),
     );
 
-    var task = await (database.select(database.tasks)
-          ..where((row) => row.id.equals('task-1')))
-        .getSingle();
+    var task = await (database.select(
+      database.tasks,
+    )..where((row) => row.id.equals('task-1'))).getSingle();
     expect(task.title, 'Prepare project plan');
     expect(task.priority, 2);
     expect(task.isCompleted, isFalse);
@@ -35,16 +35,16 @@ void main() {
       details: 'Review milestone',
       priority: 1,
     );
-    task = await (database.select(database.tasks)
-          ..where((row) => row.id.equals('task-1')))
-        .getSingle();
+    task = await (database.select(
+      database.tasks,
+    )..where((row) => row.id.equals('task-1'))).getSingle();
     expect(task.title, 'Updated plan');
     expect(task.dueAt, isNull);
 
     await database.setTaskCompleted('task-1', true);
-    task = await (database.select(database.tasks)
-          ..where((row) => row.id.equals('task-1')))
-        .getSingle();
+    task = await (database.select(
+      database.tasks,
+    )..where((row) => row.id.equals('task-1'))).getSingle();
     expect(task.isCompleted, isTrue);
     expect(task.completedAt, isNotNull);
 
@@ -54,12 +54,7 @@ void main() {
 
   test('rejects empty task titles', () async {
     await expectLater(
-      database.saveTask(
-        id: 'invalid',
-        title: '   ',
-        details: '',
-        priority: 0,
-      ),
+      database.saveTask(id: 'invalid', title: '   ', details: '', priority: 0),
       throwsArgumentError,
     );
     expect(await database.select(database.tasks).get(), isEmpty);
@@ -72,9 +67,9 @@ void main() {
       details: '',
       priority: 99,
     );
-    final task = await (database.select(database.tasks)
-          ..where((row) => row.id.equals('task-priority')))
-        .getSingle();
+    final task = await (database.select(
+      database.tasks,
+    )..where((row) => row.id.equals('task-priority'))).getSingle();
     expect(task.priority, 2);
   });
 }

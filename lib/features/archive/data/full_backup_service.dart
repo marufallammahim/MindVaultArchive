@@ -15,10 +15,8 @@ import 'package:uuid/uuid.dart';
 /// Local absolute paths are never exported. Each attachment is restored to a
 /// new app-private path and its SHA-256 checksum is verified before import.
 class FullBackupService {
-  FullBackupService(
-    this._database, {
-    Directory? restoreDirectory,
-  }) : _restoreDirectory = restoreDirectory;
+  FullBackupService(this._database, {Directory? restoreDirectory})
+    : _restoreDirectory = restoreDirectory;
 
   static const backupFormat = 'mindvault-full-backup';
   static const backupVersion = 1;
@@ -51,8 +49,10 @@ class FullBackupService {
       final source = File(attachment.localPath);
       if (!await source.exists()) {
         throw StateError(
-          'Attachment "' + attachment.filename + '" is missing. Backup stopped '
-          'to avoid creating an incomplete archive.',
+          'Attachment "' +
+              attachment.filename +
+              '" is missing. Backup stopped '
+                  'to avoid creating an incomplete archive.',
         );
       }
 
@@ -87,7 +87,9 @@ class FullBackupService {
       'attachments': manifestAttachments,
     };
     final manifestBytes = utf8.encode(jsonEncode(manifest));
-    zip.addFile(ArchiveFile('manifest.json', manifestBytes.length, manifestBytes));
+    zip.addFile(
+      ArchiveFile('manifest.json', manifestBytes.length, manifestBytes),
+    );
 
     final encoded = ZipEncoder().encode(zip);
     if (encoded == null) {
@@ -195,7 +197,9 @@ class FullBackupService {
 
       final expectedPath = 'attachments/' + id + '/' + _safeFilename(filename);
       if (archivePath != expectedPath) {
-        throw const FormatException('Backup attachment path does not match its ID.');
+        throw const FormatException(
+          'Backup attachment path does not match its ID.',
+        );
       }
       final entry = files[archivePath];
       if (entry == null) {
@@ -227,7 +231,11 @@ class FullBackupService {
     try {
       for (final item in prepared) {
         final uniqueName =
-            item.id + '_' + const Uuid().v4() + '_' + _safeFilename(item.filename);
+            item.id +
+            '_' +
+            const Uuid().v4() +
+            '_' +
+            _safeFilename(item.filename);
         final target = File(p.join(attachmentDirectory.path, uniqueName));
         await target.writeAsBytes(item.bytes, flush: true);
         createdFiles[item.id] = target;
@@ -246,10 +254,8 @@ class FullBackupService {
         );
       }
 
-      final result = await ArchiveTransferService(_database).importJson(
-        archiveJson,
-        attachments: records,
-      );
+      final result = await ArchiveTransferService(_database)
+          .importJson(archiveJson, attachments: records);
       final importedIds = result.importedAttachmentIds.toSet();
       for (final entry in createdFiles.entries) {
         if (!importedIds.contains(entry.key)) {
@@ -266,7 +272,8 @@ class FullBackupService {
   }
 
   Future<Directory> _attachmentsDirectory() async {
-    final root = _restoreDirectory ??
+    final root =
+        _restoreDirectory ??
         Directory(
           p.join(
             (await getApplicationDocumentsDirectory()).path,
