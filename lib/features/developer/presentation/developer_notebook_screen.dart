@@ -131,7 +131,7 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                   'text';
               return Card(
                   child: ListTile(
-                leading: const CircleAvatar(
+                leading: CircleAvatar(
                     backgroundColor:
                         Theme.of(context).colorScheme.primaryContainer,
                     foregroundColor:
