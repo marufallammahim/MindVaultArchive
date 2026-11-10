@@ -168,6 +168,15 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
+  Future<void> setNoteColor(String id, int? color) {
+    return (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(
+        color: Value(color),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
   Future<void> setFavorite(String id, bool value) {
     return (update(notes)..where((note) => note.id.equals(id))).write(
       NotesCompanion(
