@@ -238,8 +238,19 @@ class AppDatabase extends _$AppDatabase {
     }
   }
 
-  Future<void> setNoteColor(String id, int? color) {
-    return (update(notes)..where((note) => note.id.equals(id))).write(
+  Future<void> setNoteColor(String id, int? color) async {
+    final existing = await (select(notes)..where((note) => note.id.equals(id)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await into(notes).insert(
+        NotesCompanion.insert(
+          id: id,
+          color: Value(color),
+        ),
+      );
+      return;
+    }
+    await (update(notes)..where((note) => note.id.equals(id))).write(
       NotesCompanion(
         color: Value(color),
         updatedAt: Value(DateTime.now()),
