@@ -1,11 +1,13 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
-import 'package:mindvault_archive/main.dart';
+
 
 class EditorScreen extends ConsumerStatefulWidget {
   final String noteId;
@@ -60,7 +62,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
 
     return PopScope(
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) {
           await ref.read(editorProvider(widget.noteId).notifier).forceSave();
         }
@@ -80,7 +82,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               icon: const Icon(Icons.check),
               onPressed: () async {
                 await ref.read(editorProvider(widget.noteId).notifier).forceSave();
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Note saved.')),
                   );
@@ -113,7 +115,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   keyboardType: TextInputType.multiline,
                 ),
               ),
-              StreamBuilder(
+              StreamBuilder<List<Attachment>>(
                 stream: attachmentQuery.watch(),
                 builder: (context, snapshot) {
                   final drawings = (snapshot.data ?? [])
