@@ -9,6 +9,7 @@ vision. A feature is not marked complete merely because a route or button exists
 - Note creation and editing with debounced autosave and save-before-exit.
 - Favorites, archive, trash, restore and confirmed permanent deletion.
 - Category creation, rename, deletion, note assignment and category-filtered view.
+- Tag creation, rename, deletion and multi-tag note assignment.
 - Per-note color selection and tinted archive cards.
 - Quick Capture for fast local idea capture.
 - Local drawing canvas with PNG attachment metadata.
@@ -18,8 +19,8 @@ vision. A feature is not marked complete merely because a route or button exists
   editing and deletion.
 - Reusable starter templates for daily journal, meeting, project plan, study
   notes and developer notes.
-- Versioned JSON transfer v2 for notes, categories and tasks; v1 remains
-  importable.
+- Versioned JSON transfer v3 for notes, categories, tags, tag links and tasks;
+  v1 and v2 remain importable.
 - Import validation, transactional writes and duplicate note/task-ID protection.
 - Existing Flutter CI and Android build workflows.
 
@@ -28,8 +29,8 @@ vision. A feature is not marked complete merely because a route or button exists
 - Search: local title/body substring matching; no FTS index, advanced filters
   or OCR index.
 - Editor: plain text fields plus drawing attachments; not a block-based rich editor.
-- Organization: categories and template starters exist; nested notebooks,
-  tags, smart views and backlinks are not implemented.
+- Organization: categories and tags exist; nested notebooks, smart views,
+  backlinks and knowledge graph are not implemented.
 - Attachments: drawing metadata is stored locally; archive transfer does not
   package attachment bytes.
 - Security: app-level lock and encrypted database/attachments are not implemented.
