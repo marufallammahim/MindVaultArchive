@@ -22,16 +22,16 @@ jobs:
         with:
           channel: stable
       - name: Format Dart source
-        run: dart format lib/features/search/data/archive_search_service.dart test/archive_search_service_test.dart
+        run: dart format lib test
       - name: Commit formatter output
         run: |
-          if git diff --quiet -- lib/features/search/data/archive_search_service.dart test/archive_search_service_test.dart; then
+          if git diff --quiet -- lib test; then
             echo "Dart files are already formatted."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lib/features/search/data/archive_search_service.dart test/archive_search_service_test.dart
+          git add lib test
           git commit -m "style: apply Dart formatter to source and tests"
           TARGET_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
           git fetch origin "$TARGET_BRANCH"
