@@ -50,8 +50,8 @@ void main() {
   });
 
   test('rejects empty task titles', () async {
-    expect(
-      () => database.saveTask(
+    await expectLater(
+      database.saveTask(
         id: 'invalid',
         title: '   ',
         details: '',
