@@ -13,7 +13,7 @@ class ArchiveTransferService {
   final AppDatabase _database;
 
   static const formatName = 'mindvault-archive';
-  static const formatVersion = 1;
+  static const formatVersion = 2;
 
   Future<String> exportJson() async {
     final categories = await _database.select(_database.categories).get();
@@ -47,6 +47,19 @@ class ArchiveTransferService {
                   'sortOrder': item.sortOrder,
                 })
             .toList(),
+        'tasks': (await _database.select(_database.tasks).get())
+            .map((item) => <String, Object?>{
+                  'id': item.id,
+                  'title': item.title,
+                  'details': item.details,
+                  'dueAt': item.dueAt?.toUtc().toIso8601String(),
+                  'priority': item.priority,
+                  'isCompleted': item.isCompleted,
+                  'createdAt': item.createdAt.toUtc().toIso8601String(),
+                  'updatedAt': item.updatedAt.toUtc().toIso8601String(),
+                  'completedAt': item.completedAt?.toUtc().toIso8601String(),
+                })
+            .toList(),
       },
       'limitations': <String>[
         'Attachment file bytes are not included in format version 1.',
@@ -64,7 +77,7 @@ class ArchiveTransferService {
     final decoded = jsonDecode(source);
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != formatName ||
-        decoded['version'] != formatVersion) {
+        (decoded['version'] != 1 && decoded['version'] != formatVersion)) {
       throw const FormatException('Unsupported MindVault archive format.');
     }
 
@@ -75,12 +88,14 @@ class ArchiveTransferService {
 
     final rawCategories = contents['categories'];
     final rawNotes = contents['notes'];
-    if (rawCategories is! List || rawNotes is! List) {
+    final rawTasks = contents['tasks'] ?? <Object?>[];
+    if (rawCategories is! List || rawNotes is! List || rawTasks is! List) {
       throw const FormatException('Archive categories or notes are invalid.');
     }
 
     final parsedCategories = rawCategories.map(_parseCategory).toList();
     final parsedNotes = rawNotes.map(_parseNote).toList();
+    final parsedTasks = rawTasks.map(_parseTask).toList();
 
     final categoryIds = parsedCategories.map((item) => item.id).toSet();
     if (categoryIds.length != parsedCategories.length) {
@@ -91,8 +106,15 @@ class ArchiveTransferService {
       throw const FormatException('Archive contains duplicate note IDs.');
     }
 
+    final taskIds = parsedTasks.map((item) => item.id).toSet();
+    if (taskIds.length != parsedTasks.length) {
+      throw const FormatException('Archive contains duplicate task IDs.');
+    }
+
     var imported = 0;
     var skipped = 0;
+    var importedTasks = 0;
+    var skippedTasks = 0;
     await _database.transaction(() async {
       for (final category in parsedCategories) {
         await _database.into(_database.categories).insertOnConflictUpdate(
@@ -141,9 +163,38 @@ class ArchiveTransferService {
             );
         imported++;
       }
+
+      for (final task in parsedTasks) {
+        final existing = await (_database.select(_database.tasks)
+              ..where((row) => row.id.equals(task.id)))
+            .getSingleOrNull();
+        if (existing != null) {
+          skippedTasks++;
+          continue;
+        }
+        await _database.into(_database.tasks).insert(
+              TasksCompanion.insert(
+                id: task.id,
+                title: task.title,
+                details: Value(task.details),
+                dueAt: Value(task.dueAt),
+                priority: Value(task.priority),
+                isCompleted: Value(task.isCompleted),
+                createdAt: Value(task.createdAt),
+                updatedAt: Value(task.updatedAt),
+                completedAt: Value(task.completedAt),
+              ),
+            );
+        importedTasks++;
+      }
     });
 
-    return ArchiveImportResult(imported: imported, skipped: skipped);
+    return ArchiveImportResult(
+      imported: imported,
+      skipped: skipped,
+      importedTasks: importedTasks,
+      skippedTasks: skippedTasks,
+    );
   }
 
   _ArchiveCategory _parseCategory(Object? value) {
@@ -208,6 +259,41 @@ class ArchiveTransferService {
     );
   }
 
+  _ArchiveTask _parseTask(Object? value) {
+    if (value is! Map<String, dynamic>) {
+      throw const FormatException('Archive contains an invalid task.');
+    }
+    final id = value['id'];
+    final title = value['title'];
+    final details = value['details'];
+    final dueAt = value['dueAt'];
+    final priority = value['priority'];
+    final completed = value['isCompleted'];
+    final completedAt = value['completedAt'];
+    if (id is! String ||
+        id.trim().isEmpty ||
+        title is! String ||
+        title.trim().isEmpty ||
+        details is! String ||
+        (dueAt != null && dueAt is! String) ||
+        priority is! int ||
+        completed is! bool ||
+        (completedAt != null && completedAt is! String)) {
+      throw const FormatException('Archive task fields are invalid.');
+    }
+    return _ArchiveTask(
+      id: id,
+      title: title,
+      details: details,
+      dueAt: dueAt == null ? null : _date(dueAt),
+      priority: priority.clamp(0, 2).toInt(),
+      isCompleted: completed,
+      createdAt: _date(value['createdAt']),
+      updatedAt: _date(value['updatedAt']),
+      completedAt: completedAt == null ? null : _date(completedAt),
+    );
+  }
+
   DateTime _date(Object? value) {
     if (value is! String) {
       throw const FormatException('Archive contains an invalid timestamp.');
@@ -221,10 +307,17 @@ class ArchiveTransferService {
 }
 
 class ArchiveImportResult {
-  const ArchiveImportResult({required this.imported, required this.skipped});
+  const ArchiveImportResult({
+    required this.imported,
+    required this.skipped,
+    this.importedTasks = 0,
+    this.skippedTasks = 0,
+  });
 
   final int imported;
   final int skipped;
+  final int importedTasks;
+  final int skippedTasks;
 }
 
 class _ArchiveCategory {
@@ -267,4 +360,28 @@ class _ArchiveNote {
   final bool isDeleted;
   final int? color;
   final int sortOrder;
+}
+
+class _ArchiveTask {
+  const _ArchiveTask({
+    required this.id,
+    required this.title,
+    required this.details,
+    required this.dueAt,
+    required this.priority,
+    required this.isCompleted,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.completedAt,
+  });
+
+  final String id;
+  final String title;
+  final String details;
+  final DateTime? dueAt;
+  final int priority;
+  final bool isCompleted;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? completedAt;
 }
