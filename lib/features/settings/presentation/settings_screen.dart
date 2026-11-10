@@ -35,10 +35,8 @@ class SettingsScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(
-              dialogContext,
-              controller.text.trim(),
-            ),
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
             child: const Text('Save'),
           ),
         ],
@@ -47,10 +45,9 @@ class SettingsScreen extends ConsumerWidget {
     controller.dispose();
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     try {
-      await ref.read(databaseProvider).saveCategory(
-            category?.id ?? const Uuid().v4(),
-            name,
-          );
+      await ref
+          .read(databaseProvider)
+          .saveCategory(category?.id ?? const Uuid().v4(), name);
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,8 +136,9 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Categories'),
-            subtitle:
-                const Text('Create, rename, and organize note categories'),
+            subtitle: const Text(
+              'Create, rename, and organize note categories',
+            ),
             trailing: IconButton(
               tooltip: 'Add category',
               icon: const Icon(Icons.add),
@@ -148,9 +146,11 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           StreamBuilder<List<Category>>(
-            stream: (db.select(db.categories)
-                  ..orderBy([(category) => OrderingTerm.asc(category.name)]))
-                .watch(),
+            stream:
+                (db.select(
+                      db.categories,
+                    )..orderBy([(category) => OrderingTerm.asc(category.name)]))
+                    .watch(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text('Could not load categories: ${snapshot.error}');
@@ -177,14 +177,8 @@ class SettingsScreen extends ConsumerWidget {
                           }
                         },
                         itemBuilder: (context) => const [
-                          PopupMenuItem(
-                            value: 'rename',
-                            child: Text('Rename'),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Delete'),
-                          ),
+                          PopupMenuItem(value: 'rename', child: Text('Rename')),
+                          PopupMenuItem(value: 'delete', child: Text('Delete')),
                         ],
                       ),
                     ),
@@ -200,6 +194,14 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('Create and manage reusable note tags'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push('/tags'),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.lock_outline),
+            title: const Text('App lock'),
+            subtitle: const Text('Protect app access with a six-digit PIN'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/app-lock'),
           ),
           const SizedBox(height: 8),
           ListTile(

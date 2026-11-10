@@ -2,38 +2,61 @@
 
 Updated: 2026-11-10
 
-## Current source
+## Repository and branch
 - Repository: `marufallammahim/MindVaultArchive`
 - Working branch: `feature/ultimate-all-in-one-mindvault`
-- Base branch: `main`
 - Android application ID: `com.marufallammahim.mindvaultarchive`
 - Android compile SDK: 36
 
-## CI observations
-- GitHub Actions successfully ran Flutter dependency resolution and Drift code generation on this branch.
-- The first Code Quality attempt failed formatting because `test/database_test.dart` needed Dart formatting. That file was formatted in a follow-up commit.
-- A subsequent run passed formatting but failed `flutter analyze` on one unused route import and analyzer lint issues (string interpolation and deprecated form-field `value` parameters).
-- The unused import/route mismatch and listed analyzer lints were corrected in subsequent commits.
-- The latest commits require a fresh workflow result. Do not treat tests or APK builds as passing until the newest run reports success.
+## Historical verified checkpoint
+Commit `8649d7af5eb2475211701a795e457ed120920ff6` passed Code Quality:
+- Dependency resolution and Drift code generation passed (schema v4).
+- Dart formatting passed.
+- Static analysis passed with no issues.
+- 21 Flutter tests passed.
 
-## Implemented in this branch
-- Existing offline Drift/SQLite note database and app identity retained.
-- Existing note create/edit, autosave, favorites, archive/trash lifecycle, category management and drawing workflow retained.
-- Category assignment and category-filtered note navigation.
-- Per-note color selection.
-- Quick Capture screen.
-- Offline task manager with due date, priority and completion state; schema v2 migration.
-- Five reusable note templates.
-- Versioned JSON transfer v2 for notes, categories and tasks, with v1 import compatibility.
-- Import validation, transactional writes and duplicate note/task-ID protection.
-- Unit tests for archive transfer, task lifecycle, category assignment and note color.
-- Architecture, database, backup, security, AI, sync, UI and roadmap docs updated.
+This checkpoint predates the current schema v5 task links, global search,
+Markdown editor, full ZIP backup and app lock. It is not verification of the
+current branch head.
+
+## Latest CI attempt and current status
+The latest recorded Android CI/Android Build attempt for commit
+`292718ed8bbea448ede0e606c17c9cfad3afda02`:
+- `flutter pub get`: passed.
+- Drift code generation: passed.
+- Dart formatting: failed because three files needed formatting.
+- Static analysis, tests and Android builds: skipped after the formatting gate.
+
+A formatter repair workflow was added temporarily to apply the official Dart
+formatter. The current source has newer changes beyond that failed CI commit,
+including full ZIP backup and app lock. A fresh complete CI run is still
+required for the current head. No APK/AAB from the current head is verified.
+
+## Implemented in the current source
+- Offline-first notes, autosave, favorites, pinning and archive/trash lifecycle.
+- Categories, tags, note colors, wikilinks and backlinks.
+- Quick Capture, five templates and offline tasks with optional note links.
+- Note revision history with bounded retention and restore.
+- Markdown authoring toolbar and selectable preview.
+- Global local search across notes, categories, tags and tasks.
+- JSON archive v5 with backward import support for v1-v4.
+- Full ZIP backup/restore for registered attachment bytes with SHA-256 checks.
+- Optional six-digit app access PIN using Android secure storage.
+- Architecture, backup, security, AI, sync, UI and roadmap documentation.
 
 ## Explicit limitations
-- JSON transfer v2 does not include attachment bytes or binary media and is not a full archive backup.
-- Rich text/block editor, tags, nested notebooks, backlinks, knowledge graph, calendar, reminders, OCR, PDF annotation, audio recording/transcription, encryption, app lock, remote sync, cloud backup, collaboration and AI provider integration are not yet implemented.
-- Full Bengali localization and comprehensive device accessibility testing remain outstanding.
-- No production signing key is present in the repository.
+- App lock is an access gate only; SQLite and attachment files are not encrypted.
+- No PIN recovery flow exists.
+- Search is substring matching, not FTS5/semantic/OCR search.
+- Markdown is not a full WYSIWYG block editor.
+- Notifications, calendar, OCR/PDF indexing, audio recording/transcription,
+  biometric unlock, encrypted database/files, remote sync, collaboration and
+  AI provider integration remain incomplete.
+- Full Bengali localization and device accessibility testing remain outstanding.
+- No production signing key or cloud/AI provider is configured.
 
-## External infrastructure
-Cloud sync, collaboration and cloud AI require real provider infrastructure and user authorization. No such service is configured at this time.
+## Required next verification
+Run CI on the latest feature-branch head and confirm dependency resolution,
+Drift code generation, formatting, analysis, all tests and Android debug build.
+Only report a release candidate after the workflow completes and the artifact
+is visible.

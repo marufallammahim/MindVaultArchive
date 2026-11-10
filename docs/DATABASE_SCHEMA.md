@@ -1,6 +1,6 @@
 # Database Schema — current implementation
 
-The current Drift database is schema version 4.
+The current Drift database is schema version 5.
 
 ## Notes
 - `id` (primary key)
@@ -24,6 +24,7 @@ The current Drift database is schema version 4.
 ## Tasks (schema v2)
 - `id` (primary key)
 - `title`, `details`
+- nullable `noteId` linking a task to a note
 - nullable `dueAt`
 - `priority`, `isCompleted`
 - `createdAt`, `updatedAt`, nullable `completedAt`
@@ -43,7 +44,11 @@ foreign keys for note/category/attachment/tag/revision references. Application
 operations maintain category detachment, tag-link cleanup, revision cleanup
 and note attachment metadata cleanup behavior.
 
-Schema upgrades are additive: version 1 to 2 creates the task table; version 2
-to 3 creates tags and note-tag relations; version 3 to 4 creates note revisions.
-Future additions must increment the schema version and include tested Drift
-migrations. Do not add tables only to match a planned feature list.
+Schema upgrades are additive: version 1 to 2 creates tasks; version 2 to 3
+creates tags and note-tag relations; version 3 to 4 creates note revisions;
+version 4 to 5 adds nullable task-to-note links. When upgrading directly from
+version 1, the task table is created with its current columns, so the v5
+migration only adds the column for databases that already had the task table.
+Schema v5 adds nullable `Tasks.noteId`. Permanent note deletion clears linked
+task references before removing the note. Future additions must increment the
+schema version and include tested Drift migrations. Do not add tables only to match a planned feature list.

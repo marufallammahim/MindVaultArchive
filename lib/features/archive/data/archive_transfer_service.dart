@@ -5,15 +5,16 @@ import 'package:mindvault_archive/core/database/database.dart';
 
 /// Portable, versioned JSON transfer for notes, categories, tags, tasks and revisions.
 ///
-/// Format v4 includes note revision history; attachment file bytes are still excluded. It never
-/// serializes private device paths, and import never overwrites existing notes.
+/// Format v5 includes linked tasks and note revision history. JSON transfer
+/// excludes attachment bytes; use FullBackupService for a complete ZIP backup.
+/// Local device paths are never serialized, and import protects existing notes.
 class ArchiveTransferService {
   ArchiveTransferService(this._database);
 
   final AppDatabase _database;
 
   static const formatName = 'mindvault-archive';
-  static const formatVersion = 4;
+  static const formatVersion = 5;
 
   Future<String> exportJson() async {
     final categories = await _database.select(_database.categories).get();
@@ -25,68 +26,81 @@ class ArchiveTransferService {
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'contents': <String, Object?>{
         'categories': categories
-            .map((item) => <String, Object?>{
-                  'id': item.id,
-                  'name': item.name,
-                  'createdAt': item.createdAt.toUtc().toIso8601String(),
-                  'updatedAt': item.updatedAt.toUtc().toIso8601String(),
-                })
+            .map(
+              (item) => <String, Object?>{
+                'id': item.id,
+                'name': item.name,
+                'createdAt': item.createdAt.toUtc().toIso8601String(),
+                'updatedAt': item.updatedAt.toUtc().toIso8601String(),
+              },
+            )
             .toList(),
         'notes': notes
-            .map((item) => <String, Object?>{
-                  'id': item.id,
-                  'title': item.title,
-                  'documentContent': item.documentContent,
-                  'categoryId': item.categoryId,
-                  'createdAt': item.createdAt.toUtc().toIso8601String(),
-                  'updatedAt': item.updatedAt.toUtc().toIso8601String(),
-                  'isFavorite': item.isFavorite,
-                  'isArchived': item.isArchived,
-                  'isDeleted': item.isDeleted,
-                  'color': item.color,
-                  'sortOrder': item.sortOrder,
-                })
+            .map(
+              (item) => <String, Object?>{
+                'id': item.id,
+                'title': item.title,
+                'documentContent': item.documentContent,
+                'categoryId': item.categoryId,
+                'createdAt': item.createdAt.toUtc().toIso8601String(),
+                'updatedAt': item.updatedAt.toUtc().toIso8601String(),
+                'isFavorite': item.isFavorite,
+                'isArchived': item.isArchived,
+                'isDeleted': item.isDeleted,
+                'color': item.color,
+                'sortOrder': item.sortOrder,
+              },
+            )
             .toList(),
         'tags': (await _database.select(_database.tags).get())
-            .map((item) => <String, Object?>{
-                  'id': item.id,
-                  'name': item.name,
-                  'color': item.color,
-                  'createdAt': item.createdAt.toUtc().toIso8601String(),
-                })
+            .map(
+              (item) => <String, Object?>{
+                'id': item.id,
+                'name': item.name,
+                'color': item.color,
+                'createdAt': item.createdAt.toUtc().toIso8601String(),
+              },
+            )
             .toList(),
         'revisions': (await _database.select(_database.noteRevisions).get())
-            .map((item) => <String, Object?>{
-                  'id': item.id,
-                  'noteId': item.noteId,
-                  'title': item.title,
-                  'documentContent': item.documentContent,
-                  'createdAt': item.createdAt.toUtc().toIso8601String(),
-                })
+            .map(
+              (item) => <String, Object?>{
+                'id': item.id,
+                'noteId': item.noteId,
+                'title': item.title,
+                'documentContent': item.documentContent,
+                'createdAt': item.createdAt.toUtc().toIso8601String(),
+              },
+            )
             .toList(),
         'noteTags': (await _database.select(_database.noteTags).get())
-            .map((item) => <String, Object?>{
-                  'noteId': item.noteId,
-                  'tagId': item.tagId,
-                  'createdAt': item.createdAt.toUtc().toIso8601String(),
-                })
+            .map(
+              (item) => <String, Object?>{
+                'noteId': item.noteId,
+                'tagId': item.tagId,
+                'createdAt': item.createdAt.toUtc().toIso8601String(),
+              },
+            )
             .toList(),
         'tasks': (await _database.select(_database.tasks).get())
-            .map((item) => <String, Object?>{
-                  'id': item.id,
-                  'title': item.title,
-                  'details': item.details,
-                  'dueAt': item.dueAt?.toUtc().toIso8601String(),
-                  'priority': item.priority,
-                  'isCompleted': item.isCompleted,
-                  'createdAt': item.createdAt.toUtc().toIso8601String(),
-                  'updatedAt': item.updatedAt.toUtc().toIso8601String(),
-                  'completedAt': item.completedAt?.toUtc().toIso8601String(),
-                })
+            .map(
+              (item) => <String, Object?>{
+                'id': item.id,
+                'title': item.title,
+                'details': item.details,
+                'noteId': item.noteId,
+                'dueAt': item.dueAt?.toUtc().toIso8601String(),
+                'priority': item.priority,
+                'isCompleted': item.isCompleted,
+                'createdAt': item.createdAt.toUtc().toIso8601String(),
+                'updatedAt': item.updatedAt.toUtc().toIso8601String(),
+                'completedAt': item.completedAt?.toUtc().toIso8601String(),
+              },
+            )
             .toList(),
       },
       'limitations': <String>[
-        'Attachment file bytes are not included in format version 4.',
+        'JSON format version 5 does not include attachment file bytes; use full ZIP backup.',
       ],
     };
 
@@ -97,13 +111,17 @@ class ArchiveTransferService {
   ///
   /// Existing note IDs are skipped to avoid accidental overwrites. Categories
   /// are upserted by stable ID so imported notes can retain their grouping.
-  Future<ArchiveImportResult> importJson(String source) async {
+  Future<ArchiveImportResult> importJson(
+    String source, {
+    List<AttachmentImportRecord> attachments = const [],
+  }) async {
     final decoded = jsonDecode(source);
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != formatName ||
         (decoded['version'] != 1 &&
             decoded['version'] != 2 &&
             decoded['version'] != 3 &&
+            decoded['version'] != 4 &&
             decoded['version'] != formatVersion)) {
       throw const FormatException('Unsupported MindVault archive format.');
     }
@@ -148,15 +166,17 @@ class ArchiveTransferService {
     if (tagIds.length != parsedTags.length) {
       throw const FormatException('Archive contains duplicate tag IDs.');
     }
-    final relationKeys =
-        parsedNoteTags.map((item) => '${item.noteId}|${item.tagId}').toSet();
+    final relationKeys = parsedNoteTags
+        .map((item) => '${item.noteId}|${item.tagId}')
+        .toSet();
     if (relationKeys.length != parsedNoteTags.length) {
       throw const FormatException('Archive contains duplicate note-tag links.');
     }
     for (final link in parsedNoteTags) {
       if (!noteIds.contains(link.noteId) || !tagIds.contains(link.tagId)) {
         throw const FormatException(
-            'Archive contains an orphan note-tag link.');
+          'Archive contains an orphan note-tag link.',
+        );
       }
     }
 
@@ -167,13 +187,33 @@ class ArchiveTransferService {
     for (final revision in parsedRevisions) {
       if (!noteIds.contains(revision.noteId)) {
         throw const FormatException(
-            'Archive contains an orphan note revision.');
+          'Archive contains an orphan note revision.',
+        );
+      }
+    }
+
+    final attachmentIds = attachments.map((item) => item.id).toSet();
+    if (attachmentIds.length != attachments.length) {
+      throw const FormatException('Backup contains duplicate attachment IDs.');
+    }
+    for (final attachment in attachments) {
+      if (!noteIds.contains(attachment.noteId)) {
+        throw const FormatException(
+          'Backup contains an attachment for a missing note.',
+        );
       }
     }
 
     final taskIds = parsedTasks.map((item) => item.id).toSet();
     if (taskIds.length != parsedTasks.length) {
       throw const FormatException('Archive contains duplicate task IDs.');
+    }
+    for (final task in parsedTasks) {
+      if (task.noteId != null && !noteIds.contains(task.noteId)) {
+        throw const FormatException(
+          'Archive contains a task linked to a missing note.',
+        );
+      }
     }
 
     var imported = 0;
@@ -184,10 +224,15 @@ class ArchiveTransferService {
     var skippedTags = 0;
     var importedRevisions = 0;
     var skippedRevisions = 0;
+    var importedAttachments = 0;
+    var skippedAttachments = 0;
+    final importedAttachmentIds = <String>[];
     final skippedNoteIds = <String>{};
     await _database.transaction(() async {
       for (final category in parsedCategories) {
-        await _database.into(_database.categories).insertOnConflictUpdate(
+        await _database
+            .into(_database.categories)
+            .insertOnConflictUpdate(
               CategoriesCompanion.insert(
                 id: category.id,
                 name: category.name,
@@ -197,27 +242,32 @@ class ArchiveTransferService {
             );
       }
 
-      final existingCategoryRows =
-          await _database.select(_database.categories).get();
-      final availableCategoryIds =
-          existingCategoryRows.map((item) => item.id).toSet();
+      final existingCategoryRows = await _database
+          .select(_database.categories)
+          .get();
+      final availableCategoryIds = existingCategoryRows
+          .map((item) => item.id)
+          .toSet();
 
       for (final note in parsedNotes) {
-        final existing = await (_database.select(_database.notes)
-              ..where((row) => row.id.equals(note.id)))
-            .getSingleOrNull();
+        final existing = await (_database.select(
+          _database.notes,
+        )..where((row) => row.id.equals(note.id))).getSingleOrNull();
         if (existing != null) {
           skipped++;
           skippedNoteIds.add(note.id);
           continue;
         }
 
-        final categoryId = note.categoryId != null &&
+        final categoryId =
+            note.categoryId != null &&
                 availableCategoryIds.contains(note.categoryId)
             ? note.categoryId
             : null;
 
-        await _database.into(_database.notes).insert(
+        await _database
+            .into(_database.notes)
+            .insert(
               NotesCompanion.insert(
                 id: note.id,
                 title: Value(note.title),
@@ -236,14 +286,16 @@ class ArchiveTransferService {
       }
 
       for (final tag in parsedTags) {
-        final existing = await (_database.select(_database.tags)
-              ..where((row) => row.id.equals(tag.id)))
-            .getSingleOrNull();
+        final existing = await (_database.select(
+          _database.tags,
+        )..where((row) => row.id.equals(tag.id))).getSingleOrNull();
         if (existing != null) {
           skippedTags++;
           continue;
         }
-        await _database.into(_database.tags).insert(
+        await _database
+            .into(_database.tags)
+            .insert(
               TagsCompanion.insert(
                 id: tag.id,
                 name: tag.name,
@@ -261,11 +313,13 @@ class ArchiveTransferService {
             !availableTagIds.contains(link.tagId)) {
           continue;
         }
-        final noteExists = await (_database.select(_database.notes)
-              ..where((row) => row.id.equals(link.noteId)))
-            .getSingleOrNull();
+        final noteExists = await (_database.select(
+          _database.notes,
+        )..where((row) => row.id.equals(link.noteId))).getSingleOrNull();
         if (noteExists == null) continue;
-        await _database.into(_database.noteTags).insertOnConflictUpdate(
+        await _database
+            .into(_database.noteTags)
+            .insertOnConflictUpdate(
               NoteTagsCompanion.insert(
                 noteId: link.noteId,
                 tagId: link.tagId,
@@ -279,18 +333,20 @@ class ArchiveTransferService {
           skippedRevisions++;
           continue;
         }
-        final exists = await (_database.select(_database.notes)
-              ..where((note) => note.id.equals(revision.noteId)))
-            .getSingleOrNull();
+        final exists = await (_database.select(
+          _database.notes,
+        )..where((note) => note.id.equals(revision.noteId))).getSingleOrNull();
         if (exists == null) continue;
-        final revisionExists = await (_database.select(_database.noteRevisions)
-              ..where((row) => row.id.equals(revision.id)))
-            .getSingleOrNull();
+        final revisionExists = await (_database.select(
+          _database.noteRevisions,
+        )..where((row) => row.id.equals(revision.id))).getSingleOrNull();
         if (revisionExists != null) {
           skippedRevisions++;
           continue;
         }
-        await _database.into(_database.noteRevisions).insert(
+        await _database
+            .into(_database.noteRevisions)
+            .insert(
               NoteRevisionsCompanion.insert(
                 id: revision.id,
                 noteId: revision.noteId,
@@ -302,19 +358,89 @@ class ArchiveTransferService {
         importedRevisions++;
       }
 
+      final revisionNoteIds = parsedRevisions
+          .map((item) => item.noteId)
+          .where((id) => !skippedNoteIds.contains(id))
+          .toSet();
+      for (final noteId in revisionNoteIds) {
+        final history =
+            await (_database.select(_database.noteRevisions)
+                  ..where((item) => item.noteId.equals(noteId))
+                  ..orderBy([(item) => OrderingTerm.desc(item.createdAt)]))
+                .get();
+        if (history.length > 30) {
+          final expiredIds = history.skip(30).map((item) => item.id).toList();
+          await (_database.delete(
+            _database.noteRevisions,
+          )..where((item) => item.id.isIn(expiredIds))).go();
+        }
+      }
+
+      for (final attachment in attachments) {
+        if (skippedNoteIds.contains(attachment.noteId)) {
+          skippedAttachments++;
+          continue;
+        }
+        final noteExists =
+            await (_database.select(_database.notes)
+                  ..where((note) => note.id.equals(attachment.noteId)))
+                .getSingleOrNull();
+        if (noteExists == null) {
+          skippedAttachments++;
+          continue;
+        }
+        final existing = await (_database.select(
+          _database.attachments,
+        )..where((row) => row.id.equals(attachment.id))).getSingleOrNull();
+        if (existing != null) {
+          skippedAttachments++;
+          continue;
+        }
+        await _database
+            .into(_database.attachments)
+            .insert(
+              AttachmentsCompanion.insert(
+                id: attachment.id,
+                noteId: attachment.noteId,
+                type: attachment.type,
+                localPath: attachment.localPath,
+                filename: attachment.filename,
+                duration: Value(attachment.duration),
+                documentPosition: Value(attachment.documentPosition),
+                createdAt: Value(attachment.createdAt),
+                metadata: Value(attachment.metadata),
+              ),
+            );
+        importedAttachments++;
+        importedAttachmentIds.add(attachment.id);
+      }
+
+      final currentNotes = await _database.select(_database.notes).get();
+      final activeNoteIds = currentNotes
+          .where((item) => !item.isDeleted)
+          .map((item) => item.id)
+          .toSet();
+
       for (final task in parsedTasks) {
-        final existing = await (_database.select(_database.tasks)
-              ..where((row) => row.id.equals(task.id)))
-            .getSingleOrNull();
+        final existing = await (_database.select(
+          _database.tasks,
+        )..where((row) => row.id.equals(task.id))).getSingleOrNull();
         if (existing != null) {
           skippedTasks++;
           continue;
         }
-        await _database.into(_database.tasks).insert(
+        await _database
+            .into(_database.tasks)
+            .insert(
               TasksCompanion.insert(
                 id: task.id,
                 title: task.title,
                 details: Value(task.details),
+                noteId: Value(
+                  task.noteId != null && activeNoteIds.contains(task.noteId)
+                      ? task.noteId
+                      : null,
+                ),
                 dueAt: Value(task.dueAt),
                 priority: Value(task.priority),
                 isCompleted: Value(task.isCompleted),
@@ -336,6 +462,9 @@ class ArchiveTransferService {
       skippedTags: skippedTags,
       importedRevisions: importedRevisions,
       skippedRevisions: skippedRevisions,
+      importedAttachments: importedAttachments,
+      skippedAttachments: skippedAttachments,
+      importedAttachmentIds: importedAttachmentIds,
     );
   }
 
@@ -474,6 +603,7 @@ class ArchiveTransferService {
     final id = value['id'];
     final title = value['title'];
     final details = value['details'];
+    final noteId = value['noteId'];
     final dueAt = value['dueAt'];
     final priority = value['priority'];
     final completed = value['isCompleted'];
@@ -483,6 +613,7 @@ class ArchiveTransferService {
         title is! String ||
         title.trim().isEmpty ||
         details is! String ||
+        (noteId != null && noteId is! String) ||
         (dueAt != null && dueAt is! String) ||
         priority is! int ||
         completed is! bool ||
@@ -493,6 +624,7 @@ class ArchiveTransferService {
       id: id,
       title: title,
       details: details,
+      noteId: noteId as String?,
       dueAt: dueAt == null ? null : _date(dueAt),
       priority: priority.clamp(0, 2).toInt(),
       isCompleted: completed,
@@ -524,6 +656,9 @@ class ArchiveImportResult {
     this.skippedTags = 0,
     this.importedRevisions = 0,
     this.skippedRevisions = 0,
+    this.importedAttachments = 0,
+    this.skippedAttachments = 0,
+    this.importedAttachmentIds = const [],
   });
 
   final int imported;
@@ -534,6 +669,33 @@ class ArchiveImportResult {
   final int skippedTags;
   final int importedRevisions;
   final int skippedRevisions;
+  final int importedAttachments;
+  final int skippedAttachments;
+  final List<String> importedAttachmentIds;
+}
+
+class AttachmentImportRecord {
+  const AttachmentImportRecord({
+    required this.id,
+    required this.noteId,
+    required this.type,
+    required this.localPath,
+    required this.filename,
+    required this.duration,
+    required this.documentPosition,
+    required this.createdAt,
+    required this.metadata,
+  });
+
+  final String id;
+  final String noteId;
+  final String type;
+  final String localPath;
+  final String filename;
+  final int? duration;
+  final int documentPosition;
+  final DateTime createdAt;
+  final String? metadata;
 }
 
 class _ArchiveCategory {
@@ -583,6 +745,7 @@ class _ArchiveTask {
     required this.id,
     required this.title,
     required this.details,
+    required this.noteId,
     required this.dueAt,
     required this.priority,
     required this.isCompleted,
@@ -594,6 +757,7 @@ class _ArchiveTask {
   final String id;
   final String title;
   final String details;
+  final String? noteId;
   final DateTime? dueAt;
   final int priority;
   final bool isCompleted;

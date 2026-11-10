@@ -22,8 +22,7 @@ void main() {
 
       final note = await (database.select(
         database.notes,
-      )..where((row) => row.id.equals('note-1')))
-          .getSingle();
+      )..where((row) => row.id.equals('note-1'))).getSingle();
 
       expect(note.title, 'Updated title');
       expect(note.documentContent, 'Updated body');
@@ -61,15 +60,13 @@ void main() {
     await database.setNoteCategory('note-category', 'ideas');
     var note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-category')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-category'))).getSingle();
     expect(note.categoryId, 'ideas');
 
     await database.setNoteCategory('note-category', null);
     note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-category')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-category'))).getSingle();
     expect(note.categoryId, isNull);
     await expectLater(
       database.setNoteCategory('note-category', 'missing'),
@@ -80,28 +77,33 @@ void main() {
   test('note revisions preserve old content and can be restored', () async {
     await database.saveNoteContent('history-note', 'First title', 'First body');
     await database.saveNoteContent(
-        'history-note', 'Second title', 'Second body');
+      'history-note',
+      'Second title',
+      'Second body',
+    );
 
-    var revisions = await (database.select(database.noteRevisions)
-          ..where((revision) => revision.noteId.equals('history-note')))
-        .get();
+    var revisions = await (database.select(
+      database.noteRevisions,
+    )..where((revision) => revision.noteId.equals('history-note'))).get();
     expect(revisions, hasLength(1));
     expect(revisions.single.title, 'First title');
     expect(revisions.single.documentContent, 'First body');
 
     await database.restoreRevision('history-note', revisions.single.id);
-    final restored = await (database.select(database.notes)
-          ..where((note) => note.id.equals('history-note')))
-        .getSingle();
+    final restored = await (database.select(
+      database.notes,
+    )..where((note) => note.id.equals('history-note'))).getSingle();
     expect(restored.title, 'First title');
     expect(restored.documentContent, 'First body');
 
-    revisions = await (database.select(database.noteRevisions)
-          ..where((revision) => revision.noteId.equals('history-note')))
-        .get();
+    revisions = await (database.select(
+      database.noteRevisions,
+    )..where((revision) => revision.noteId.equals('history-note'))).get();
     expect(revisions, hasLength(2));
     expect(
-        revisions.any((revision) => revision.title == 'Second title'), isTrue);
+      revisions.any((revision) => revision.title == 'Second title'),
+      isTrue,
+    );
   });
 
   test('revision history is bounded to the latest 30 snapshots', () async {
@@ -124,15 +126,13 @@ void main() {
     await database.setPinned('pin-note', true);
     var note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('pin-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('pin-note'))).getSingle();
     expect(note.sortOrder, 1);
 
     await database.setPinned('pin-note', false);
     note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('pin-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('pin-note'))).getSingle();
     expect(note.sortOrder, 0);
   });
 
@@ -141,15 +141,13 @@ void main() {
     await database.setNoteColor('color-note', 0xFFFFF0D8);
     var note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('color-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('color-note'))).getSingle();
     expect(note.color, 0xFFFFF0D8);
 
     await database.setNoteColor('color-note', null);
     note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('color-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('color-note'))).getSingle();
     expect(note.color, isNull);
   });
 
@@ -161,8 +159,7 @@ void main() {
 
     final note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-2')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-2'))).getSingle();
 
     expect(note.isFavorite, isTrue);
     expect(note.isArchived, isTrue);
@@ -171,8 +168,7 @@ void main() {
     await database.setDeleted('note-2', false);
     final restored = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-2')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-2'))).getSingle();
     expect(restored.isDeleted, isFalse);
   });
 
@@ -186,22 +182,22 @@ void main() {
 
     final category = await (database.select(
       database.categories,
-    )..where((row) => row.id.equals('work')))
-        .getSingle();
+    )..where((row) => row.id.equals('work'))).getSingle();
     expect(category.name, 'Projects');
 
     await database.deleteCategory('work');
     final note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-3')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-3'))).getSingle();
     expect(note.categoryId, isNull);
     expect(await database.select(database.categories).get(), isEmpty);
   });
 
   test('permanent deletion removes note and its attachment metadata', () async {
     await database.saveNoteContent('note-4', 'With attachment', 'Body');
-    await database.into(database.attachments).insert(
+    await database
+        .into(database.attachments)
+        .insert(
           AttachmentsCompanion.insert(
             id: 'attachment-1',
             noteId: 'note-4',
@@ -217,6 +213,56 @@ void main() {
     expect(await database.select(database.notes).get(), isEmpty);
     expect(await database.select(database.attachments).get(), isEmpty);
     expect(await database.select(database.noteRevisions).get(), isEmpty);
+  });
+
+  test(
+    'tasks can be linked to notes and are detached on permanent deletion',
+    () async {
+      await database.saveNoteContent('task-note', 'Project note', 'Details');
+      await database.saveTask(
+        id: 'linked-task',
+        title: 'Review this note',
+        details: 'Check the attached idea',
+        priority: 1,
+        noteId: 'task-note',
+      );
+
+      var task = await (database.select(
+        database.tasks,
+      )..where((item) => item.id.equals('linked-task'))).getSingle();
+      expect(task.noteId, 'task-note');
+
+      await database.permanentlyDeleteNote('task-note');
+      task = await (database.select(
+        database.tasks,
+      )..where((item) => item.id.equals('linked-task'))).getSingle();
+      expect(task.noteId, isNull);
+    },
+  );
+
+  test('task cannot be linked to a missing or deleted note', () async {
+    await expectLater(
+      database.saveTask(
+        id: 'bad-task',
+        title: 'Invalid link',
+        details: '',
+        priority: 1,
+        noteId: 'missing-note',
+      ),
+      throwsArgumentError,
+    );
+    await database.saveNoteContent('deleted-note', 'Deleted', 'Body');
+    await database.setDeleted('deleted-note', true);
+    await expectLater(
+      database.saveTask(
+        id: 'deleted-link-task',
+        title: 'Invalid deleted link',
+        details: '',
+        priority: 1,
+        noteId: 'deleted-note',
+      ),
+      throwsArgumentError,
+    );
   });
 
   test('category names cannot be empty', () async {

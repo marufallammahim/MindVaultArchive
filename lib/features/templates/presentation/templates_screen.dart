@@ -26,40 +26,35 @@ const noteTemplates = <NoteTemplate>[
     title: 'Daily journal',
     description: 'Reflect on the day and capture what matters.',
     icon: Icons.book_outlined,
-    content:
-        '## Today\n\nDate: \n\n### Highlights\n- \n\n### What I learned\n- \n\n### Challenges\n- \n\n### Tomorrow\n- ',
+    content: '## Today\n\nDate: \n\n### Highlights\n- \n\n### What I learned\n- \n\n### Challenges\n- \n\n### Tomorrow\n- ',
   ),
   NoteTemplate(
     id: 'meeting',
     title: 'Meeting notes',
     description: 'Agenda, decisions, and action items.',
     icon: Icons.groups_outlined,
-    content:
-        '## Meeting\n\nDate: \nAttendees: \n\n### Agenda\n- \n\n### Discussion\n\n\n### Decisions\n- \n\n### Action items\n- [ ] ',
+    content: '## Meeting\n\nDate: \nAttendees: \n\n### Agenda\n- \n\n### Discussion\n\n\n### Decisions\n- \n\n### Action items\n- [ ] ',
   ),
   NoteTemplate(
     id: 'project-plan',
     title: 'Project plan',
     description: 'Define goals, milestones, risks, and next steps.',
     icon: Icons.rocket_launch_outlined,
-    content:
-        '## Project overview\n\nGoal: \n\n### Scope\n- \n\n### Milestones\n1. \n2. \n\n### Risks\n- \n\n### Next actions\n- [ ] ',
+    content: '## Project overview\n\nGoal: \n\n### Scope\n- \n\n### Milestones\n1. \n2. \n\n### Risks\n- \n\n### Next actions\n- [ ] ',
   ),
   NoteTemplate(
     id: 'study',
     title: 'Study notes',
     description: 'Organize concepts, examples, and questions.',
     icon: Icons.school_outlined,
-    content:
-        '## Topic\n\nSubject: \nSource: \n\n### Key concepts\n- \n\n### Explanation\n\n\n### Examples\n- \n\n### Questions to revisit\n- ',
+    content: '## Topic\n\nSubject: \nSource: \n\n### Key concepts\n- \n\n### Explanation\n\n\n### Examples\n- \n\n### Questions to revisit\n- ',
   ),
   NoteTemplate(
     id: 'developer',
     title: 'Developer notebook',
     description: 'Record code ideas, commands, and debugging notes.',
     icon: Icons.terminal_outlined,
-    content:
-        '## Technical note\n\nProject: \nLanguage / tool: \n\n### Problem or idea\n\n\n### Approach\n\n\n### Commands / snippets\n\n\n### Result\n\n\n### Follow-up\n- [ ] ',
+    content: '## Technical note\n\nProject: \nLanguage / tool: \n\n### Problem or idea\n\n\n### Approach\n\n\n### Commands / snippets\n\n\n### Result\n\n\n### Follow-up\n- [ ] ',
   ),
 ];
 
@@ -73,18 +68,16 @@ class TemplatesScreen extends ConsumerWidget {
   ) async {
     final id = const Uuid().v4();
     try {
-      await ref.read(databaseProvider).saveNoteContent(
-            id,
-            template.title,
-            template.content,
-          );
+      await ref
+          .read(databaseProvider)
+          .saveNoteContent(id, template.title, template.content);
       if (!context.mounted) return;
       context.push('/editor/$id');
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not create note: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not create note: $error')));
     }
   }
 
@@ -101,15 +94,14 @@ class TemplatesScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 6),
           const Text(
-              'Choose a template. You can edit every part after it opens.'),
+            'Choose a template. You can edit every part after it opens.',
+          ),
           const SizedBox(height: 16),
           for (final template in noteTemplates)
             Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.all(16),
-                leading: CircleAvatar(
-                  child: Icon(template.icon),
-                ),
+                leading: CircleAvatar(child: Icon(template.icon)),
                 title: Text(template.title),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 4),
