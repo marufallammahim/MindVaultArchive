@@ -318,6 +318,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             itemBuilder: (context, index) {
               final note = notes[index];
               return Card(
+                color: note.color == null
+                    ? null
+                    : Color(note.color!).withValues(alpha: 0.22),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () => context.push('/editor/${note.id}'),
