@@ -243,7 +243,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
       }
       context.push('/editor/$id');
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Could not create note: $error')),
       );
