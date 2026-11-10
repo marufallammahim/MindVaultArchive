@@ -117,8 +117,7 @@ void main() {
     }
     final revisions = await (database.select(
       database.noteRevisions,
-    )..where((revision) => revision.noteId.equals('bounded-history')))
-        .get();
+    )..where((revision) => revision.noteId.equals('bounded-history'))).get();
     expect(revisions, hasLength(30));
   });
 
