@@ -42,8 +42,8 @@ only called implemented when the repository contains a usable local workflow.
 ## Partial
 
 - Search is local substring matching, not FTS5, semantic or OCR search.
-- Editor stores plain text/Markdown-like content; it is not a block-based
-  rich-text editor with inline formatting controls.
+- Editor stores Markdown source and provides formatting shortcuts plus a
+  selectable rendered preview; it is not a WYSIWYG block editor.
 - Organization supports categories/tags and title-based links; nested
   notebooks, smart views and a graph visualization are absent.
 - Drawing attachment records are local; export does not package attachment
