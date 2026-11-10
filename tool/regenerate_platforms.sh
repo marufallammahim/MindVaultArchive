@@ -56,6 +56,26 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
   fi
 fi
 
+# AndroidX AAR metadata is checked against each Android module's compile SDK.
+# Flutter plugins may still default to an older API level, so enforce API 36
+# for every Android application/library module after its Android plugin loads.
+ROOT_GRADLE="android/build.gradle"
+if [[ -f "$ROOT_GRADLE" ]] && ! grep -q "MINDVAULT_COMPILE_SDK_ENFORCEMENT" "$ROOT_GRADLE"; then
+  cat >> "$ROOT_GRADLE" <<'GRADLE'
+
+// MINDVAULT_COMPILE_SDK_ENFORCEMENT
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                compileSdkVersion 36
+            }
+        }
+    }
+}
+GRADLE
+fi
+
 # Ensure the Gradle wrapper can be executed on Linux runners.
 if [[ -f android/gradlew ]]; then
   chmod +x android/gradlew
