@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' hide Column;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +12,9 @@ import 'package:mindvault_archive/features/editor/providers/editor_provider.dart
 import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final String noteId;
@@ -84,6 +88,191 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
   }
 
+
+  Future<void> _attachFile() async {
+    final saved = await ref
+        .read(editorProvider(widget.noteId).notifier)
+        .forceSave();
+    if (!mounted) {
+      return;
+    }
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Save the note before attaching a file.')),
+      );
+      return;
+    }
+    File? target;
+    try {
+      final selection = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        withData: true,
+      );
+      if (selection == null || selection.files.isEmpty) {
+        return;
+      }
+      final picked = selection.files.single;
+      final bytes = picked.bytes;
+      if (bytes == null || bytes.isEmpty) {
+        throw StateError('The selected file could not be read.');
+      }
+      if (bytes.length > 25 * 1024 * 1024) {
+        throw StateError('Files larger than 25 MB are not supported yet.');
+      }
+      final documents = await getApplicationDocumentsDirectory();
+      final directory = Directory(
+        p.join(documents.path, 'mindvault', 'attachments'),
+      );
+      await directory.create(recursive: true);
+      final id = const Uuid().v4();
+      final safeName = p
+          .basename(picked.name)
+          .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+      final filename = '${id}_${safeName.isEmpty ? 'attachment' : safeName}';
+      target = File(p.join(directory.path, filename));
+      await target.writeAsBytes(bytes, flush: true);
+      final extension = p.extension(picked.name).toLowerCase();
+      final type = {
+        '.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'
+      }.contains(extension)
+          ? 'image'
+          : {'.mp3', '.m4a', '.wav', '.ogg', '.aac'}.contains(extension)
+              ? 'audio'
+              : {'.mp4', '.mov', '.mkv', '.webm'}.contains(extension)
+                  ? 'video'
+                  : extension == '.pdf'
+                      ? 'pdf'
+                      : 'file';
+      await ref.read(databaseProvider).into(
+        ref.read(databaseProvider).attachments,
+      ).insert(
+        AttachmentsCompanion.insert(
+          id: id,
+          noteId: widget.noteId,
+          type: type,
+          localPath: target.path,
+          filename: picked.name,
+        ),
+      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Attached "${picked.name}" to this note.')),
+      );
+    } catch (error) {
+      if (target != null && await target.exists()) {
+        await target.delete();
+      }
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not attach file: $error')),
+      );
+    }
+  }
+
+  Future<void> _openAttachment(Attachment attachment) async {
+    final file = File(attachment.localPath);
+    if (!await file.exists()) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('This attachment file is missing.')),
+        );
+      }
+      return;
+    }
+    if (attachment.type == 'image' || attachment.type == 'drawing') {
+      if (!mounted) {
+        return;
+      }
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => Dialog(
+          child: InteractiveViewer(
+            child: Image.file(
+              file,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text('This image could not be displayed.'),
+              ),
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+    try {
+      await Share.shareXFiles(
+        [XFile(file.path, mimeType: attachment.type == 'pdf' ? 'application/pdf' : null)],
+        text: 'Open this MindVault Archive attachment with a compatible app.',
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open attachment: $error')),
+        );
+      }
+    }
+  }
+
+  Future<void> _removeAttachment(Attachment attachment) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Remove attachment?'),
+        content: Text('Remove "${attachment.filename}" from this note?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
+    try {
+      await (ref.read(databaseProvider).delete(
+        ref.read(databaseProvider).attachments,
+      )..where((item) => item.id.equals(attachment.id))).go();
+      final file = File(attachment.localPath);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not remove attachment: $error')),
+        );
+      }
+    }
+  }
+
+  IconData _attachmentIcon(Attachment item) {
+    switch (item.type) {
+      case 'image':
+      case 'drawing':
+        return Icons.image_outlined;
+      case 'audio':
+        return Icons.audio_file_outlined;
+      case 'video':
+        return Icons.video_file_outlined;
+      case 'pdf':
+        return Icons.picture_as_pdf_outlined;
+      default:
+        return Icons.attach_file_outlined;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(editorProvider(widget.noteId));
@@ -127,6 +316,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
           ),
           actions: [
+            IconButton(
+              tooltip: 'Attach file',
+              icon: const Icon(Icons.attach_file),
+              onPressed: _attachFile,
+            ),
             IconButton(
               tooltip: 'Export or share Markdown',
               icon: const Icon(Icons.ios_share_outlined),
@@ -581,35 +775,42 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               StreamBuilder<List<Attachment>>(
                 stream: attachmentQuery.watch(),
                 builder: (context, snapshot) {
-                  final drawings = (snapshot.data ?? [])
-                      .where((item) => item.type == 'drawing')
-                      .toList();
-                  if (drawings.isEmpty) return const SizedBox.shrink();
+                  if (snapshot.hasError) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text('Could not load attachments: ${snapshot.error}'),
+                    );
+                  }
+                  final attachments = snapshot.data ?? [];
+                  if (attachments.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
                   return SizedBox(
-                    height: 112,
+                    height: 88,
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.only(bottom: 12),
-                      itemCount: drawings.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 10),
+                      itemCount: attachments.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
                       itemBuilder: (context, index) {
-                        final item = drawings[index];
-                        final file = File(item.localPath);
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: file.existsSync()
-                              ? Image.file(
-                                  file,
-                                  width: 112,
-                                  height: 100,
-                                  fit: BoxFit.cover,
-                                )
-                              : const SizedBox(
-                                  width: 112,
-                                  child: Center(
-                                    child: Icon(Icons.broken_image_outlined),
-                                  ),
-                                ),
+                        final item = attachments[index];
+                        return SizedBox(
+                          width: 240,
+                          child: Card(
+                            child: ListTile(
+                              dense: true,
+                              leading: Icon(_attachmentIcon(item)),
+                              title: Text(item.filename,
+                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                              subtitle: Text(item.type.toUpperCase()),
+                              onTap: () => _openAttachment(item),
+                              trailing: IconButton(
+                                tooltip: 'Remove attachment',
+                                icon: const Icon(Icons.close, size: 18),
+                                onPressed: () => _removeAttachment(item),
+                              ),
+                            ),
+                          ),
                         );
                       },
                     ),
