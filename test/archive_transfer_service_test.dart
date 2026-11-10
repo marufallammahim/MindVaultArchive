@@ -142,6 +142,18 @@ void main() {
     expect(importedTagLink.tagId, 'priority');
   });
 
+  test('imports version 1 archives without task or tag sections', () async {
+    final legacy = <String, Object?>{
+      'format': ArchiveTransferService.formatName,
+      'version': 1,
+      'contents': {'categories': <Object?>[], 'notes': <Object?>[]},
+    };
+    final result = await transfer.importJson(jsonEncode(legacy));
+    expect(result.imported, 0);
+    expect(result.importedTasks, 0);
+    expect(result.importedTags, 0);
+  });
+
   test('rejects invalid archive before changing local data', () async {
     await database.saveNoteContent('safe', 'Safe', 'Keep me');
     await expectLater(
