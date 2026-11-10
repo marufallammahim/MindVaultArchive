@@ -55,7 +55,7 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Capture failed: ' + error.toString())),
+        SnackBar(content: Text('Capture failed: $error')),
       );
     } finally {
       if (mounted) setState(() => _saving = false);
