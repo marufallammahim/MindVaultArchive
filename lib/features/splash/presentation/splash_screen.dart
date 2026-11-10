@@ -37,33 +37,35 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Center(
-      child: FadeTransition(
-        opacity: _animation,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/branding/mindvault_logo.svg',
-              width: 144,
-              height: 144,
+        body: Center(
+          child: FadeTransition(
+            opacity: _animation,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/branding/mindvault_logo.svg',
+                  width: 144,
+                  height: 144,
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'MindVault Archive',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineMedium
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Your Thoughts. Your Archive.',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            Text(
-              'MindVault Archive',
-              style: Theme.of(context).textTheme.headlineMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Your Thoughts. Your Archive.',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }

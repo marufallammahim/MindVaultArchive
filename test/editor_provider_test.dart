@@ -27,11 +27,9 @@ void main() {
       final notifier = EditorNotifier(database, 'history-note');
       addTearDown(notifier.dispose);
 
-      for (
-        var attempt = 0;
-        attempt < 20 && !notifier.state.isLoaded;
-        attempt++
-      ) {
+      for (var attempt = 0;
+          attempt < 20 && !notifier.state.isLoaded;
+          attempt++) {
         await Future<void>.delayed(const Duration(milliseconds: 5));
       }
       expect(notifier.state.isLoaded, isTrue);
@@ -51,7 +49,8 @@ void main() {
 
       final note = await (database.select(
         database.notes,
-      )..where((item) => item.id.equals('history-note'))).getSingle();
+      )..where((item) => item.id.equals('history-note')))
+          .getSingle();
 
       expect(note.title, 'Restored revision');
       expect(note.documentContent, 'Restored content');

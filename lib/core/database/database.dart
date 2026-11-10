@@ -122,32 +122,32 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (m) async {
-      await m.createAll();
-      await _createSearchIndexes();
-    },
-    onUpgrade: (m, from, to) async {
-      if (from < 2) {
-        await m.createTable(tasks);
-      }
-      if (from < 3) {
-        await m.createTable(tags);
-        await m.createTable(noteTags);
-      }
-      if (from < 4) {
-        await m.createTable(noteRevisions);
-      }
-      if (from >= 2 && from < 5) {
-        await m.addColumn(tasks, tasks.noteId);
-      }
-      if (from < 6) {
-        await _createSearchIndexes();
-      }
-    },
-    beforeOpen: (details) async {
-      await customStatement('PRAGMA foreign_keys = ON');
-    },
-  );
+        onCreate: (m) async {
+          await m.createAll();
+          await _createSearchIndexes();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(tasks);
+          }
+          if (from < 3) {
+            await m.createTable(tags);
+            await m.createTable(noteTags);
+          }
+          if (from < 4) {
+            await m.createTable(noteRevisions);
+          }
+          if (from >= 2 && from < 5) {
+            await m.addColumn(tasks, tasks.noteId);
+          }
+          if (from < 6) {
+            await _createSearchIndexes();
+          }
+        },
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+        },
+      );
 
   /// Creates local FTS5 indexes and keeps them synchronized with Drift rows.
   /// Indexes are rebuildable derived data; notes and tasks remain the source of truth.
@@ -232,7 +232,8 @@ class AppDatabase extends _$AppDatabase {
     if (noteId != null) {
       final linkedNote = await (select(
         notes,
-      )..where((note) => note.id.equals(noteId))).getSingleOrNull();
+      )..where((note) => note.id.equals(noteId)))
+          .getSingleOrNull();
       if (linkedNote == null || linkedNote.isDeleted) {
         throw ArgumentError.value(noteId, 'noteId', 'Linked note not found.');
       }
@@ -242,7 +243,8 @@ class AppDatabase extends _$AppDatabase {
     }
     final existing = await (select(
       tasks,
-    )..where((task) => task.id.equals(id))).getSingleOrNull();
+    )..where((task) => task.id.equals(id)))
+        .getSingleOrNull();
     if (existing == null) {
       await into(tasks).insert(
         TasksCompanion.insert(
@@ -303,20 +305,23 @@ class AppDatabase extends _$AppDatabase {
     final uniqueIds = tagIds.toSet().toList();
     final available = await (select(
       tags,
-    )..where((tag) => tag.id.isIn(uniqueIds))).get();
+    )..where((tag) => tag.id.isIn(uniqueIds)))
+        .get();
     if (available.length != uniqueIds.length) {
       throw ArgumentError('One or more selected tags do not exist.');
     }
     await transaction(() async {
       final existingNote = await (select(
         notes,
-      )..where((note) => note.id.equals(noteId))).getSingleOrNull();
+      )..where((note) => note.id.equals(noteId)))
+          .getSingleOrNull();
       if (existingNote == null) {
         await into(notes).insert(NotesCompanion.insert(id: noteId));
       }
       await (delete(
         noteTags,
-      )..where((item) => item.noteId.equals(noteId))).go();
+      )..where((item) => item.noteId.equals(noteId)))
+          .go();
       for (final tagId in uniqueIds) {
         await into(noteTags)
             .insert(NoteTagsCompanion.insert(noteId: noteId, tagId: tagId));
@@ -331,7 +336,8 @@ class AppDatabase extends _$AppDatabase {
     if (categoryId != null) {
       final category = await (select(
         categories,
-      )..where((item) => item.id.equals(categoryId))).getSingleOrNull();
+      )..where((item) => item.id.equals(categoryId)))
+          .getSingleOrNull();
       if (category == null) {
         throw ArgumentError.value(
           categoryId,
@@ -342,7 +348,8 @@ class AppDatabase extends _$AppDatabase {
     }
     final existing = await (select(
       notes,
-    )..where((note) => note.id.equals(noteId))).getSingleOrNull();
+    )..where((note) => note.id.equals(noteId)))
+        .getSingleOrNull();
     if (existing == null) {
       await into(notes).insert(
         NotesCompanion.insert(id: noteId, categoryId: Value(categoryId)),
@@ -369,7 +376,8 @@ class AppDatabase extends _$AppDatabase {
   Future<void> setNoteColor(String id, int? color) async {
     final existing = await (select(
       notes,
-    )..where((note) => note.id.equals(id))).getSingleOrNull();
+    )..where((note) => note.id.equals(id)))
+        .getSingleOrNull();
     if (existing == null) {
       await into(notes)
           .insert(NotesCompanion.insert(id: id, color: Value(color)));
@@ -413,17 +421,18 @@ class AppDatabase extends _$AppDatabase {
       await (delete(noteTags)..where((item) => item.noteId.equals(id))).go();
       await (delete(
         noteRevisions,
-      )..where((item) => item.noteId.equals(id))).go();
+      )..where((item) => item.noteId.equals(id)))
+          .go();
       await (delete(notes)..where((note) => note.id.equals(id))).go();
     });
   }
 
   Future<void> restoreRevision(String noteId, String revisionId) async {
-    final revision =
-        await (select(noteRevisions)..where(
-              (item) => item.id.equals(revisionId) & item.noteId.equals(noteId),
-            ))
-            .getSingleOrNull();
+    final revision = await (select(noteRevisions)
+          ..where(
+            (item) => item.id.equals(revisionId) & item.noteId.equals(noteId),
+          ))
+        .getSingleOrNull();
     if (revision == null) {
       throw ArgumentError.value(
         revisionId,
@@ -455,7 +464,8 @@ class AppDatabase extends _$AppDatabase {
       );
       await (delete(
         categories,
-      )..where((category) => category.id.equals(id))).go();
+      )..where((category) => category.id.equals(id)))
+          .go();
     });
   }
 
@@ -463,7 +473,8 @@ class AppDatabase extends _$AppDatabase {
     return transaction(() async {
       final existing = await (select(
         notes,
-      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      )..where((t) => t.id.equals(id)))
+          .getSingleOrNull();
       if (existing != null) {
         if (existing.title != title || existing.documentContent != content) {
           await into(noteRevisions).insert(
@@ -474,18 +485,18 @@ class AppDatabase extends _$AppDatabase {
               documentContent: existing.documentContent,
             ),
           );
-          final history =
-              await (select(noteRevisions)
-                    ..where((revision) => revision.noteId.equals(id))
-                    ..orderBy([
-                      (revision) => OrderingTerm.desc(revision.createdAt),
-                    ]))
-                  .get();
+          final history = await (select(noteRevisions)
+                ..where((revision) => revision.noteId.equals(id))
+                ..orderBy([
+                  (revision) => OrderingTerm.desc(revision.createdAt),
+                ]))
+              .get();
           if (history.length > 30) {
             final expiredIds = history.skip(30).map((item) => item.id).toList();
             await (delete(
               noteRevisions,
-            )..where((revision) => revision.id.isIn(expiredIds))).go();
+            )..where((revision) => revision.id.isIn(expiredIds)))
+                .go();
           }
         }
         await update(notes).replace(
