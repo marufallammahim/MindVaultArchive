@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 class QuickCaptureScreen extends ConsumerStatefulWidget {
@@ -15,9 +16,56 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
   final _title = TextEditingController();
   final _content = TextEditingController();
   bool _saving = false;
+  bool _restoringDraft = true;
+  static const _draftTitleKey = 'quick_capture_draft_title';
+  static const _draftContentKey = 'quick_capture_draft_content';
+
+  @override
+  void initState() {
+    super.initState();
+    _title.addListener(_persistDraft);
+    _content.addListener(_persistDraft);
+    _restoreDraft();
+  }
+
+  Future<void> _restoreDraft() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      _title.text = preferences.getString(_draftTitleKey) ?? '';
+      _content.text = preferences.getString(_draftContentKey) ?? '';
+    } catch (_) {
+      // Keep capture available when preferences cannot be read.
+    } finally {
+      if (mounted) setState(() => _restoringDraft = false);
+    }
+  }
+
+  Future<void> _persistDraft() async {
+    if (_restoringDraft || !mounted) return;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString(_draftTitleKey, _title.text);
+      await preferences.setString(_draftContentKey, _content.text);
+    } catch (_) {
+      // Explicit Save remains available if draft persistence fails.
+    }
+  }
+
+  Future<void> _clearDraft() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.remove(_draftTitleKey);
+      await preferences.remove(_draftContentKey);
+    } catch (_) {
+      // A stale draft can be safely overwritten on the next capture.
+    }
+  }
 
   @override
   void dispose() {
+    _title.removeListener(_persistDraft);
+    _content.removeListener(_persistDraft);
     _title.dispose();
     _content.dispose();
     super.dispose();
@@ -43,6 +91,7 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
             title.isEmpty ? 'Quick capture' : title,
             content,
           );
+      await _clearDraft();
       if (!mounted) return;
       if (openEditor) {
         context.go('/editor/$id');
@@ -109,8 +158,13 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
             const LinearProgressIndicator(),
           ],
           const SizedBox(height: 8),
+          if (_restoringDraft)
+            const Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: LinearProgressIndicator(),
+            ),
           const Text(
-            'Quick captures are saved on this device. No account or internet connection is required.',
+            'Unfinished text is saved as a local draft and restored when you return. Saved notes stay on this device.',
           ),
         ],
       ),
