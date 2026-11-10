@@ -148,6 +148,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           IconButton(
+            tooltip: 'Search all archive content',
+            icon: const Icon(Icons.manage_search_outlined),
+            onPressed: () => context.push('/search'),
+          ),
+          IconButton(
             tooltip: 'Quick capture',
             icon: const Icon(Icons.bolt_outlined),
             onPressed: () => context.push('/capture'),
@@ -218,6 +223,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                 ],
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.manage_search_outlined),
+              title: const Text('Search all archive content'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/search');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.bolt_outlined),
