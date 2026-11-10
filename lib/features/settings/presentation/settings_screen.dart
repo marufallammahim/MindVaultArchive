@@ -39,7 +39,7 @@ class SettingsScreen extends ConsumerWidget {
             ],
             selected: {mode},
             onSelectionChanged: (selection) {
-              ref.read(themeModeProvider.notifier).state = selection.first;
+              ref.read(themeModeProvider.notifier).setThemeMode(selection.first);
             },
           ),
           const SizedBox(height: 24),
