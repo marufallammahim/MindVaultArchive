@@ -37,10 +37,7 @@ void main() {
 
     await expectLater(service.setPin('1234'), throwsArgumentError);
     await service.setPin('731904');
-    await expectLater(
-      service.disablePin('000000'),
-      throwsA(isA<StateError>()),
-    );
+    await expectLater(service.disablePin('000000'), throwsA(isA<StateError>()));
     expect(await service.isEnabled(), isTrue);
 
     await service.disablePin('731904');
