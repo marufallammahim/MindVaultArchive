@@ -15,13 +15,14 @@ vision. A feature is not marked complete merely because a route or button exists
 - Local drawing canvas with PNG attachment metadata.
 - Title/body substring search over the current archive view.
 - Lightweight `[[Note title]]` wikilinks with matching linked-note chips and live backlinks.
+- Version history with up to 30 previous snapshots per note and restore.
 - Light, dark and system theme selection with local persistence.
 - Offline task manager with title/details, due date, priority, completion state,
   editing and deletion.
 - Reusable starter templates for daily journal, meeting, project plan, study
   notes and developer notes.
-- Versioned JSON transfer v3 for notes, categories, tags, tag links and tasks;
-  v1 and v2 remain importable.
+- Versioned JSON transfer v4 for notes, categories, tags, tag links, tasks and
+  note revisions; v1-v3 remain importable.
 - Import validation, transactional writes and duplicate note/task-ID protection.
 - Existing Flutter CI and Android build workflows.
 
