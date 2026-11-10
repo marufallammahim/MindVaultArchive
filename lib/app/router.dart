@@ -10,6 +10,7 @@ import 'package:mindvault_archive/features/tasks/presentation/tasks_screen.dart'
 import 'package:mindvault_archive/features/templates/presentation/templates_screen.dart';
 import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
+import 'package:mindvault_archive/features/history/presentation/revision_history_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -43,6 +44,12 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/tags',
       builder: (context, state) => const TagsScreen(),
+    ),
+    GoRoute(
+      path: '/history/:id',
+      builder: (context, state) => RevisionHistoryScreen(
+        noteId: state.pathParameters['id']!,
+      ),
     ),
     GoRoute(
       path: '/archive-tools',
