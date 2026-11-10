@@ -26,7 +26,7 @@ only called implemented when the repository contains a usable local workflow.
 - Global offline search across note titles/bodies, category names, tag names,
   and task titles/details.
 - Versioned JSON archive transfer v5 for notes, categories, tags, tag links,
-  tasks and note revisions.
+  note-linked tasks and note revisions.
 - Import supports formats v1-v5, validates input before transaction, and
   protects existing note/task IDs from overwrite.
 - Import/export deliberately excludes private device paths and binary
