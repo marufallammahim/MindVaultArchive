@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:uuid/uuid.dart';
 
 part 'database.g.dart';
 
@@ -36,6 +37,55 @@ class Categories extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('VaultTask')
+class Tasks extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get details => text().withDefault(const Constant(''))();
+  DateTimeColumn get dueAt => dateTime().nullable()();
+  IntColumn get priority => integer().withDefault(const Constant(1))();
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get completedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('Tag')
+class Tags extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  IntColumn get color => integer().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('NoteTag')
+class NoteTags extends Table {
+  TextColumn get noteId => text()();
+  TextColumn get tagId => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {noteId, tagId};
+}
+
+@DataClassName('NoteRevision')
+class NoteRevisions extends Table {
+  TextColumn get id => text()();
+  TextColumn get noteId => text()();
+  TextColumn get title => text()();
+  TextColumn get documentContent => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DataClassName('Attachment')
 class Attachments extends Table {
   TextColumn get id => text()();
@@ -52,20 +102,197 @@ class Attachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Notes, Categories, Attachments])
+@DriftDatabase(tables: [
+  Notes,
+  Categories,
+  Attachments,
+  Tasks,
+  Tags,
+  NoteTags,
+  NoteRevisions
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(tasks);
+          }
+          if (from < 3) {
+            await m.createTable(tags);
+            await m.createTable(noteTags);
+          }
+          if (from < 4) {
+            await m.createTable(noteRevisions);
+          }
+        },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+
+  Future<void> saveTask({
+    required String id,
+    required String title,
+    required String details,
+    required int priority,
+    DateTime? dueAt,
+  }) async {
+    final normalizedTitle = title.trim();
+    if (normalizedTitle.isEmpty) {
+      throw ArgumentError.value(title, 'title', 'Task title cannot be empty.');
+    }
+    final existing = await (select(tasks)..where((task) => task.id.equals(id)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await into(tasks).insert(
+        TasksCompanion.insert(
+          id: id,
+          title: normalizedTitle,
+          details: Value(details.trim()),
+          priority: Value(priority.clamp(0, 2).toInt()),
+          dueAt: Value(dueAt),
+        ),
+      );
+    } else {
+      await update(tasks).replace(
+        existing.copyWith(
+          title: normalizedTitle,
+          details: details.trim(),
+          priority: priority.clamp(0, 2).toInt(),
+          dueAt: Value(dueAt),
+          updatedAt: DateTime.now(),
+        ),
+      );
+    }
+  }
+
+  Future<void> setTaskCompleted(String id, bool completed) {
+    return (update(tasks)..where((task) => task.id.equals(id))).write(
+      TasksCompanion(
+        isCompleted: Value(completed),
+        completedAt: Value(completed ? DateTime.now() : null),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> deleteTask(String id) {
+    return (delete(tasks)..where((task) => task.id.equals(id))).go();
+  }
+
+  Future<void> saveTag(String id, String name, {int? color}) async {
+    final normalizedName = name.trim();
+    if (normalizedName.isEmpty) {
+      throw ArgumentError.value(name, 'name', 'Tag name cannot be empty.');
+    }
+    await into(tags).insertOnConflictUpdate(
+      TagsCompanion.insert(
+        id: id,
+        name: normalizedName,
+        color: Value(color),
+      ),
+    );
+  }
+
+  Future<void> deleteTag(String id) {
+    return transaction(() async {
+      await (delete(noteTags)..where((item) => item.tagId.equals(id))).go();
+      await (delete(tags)..where((tag) => tag.id.equals(id))).go();
+    });
+  }
+
+  Future<void> setNoteTags(String noteId, List<String> tagIds) async {
+    final uniqueIds = tagIds.toSet().toList();
+    final available =
+        await (select(tags)..where((tag) => tag.id.isIn(uniqueIds))).get();
+    if (available.length != uniqueIds.length) {
+      throw ArgumentError('One or more selected tags do not exist.');
+    }
+    await transaction(() async {
+      final existingNote = await (select(notes)
+            ..where((note) => note.id.equals(noteId)))
+          .getSingleOrNull();
+      if (existingNote == null) {
+        await into(notes).insert(NotesCompanion.insert(id: noteId));
+      }
+      await (delete(noteTags)..where((item) => item.noteId.equals(noteId)))
+          .go();
+      for (final tagId in uniqueIds) {
+        await into(noteTags).insert(
+          NoteTagsCompanion.insert(noteId: noteId, tagId: tagId),
+        );
+      }
+      await (update(notes)..where((note) => note.id.equals(noteId))).write(
+        NotesCompanion(updatedAt: Value(DateTime.now())),
+      );
+    });
+  }
+
+  Future<void> setNoteCategory(String noteId, String? categoryId) async {
+    if (categoryId != null) {
+      final category = await (select(categories)
+            ..where((item) => item.id.equals(categoryId)))
+          .getSingleOrNull();
+      if (category == null) {
+        throw ArgumentError.value(
+            categoryId, 'categoryId', 'Category not found.');
+      }
+    }
+    final existing = await (select(notes)
+          ..where((note) => note.id.equals(noteId)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await into(notes).insert(
+        NotesCompanion.insert(
+          id: noteId,
+          categoryId: Value(categoryId),
+        ),
+      );
+    } else {
+      await (update(notes)..where((note) => note.id.equals(noteId))).write(
+        NotesCompanion(
+          categoryId: Value(categoryId),
+          updatedAt: Value(DateTime.now()),
+        ),
+      );
+    }
+  }
+
+  Future<void> setPinned(String id, bool pinned) {
+    return (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(
+        sortOrder: Value(pinned ? 1 : 0),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> setNoteColor(String id, int? color) async {
+    final existing = await (select(notes)..where((note) => note.id.equals(id)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await into(notes).insert(
+        NotesCompanion.insert(
+          id: id,
+          color: Value(color),
+        ),
+      );
+      return;
+    }
+    await (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(
+        color: Value(color),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
 
   Future<void> setFavorite(String id, bool value) {
     return (update(notes)..where((note) => note.id.equals(id))).write(
@@ -94,8 +321,23 @@ class AppDatabase extends _$AppDatabase {
   Future<void> permanentlyDeleteNote(String id) {
     return transaction(() async {
       await (delete(attachments)..where((item) => item.noteId.equals(id))).go();
+      await (delete(noteTags)..where((item) => item.noteId.equals(id))).go();
+      await (delete(noteRevisions)..where((item) => item.noteId.equals(id)))
+          .go();
       await (delete(notes)..where((note) => note.id.equals(id))).go();
     });
+  }
+
+  Future<void> restoreRevision(String noteId, String revisionId) async {
+    final revision = await (select(noteRevisions)
+          ..where((item) =>
+              item.id.equals(revisionId) & item.noteId.equals(noteId)))
+        .getSingleOrNull();
+    if (revision == null) {
+      throw ArgumentError.value(
+          revisionId, 'revisionId', 'Revision not found.');
+    }
+    await saveNoteContent(noteId, revision.title, revision.documentContent);
   }
 
   Future<void> saveCategory(String id, String name) async {
@@ -131,6 +373,28 @@ class AppDatabase extends _$AppDatabase {
       )..where((t) => t.id.equals(id)))
           .getSingleOrNull();
       if (existing != null) {
+        if (existing.title != title || existing.documentContent != content) {
+          await into(noteRevisions).insert(
+            NoteRevisionsCompanion.insert(
+              id: const Uuid().v4(),
+              noteId: id,
+              title: existing.title,
+              documentContent: existing.documentContent,
+            ),
+          );
+          final history = await (select(noteRevisions)
+                ..where((revision) => revision.noteId.equals(id))
+                ..orderBy([
+                  (revision) => OrderingTerm.desc(revision.createdAt),
+                ]))
+              .get();
+          if (history.length > 30) {
+            final expiredIds = history.skip(30).map((item) => item.id).toList();
+            await (delete(noteRevisions)
+                  ..where((revision) => revision.id.isIn(expiredIds)))
+                .go();
+          }
+        }
         await update(notes).replace(
           existing.copyWith(
             title: title,

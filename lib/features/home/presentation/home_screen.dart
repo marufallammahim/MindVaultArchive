@@ -18,6 +18,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _query = '';
   bool _searchOpen = false;
   String _view = 'all';
+  String? _selectedCategoryId;
 
   @override
   void dispose() {
@@ -29,6 +30,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.pop(context);
     setState(() {
       _view = view;
+      _selectedCategoryId = null;
+      _query = '';
+      _searchController.clear();
+    });
+  }
+
+  void _selectCategory(String categoryId) {
+    Navigator.pop(context);
+    setState(() {
+      _view = 'category';
+      _selectedCategoryId = categoryId;
       _query = '';
       _searchController.clear();
     });
@@ -42,6 +54,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ];
     }
     return [
+      PopupMenuItem(
+        value: 'pin',
+        child: Text(note.sortOrder == 1 ? 'Unpin note' : 'Pin note'),
+      ),
       PopupMenuItem(
         value: 'favorite',
         child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
@@ -60,6 +76,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String action,
   ) async {
     switch (action) {
+      case 'pin':
+        await db.setPinned(note.id, note.sortOrder != 1);
+        break;
       case 'favorite':
         await db.setFavorite(note.id, !note.isFavorite);
         break;
@@ -90,11 +109,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return note.isDeleted.equals(false) & note.isArchived.equals(true);
           case 'trash':
             return note.isDeleted.equals(true);
+          case 'category':
+            return note.isDeleted.equals(false) &
+                note.isArchived.equals(false) &
+                note.categoryId.equals(_selectedCategoryId!);
           default:
             return note.isDeleted.equals(false) & note.isArchived.equals(false);
         }
       })
-      ..orderBy([(note) => OrderingTerm.desc(note.updatedAt)]);
+      ..orderBy([
+        (note) => OrderingTerm.desc(note.sortOrder),
+        (note) => OrderingTerm.desc(note.updatedAt),
+      ]);
 
     return Scaffold(
       appBar: AppBar(
@@ -120,6 +146,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 _searchController.clear();
               });
             },
+          ),
+          IconButton(
+            tooltip: 'Quick capture',
+            icon: const Icon(Icons.bolt_outlined),
+            onPressed: () => context.push('/capture'),
           ),
           IconButton(
             tooltip: 'Settings',
@@ -165,6 +196,52 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: const Text('Trash'),
               selected: _view == 'trash',
               onTap: () => _selectView('trash'),
+            ),
+            const Divider(),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text('CATEGORIES'),
+            ),
+            StreamBuilder<List<Category>>(
+              stream: (db.select(db.categories)
+                    ..orderBy([(category) => OrderingTerm.asc(category.name)]))
+                  .watch(),
+              builder: (context, snapshot) => Column(
+                children: [
+                  for (final category in snapshot.data ?? [])
+                    ListTile(
+                      leading: const Icon(Icons.folder_outlined),
+                      title: Text(category.name),
+                      selected: _view == 'category' &&
+                          _selectedCategoryId == category.id,
+                      onTap: () => _selectCategory(category.id),
+                    ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.bolt_outlined),
+              title: const Text('Quick capture'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/capture');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.auto_awesome_outlined),
+              title: const Text('Templates'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/templates');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.checklist_rounded),
+              title: const Text('Tasks'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/tasks');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.info_outline),
@@ -251,6 +328,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             itemBuilder: (context, index) {
               final note = notes[index];
               return Card(
+                color: note.color == null
+                    ? null
+                    : Color(note.color!).withValues(alpha: 0.22),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () => context.push('/editor/${note.id}'),
@@ -262,6 +342,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (note.sortOrder == 1)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 5, top: 2),
+                                child: Icon(Icons.push_pin, size: 16),
+                              ),
                             if (note.isFavorite)
                               const Padding(
                                 padding: EdgeInsets.only(right: 5, top: 2),

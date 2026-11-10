@@ -31,6 +31,127 @@ void main() {
     },
   );
 
+  test('tags can be assigned to notes and safely deleted', () async {
+    await database.saveTag('important', 'Important');
+    await database.setNoteTags('tagged-note', ['important']);
+    var links = await database.select(database.noteTags).get();
+    expect(links.single.noteId, 'tagged-note');
+    expect(links.single.tagId, 'important');
+
+    await database.deleteTag('important');
+    links = await database.select(database.noteTags).get();
+    expect(links, isEmpty);
+    expect(await database.select(database.tags).get(), isEmpty);
+  });
+
+  test('tag names and assignments validate', () async {
+    await expectLater(
+      database.saveTag('empty-tag', '   '),
+      throwsArgumentError,
+    );
+    await expectLater(
+      database.setNoteTags('note-with-bad-tag', ['missing']),
+      throwsArgumentError,
+    );
+    expect(await database.select(database.tags).get(), isEmpty);
+  });
+
+  test('note category assignment validates and persists', () async {
+    await database.saveCategory('ideas', 'Ideas');
+    await database.setNoteCategory('note-category', 'ideas');
+    var note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-category')))
+        .getSingle();
+    expect(note.categoryId, 'ideas');
+
+    await database.setNoteCategory('note-category', null);
+    note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-category')))
+        .getSingle();
+    expect(note.categoryId, isNull);
+    await expectLater(
+      database.setNoteCategory('note-category', 'missing'),
+      throwsArgumentError,
+    );
+  });
+
+  test('note revisions preserve old content and can be restored', () async {
+    await database.saveNoteContent('history-note', 'First title', 'First body');
+    await database.saveNoteContent(
+        'history-note', 'Second title', 'Second body');
+
+    var revisions = await (database.select(database.noteRevisions)
+          ..where((revision) => revision.noteId.equals('history-note')))
+        .get();
+    expect(revisions, hasLength(1));
+    expect(revisions.single.title, 'First title');
+    expect(revisions.single.documentContent, 'First body');
+
+    await database.restoreRevision('history-note', revisions.single.id);
+    final restored = await (database.select(database.notes)
+          ..where((note) => note.id.equals('history-note')))
+        .getSingle();
+    expect(restored.title, 'First title');
+    expect(restored.documentContent, 'First body');
+
+    revisions = await (database.select(database.noteRevisions)
+          ..where((revision) => revision.noteId.equals('history-note')))
+        .get();
+    expect(revisions, hasLength(2));
+    expect(
+        revisions.any((revision) => revision.title == 'Second title'), isTrue);
+  });
+
+  test('revision history is bounded to the latest 30 snapshots', () async {
+    await database.saveNoteContent('bounded-history', 'Version 0', 'Body 0');
+    for (var index = 1; index <= 35; index++) {
+      await database.saveNoteContent(
+        'bounded-history',
+        'Version $index',
+        'Body $index',
+      );
+    }
+    final revisions = await (database.select(database.noteRevisions)
+      ..where((revision) => revision.noteId.equals('bounded-history'))).get();
+    expect(revisions, hasLength(30));
+  });
+
+  test('pin state persists and can be cleared', () async {
+    await database.saveNoteContent('pin-note', 'Pinned', 'Body');
+    await database.setPinned('pin-note', true);
+    var note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('pin-note')))
+        .getSingle();
+    expect(note.sortOrder, 1);
+
+    await database.setPinned('pin-note', false);
+    note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('pin-note')))
+        .getSingle();
+    expect(note.sortOrder, 0);
+  });
+
+  test('note color is persisted and can be reset', () async {
+    await database.saveNoteContent('color-note', 'Colored', 'Body');
+    await database.setNoteColor('color-note', 0xFFFFF0D8);
+    var note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('color-note')))
+        .getSingle();
+    expect(note.color, 0xFFFFF0D8);
+
+    await database.setNoteColor('color-note', null);
+    note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('color-note')))
+        .getSingle();
+    expect(note.color, isNull);
+  });
+
   test('favorite, archive and trash state persist in SQLite', () async {
     await database.saveNoteContent('note-2', 'Lifecycle', 'Test');
     await database.setFavorite('note-2', true);
@@ -89,13 +210,18 @@ void main() {
           ),
         );
 
+    await database.saveNoteContent('note-4', 'With attachment', 'Changed body');
     await database.permanentlyDeleteNote('note-4');
 
     expect(await database.select(database.notes).get(), isEmpty);
     expect(await database.select(database.attachments).get(), isEmpty);
+    expect(await database.select(database.noteRevisions).get(), isEmpty);
   });
 
   test('category names cannot be empty', () async {
-    expect(() => database.saveCategory('empty', '   '), throwsArgumentError);
+    await expectLater(
+      database.saveCategory('empty', '   '),
+      throwsArgumentError,
+    );
   });
 }

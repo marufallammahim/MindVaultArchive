@@ -85,6 +85,38 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           ),
           actions: [
             IconButton(
+              tooltip: 'Version history',
+              icon: const Icon(Icons.history),
+              onPressed: () async {
+                final restored =
+                    await context.push<bool>('/history/${widget.noteId}');
+                if (restored != true || !mounted) return;
+                await ref
+                    .read(editorProvider(widget.noteId).notifier)
+                    .reloadFromDatabase();
+                if (!mounted) return;
+                final refreshed = ref.read(editorProvider(widget.noteId));
+                _titleController.text = refreshed.title;
+                _contentController.text = refreshed.content;
+              },
+            ),
+            PopupMenuButton<int>(
+              tooltip: 'Note color',
+              icon: const Icon(Icons.palette_outlined),
+              onSelected: (value) async {
+                await db.setNoteColor(
+                    widget.noteId, value == -1 ? null : value);
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(value: -1, child: Text('Default color')),
+                PopupMenuItem(value: 0xFFFFF0D8, child: Text('Warm cream')),
+                PopupMenuItem(value: 0xFFE1F2E5, child: Text('Soft green')),
+                PopupMenuItem(value: 0xFFE2ECFF, child: Text('Soft blue')),
+                PopupMenuItem(value: 0xFFF4E4F4, child: Text('Soft lavender')),
+                PopupMenuItem(value: 0xFFFFE5E5, child: Text('Soft rose')),
+              ],
+            ),
+            IconButton(
               tooltip: 'Draw',
               icon: const Icon(Icons.brush),
               onPressed: () => context.push('/drawing/${widget.noteId}'),
@@ -141,6 +173,211 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     ?.copyWith(fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
+              ),
+              StreamBuilder<List<Category>>(
+                stream: (db.select(db.categories)
+                      ..orderBy(
+                          [(category) => OrderingTerm.asc(category.name)]))
+                    .watch(),
+                builder: (context, categoriesSnapshot) {
+                  final categories = categoriesSnapshot.data ?? [];
+                  return StreamBuilder<Note?>(
+                    stream: (db.select(db.notes)
+                          ..where((note) => note.id.equals(widget.noteId)))
+                        .watchSingleOrNull(),
+                    builder: (context, noteSnapshot) {
+                      final selectedId = noteSnapshot.data?.categoryId;
+                      return DropdownButtonFormField<String?>(
+                        initialValue:
+                            categories.any((item) => item.id == selectedId)
+                                ? selectedId
+                                : null,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.folder_outlined),
+                          hintText: 'No category',
+                        ),
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text('Uncategorized'),
+                          ),
+                          for (final category in categories)
+                            DropdownMenuItem<String?>(
+                              value: category.id,
+                              child: Text(category.name),
+                            ),
+                        ],
+                        onChanged: categoriesSnapshot.hasError
+                            ? null
+                            : (value) async {
+                                try {
+                                  await db.setNoteCategory(
+                                      widget.noteId, value);
+                                } catch (error) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Could not assign category: $error')),
+                                  );
+                                }
+                              },
+                      );
+                    },
+                  );
+                },
+              ),
+              StreamBuilder<List<Tag>>(
+                stream: (db.select(db.tags)
+                      ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
+                    .watch(),
+                builder: (context, tagsSnapshot) {
+                  final tags = tagsSnapshot.data ?? [];
+                  return StreamBuilder<List<NoteTag>>(
+                    stream: (db.select(db.noteTags)
+                          ..where((item) => item.noteId.equals(widget.noteId)))
+                        .watch(),
+                    builder: (context, selectedSnapshot) {
+                      final selectedIds = (selectedSnapshot.data ?? [])
+                          .map((item) => item.tagId)
+                          .toSet();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: tags.isEmpty
+                                  ? const Text('No tags yet')
+                                  : Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
+                                      children: [
+                                        for (final tag in tags)
+                                          FilterChip(
+                                            label: Text(tag.name),
+                                            selected:
+                                                selectedIds.contains(tag.id),
+                                            onSelected: (selected) async {
+                                              final next = {...selectedIds};
+                                              if (selected) {
+                                                next.add(tag.id);
+                                              } else {
+                                                next.remove(tag.id);
+                                              }
+                                              try {
+                                                await db.setNoteTags(
+                                                  widget.noteId,
+                                                  next.toList(),
+                                                );
+                                              } catch (error) {
+                                                if (!context.mounted) return;
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Could not update tags: $error',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                      ],
+                                    ),
+                            ),
+                            IconButton(
+                              tooltip: 'Manage tags',
+                              icon: const Icon(Icons.settings_outlined),
+                              onPressed: () => context.push('/tags'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+              StreamBuilder<List<Note>>(
+                stream: db.select(db.notes).watch(),
+                builder: (context, notesSnapshot) {
+                  final allNotes = notesSnapshot.data ?? [];
+                  final currentTitle = state.title.trim();
+                  final matches = RegExp(r'\[\[([^\]]+)\]\]')
+                      .allMatches(state.content)
+                      .map((match) => match.group(1)!.trim())
+                      .where((title) => title.isNotEmpty)
+                      .toSet();
+                  final linkedNotes = allNotes
+                      .where((note) =>
+                          note.id != widget.noteId &&
+                          matches.any((title) =>
+                              note.title.trim().toLowerCase() ==
+                              title.toLowerCase()))
+                      .toList();
+                  final backlinks = currentTitle.isEmpty
+                      ? <Note>[]
+                      : allNotes
+                          .where((note) =>
+                              note.id != widget.noteId &&
+                              note.documentContent.toLowerCase().contains(
+                                    '[[' + currentTitle.toLowerCase() + ']]',
+                                  ))
+                          .toList();
+                  if (linkedNotes.isEmpty && backlinks.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Card(
+                    child: ExpansionTile(
+                      leading: const Icon(Icons.account_tree_outlined),
+                      title: Text(
+                        'Links and backlinks (${linkedNotes.length + backlinks.length})',
+                      ),
+                      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      children: [
+                        if (linkedNotes.isNotEmpty) ...[
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Linked notes'),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              for (final note in linkedNotes)
+                                ActionChip(
+                                  avatar: const Icon(Icons.link, size: 16),
+                                  label: Text(note.title),
+                                  onPressed: () =>
+                                      context.push('/editor/${note.id}'),
+                                ),
+                            ],
+                          ),
+                        ],
+                        if (backlinks.isNotEmpty) ...[
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Backlinks to this note'),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              for (final note in backlinks)
+                                ActionChip(
+                                  avatar: const Icon(Icons.reply, size: 16),
+                                  label: Text(note.title.isEmpty
+                                      ? 'Untitled'
+                                      : note.title),
+                                  onPressed: () =>
+                                      context.push('/editor/${note.id}'),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
               ),
               Expanded(
                 child: TextField(

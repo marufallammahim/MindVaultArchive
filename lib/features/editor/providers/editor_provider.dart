@@ -79,6 +79,8 @@ class EditorNotifier extends StateNotifier<EditorState> {
     }
   }
 
+  Future<void> reloadFromDatabase() => _loadNote();
+
   void updateContent(String title, String content) {
     if (!mounted) return;
     state = state.copyWith(
