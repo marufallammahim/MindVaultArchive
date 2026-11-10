@@ -144,7 +144,8 @@ class AppDatabase extends _$AppDatabase {
             ..where((item) => item.id.equals(categoryId)))
           .getSingleOrNull();
       if (category == null) {
-        throw ArgumentError.value(categoryId, 'categoryId', 'Category not found.');
+        throw ArgumentError.value(
+            categoryId, 'categoryId', 'Category not found.');
       }
     }
     final existing = await (select(notes)

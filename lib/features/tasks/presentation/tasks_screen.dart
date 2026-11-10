@@ -30,10 +30,16 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(controller: title, autofocus: true, maxLength: 120,
-                  decoration: const InputDecoration(labelText: 'Task title')),
-                TextField(controller: details, minLines: 2, maxLines: 4,
-                  decoration: const InputDecoration(labelText: 'Details')),
+                TextField(
+                    controller: title,
+                    autofocus: true,
+                    maxLength: 120,
+                    decoration: const InputDecoration(labelText: 'Task title')),
+                TextField(
+                    controller: details,
+                    minLines: 2,
+                    maxLines: 4,
+                    decoration: const InputDecoration(labelText: 'Details')),
                 DropdownButtonFormField<int>(
                   value: priority,
                   decoration: const InputDecoration(labelText: 'Priority'),
@@ -49,8 +55,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.event_outlined),
-                  title: Text(dueAt == null ? 'No due date' :
-                    'Due ' + MaterialLocalizations.of(context).formatMediumDate(dueAt!)),
+                  title: Text(dueAt == null
+                      ? 'No due date'
+                      : 'Due ' +
+                          MaterialLocalizations.of(context)
+                              .formatMediumDate(dueAt!)),
                   trailing: IconButton(
                     icon: const Icon(Icons.calendar_month_outlined),
                     onPressed: () async {
@@ -76,10 +85,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel')),
-            FilledButton(onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Save')),
+            TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Cancel')),
+            FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('Save')),
           ],
         ),
       ),
@@ -93,12 +104,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     try {
       await ref.read(databaseProvider).saveTask(
-        id: task?.id ?? const Uuid().v4(),
-        title: taskTitle,
-        details: taskDetails,
-        priority: priority,
-        dueAt: dueAt,
-      );
+            id: task?.id ?? const Uuid().v4(),
+            title: taskTitle,
+            details: taskDetails,
+            priority: priority,
+            dueAt: dueAt,
+          );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -107,8 +118,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     }
   }
 
-  String _priorityLabel(int value) =>
-      value == 2 ? 'High' : value == 0 ? 'Low' : 'Normal';
+  String _priorityLabel(int value) => value == 2
+      ? 'High'
+      : value == 0
+          ? 'Low'
+          : 'Normal';
 
   @override
   Widget build(BuildContext context) {
@@ -146,8 +160,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               stream: query.watch(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Could not load tasks: ' +
-                    snapshot.error.toString()));
+                  return Center(
+                      child: Text('Could not load tasks: ' +
+                          snapshot.error.toString()));
                 }
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -160,7 +175,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                       children: [
                         const Icon(Icons.checklist_rounded, size: 64),
                         const SizedBox(height: 12),
-                        Text(_completed ? 'No completed tasks' : 'No tasks yet'),
+                        Text(
+                            _completed ? 'No completed tasks' : 'No tasks yet'),
                         const SizedBox(height: 6),
                         const Text('Capture your next step here.'),
                       ],
@@ -173,20 +189,22 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    final overdue = !item.isCompleted && item.dueAt != null &&
-                      DateUtils.dateOnly(item.dueAt!)
-                        .isBefore(DateUtils.dateOnly(DateTime.now()));
+                    final overdue = !item.isCompleted &&
+                        item.dueAt != null &&
+                        DateUtils.dateOnly(item.dueAt!)
+                            .isBefore(DateUtils.dateOnly(DateTime.now()));
                     return Card(
                       child: ListTile(
                         leading: Checkbox(
                           value: item.isCompleted,
                           onChanged: (value) =>
-                            db.setTaskCompleted(item.id, value ?? false),
+                              db.setTaskCompleted(item.id, value ?? false),
                         ),
                         title: Text(item.title,
-                          style: item.isCompleted
-                            ? const TextStyle(decoration: TextDecoration.lineThrough)
-                            : null),
+                            style: item.isCompleted
+                                ? const TextStyle(
+                                    decoration: TextDecoration.lineThrough)
+                                : null),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
@@ -194,22 +212,30 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             if (item.details.isNotEmpty)
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),
-                                child: Text(item.details, maxLines: 2,
-                                  overflow: TextOverflow.ellipsis),
+                                child: Text(item.details,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis),
                               ),
                             const SizedBox(height: 4),
                             Wrap(
                               spacing: 12,
                               children: [
-                                Text('Priority: ' + _priorityLabel(item.priority)),
+                                Text('Priority: ' +
+                                    _priorityLabel(item.priority)),
                                 if (item.dueAt != null)
-                                  Text('Due ' + MaterialLocalizations.of(context)
-                                    .formatShortDate(item.dueAt!),
-                                    style: TextStyle(
-                                      color: overdue
-                                        ? Theme.of(context).colorScheme.error : null,
-                                      fontWeight: overdue ? FontWeight.bold : null,
-                                    )),
+                                  Text(
+                                      'Due ' +
+                                          MaterialLocalizations.of(context)
+                                              .formatShortDate(item.dueAt!),
+                                      style: TextStyle(
+                                        color: overdue
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .error
+                                            : null,
+                                        fontWeight:
+                                            overdue ? FontWeight.bold : null,
+                                      )),
                               ],
                             ),
                           ],
@@ -224,7 +250,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           },
                           itemBuilder: (_) => const [
                             PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(value: 'delete', child: Text('Delete')),
+                            PopupMenuItem(
+                                value: 'delete', child: Text('Delete')),
                           ],
                         ),
                       ),

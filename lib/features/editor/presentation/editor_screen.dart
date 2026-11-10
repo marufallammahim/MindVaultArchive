@@ -144,7 +144,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ),
               StreamBuilder<List<Category>>(
                 stream: (db.select(db.categories)
-                      ..orderBy([(category) => OrderingTerm.asc(category.name)]))
+                      ..orderBy(
+                          [(category) => OrderingTerm.asc(category.name)]))
                     .watch(),
                 builder: (context, categoriesSnapshot) {
                   final categories = categoriesSnapshot.data ?? [];
@@ -178,11 +179,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             ? null
                             : (value) async {
                                 try {
-                                  await db.setNoteCategory(widget.noteId, value);
+                                  await db.setNoteCategory(
+                                      widget.noteId, value);
                                 } catch (error) {
                                   if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Could not assign category: $error')),
+                                    SnackBar(
+                                        content: Text(
+                                            'Could not assign category: $error')),
                                   );
                                 }
                               },
