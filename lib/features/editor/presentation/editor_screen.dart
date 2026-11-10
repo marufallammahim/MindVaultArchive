@@ -283,6 +283,79 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   );
                 },
               ),
+              StreamBuilder<List<Note>>(
+                stream: db.select(db.notes).watch(),
+                builder: (context, notesSnapshot) {
+                  final allNotes = notesSnapshot.data ?? [];
+                  final currentTitle = state.title.trim();
+                  final matches = RegExp(r'\\[\\[([^\\]]+)\\]\\]')
+                      .allMatches(state.content)
+                      .map((match) => match.group(1)!.trim())
+                      .where((title) => title.isNotEmpty)
+                      .toSet();
+                  final linkedNotes = allNotes.where((note) =>
+                    note.id != widget.noteId &&
+                    matches.any((title) =>
+                      note.title.trim().toLowerCase() == title.toLowerCase())
+                  ).toList();
+                  final backlinks = currentTitle.isEmpty
+                      ? <Note>[]
+                      : allNotes.where((note) =>
+                          note.id != widget.noteId &&
+                          note.documentContent.toLowerCase().contains(
+                            '[[' + currentTitle.toLowerCase() + ']]',
+                          )
+                        ).toList();
+                  if (linkedNotes.isEmpty && backlinks.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+                  return Card(
+                    child: ExpansionTile(
+                      leading: const Icon(Icons.account_tree_outlined),
+                      title: Text(
+                        'Links and backlinks (${linkedNotes.length + backlinks.length})',
+                      ),
+                      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      children: [
+                        if (linkedNotes.isNotEmpty) ...[
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Linked notes'),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              for (final note in linkedNotes)
+                                ActionChip(
+                                  avatar: const Icon(Icons.link, size: 16),
+                                  label: Text(note.title),
+                                  onPressed: () => context.push('/editor/${note.id}'),
+                                ),
+                            ],
+                          ),
+                        ],
+                        if (backlinks.isNotEmpty) ...[
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Backlinks to this note'),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              for (final note in backlinks)
+                                ActionChip(
+                                  avatar: const Icon(Icons.reply, size: 16),
+                                  label: Text(note.title.isEmpty ? 'Untitled' : note.title),
+                                  onPressed: () => context.push('/editor/${note.id}'),
+                                ),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  );
+                },
+              ),
               Expanded(
                 child: TextField(
                   controller: _contentController,
