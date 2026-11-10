@@ -21,7 +21,7 @@ and SQLite.
 - Markdown authoring toolbar with bold, italic, headings, lists, checklists,
   quotes, links and code snippets, plus rendered preview.
 - Drawing canvas with local PNG attachment metadata.
-- Home search plus global offline search across notes, categories, tags and tasks.
+- Home search plus global offline FTS5 token/prefix search across note and task text, with category/tag name filters.
 - Optional six-digit app lock using Android secure storage (screen gate only).
 - System/light/dark theme preference and Material 3 burgundy branding.
 - Versioned JSON archive v5 for notes, categories, tags, tag links, note-linked
@@ -33,8 +33,7 @@ and SQLite.
 ## Important limitations
 JSON transfer does not include attachment bytes. Use the full ZIP backup for
 drawing/audio/file attachments; it verifies checksums and does not export local
-absolute paths. Search is local substring matching,
-not semantic search. The editor supports Markdown authoring and preview, but is not a full WYSIWYG block editor.
+absolute paths. Search uses local FTS5 token/prefix matching, not semantic search. The editor supports Markdown authoring and preview, but is not a full WYSIWYG block editor.
 See [Feature Specification](docs/FEATURE_SPECIFICATION.md).
 
 ## Not yet implemented
