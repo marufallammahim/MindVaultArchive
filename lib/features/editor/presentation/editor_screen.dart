@@ -84,6 +84,21 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
           ),
           actions: [
+            PopupMenuButton<int>(
+              tooltip: 'Note color',
+              icon: const Icon(Icons.palette_outlined),
+              onSelected: (value) async {
+                await db.setNoteColor(widget.noteId, value == -1 ? null : value);
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(value: -1, child: Text('Default color')),
+                PopupMenuItem(value: 0xFFFFF0D8, child: Text('Warm cream')),
+                PopupMenuItem(value: 0xFFE1F2E5, child: Text('Soft green')),
+                PopupMenuItem(value: 0xFFE2ECFF, child: Text('Soft blue')),
+                PopupMenuItem(value: 0xFFF4E4F4, child: Text('Soft lavender')),
+                PopupMenuItem(value: 0xFFFFE5E5, child: Text('Soft rose')),
+              ],
+            ),
             IconButton(
               tooltip: 'Draw',
               icon: const Icon(Icons.brush),
