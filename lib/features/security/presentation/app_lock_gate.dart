@@ -17,6 +17,7 @@ class _AppLockGateState extends State<AppLockGate>
   bool _enabled = false;
   bool _locked = false;
   bool _checking = false;
+  bool _storageError = false;
 
   @override
   void initState() {
@@ -38,13 +39,15 @@ class _AppLockGateState extends State<AppLockGate>
       setState(() {
         _enabled = enabled;
         _locked = enabled;
+        _storageError = false;
         _loading = false;
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _enabled = false;
-        _locked = false;
+        _enabled = true;
+        _locked = true;
+        _storageError = true;
         _loading = false;
       });
     }
@@ -67,7 +70,16 @@ class _AppLockGateState extends State<AppLockGate>
       setState(() {
         _enabled = enabled;
         _locked = enabled;
+        _storageError = false;
       });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _enabled = true;
+          _locked = true;
+          _storageError = true;
+        });
+      }
     } finally {
       _checking = false;
     }
@@ -87,17 +99,50 @@ class _AppLockGateState extends State<AppLockGate>
         child: Center(child: CircularProgressIndicator()),
       );
     }
+    if (_storageError) {
+      return Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.security_update_warning_outlined, size: 52),
+                const SizedBox(height: 12),
+                const Text(
+                  'Could not verify secure app-lock settings. Access is paused '
+                  'until secure storage is available.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    setState(() => _loading = true);
+                    _load();
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     if (_enabled && _locked) {
-      return _UnlockScreen(onUnlock: _unlock);
+      return _UnlockScreen(
+        onUnlock: _unlock,
+        onSuccess: _unlockSucceeded,
+      );
     }
     return widget.child;
   }
 }
 
 class _UnlockScreen extends StatefulWidget {
-  const _UnlockScreen({required this.onUnlock});
+  const _UnlockScreen({required this.onUnlock, required this.onSuccess});
 
   final Future<bool> Function(String pin) onUnlock;
+  final VoidCallback onSuccess;
 
   @override
   State<_UnlockScreen> createState() => _UnlockScreenState();
@@ -120,11 +165,21 @@ class _UnlockScreenState extends State<_UnlockScreen> {
       _busy = true;
       _error = null;
     });
-    final valid = await widget.onUnlock(_controller.text);
+    bool valid;
+    try {
+      valid = await widget.onUnlock(_controller.text);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _error = 'Secure storage is unavailable. Try again.';
+      });
+      return;
+    }
     if (!mounted) return;
     if (valid) {
       setState(() => _busy = false);
-      context.findAncestorStateOfType<_AppLockGateState>()?._unlockSucceeded();
+      widget.onSuccess();
     } else {
       setState(() {
         _busy = false;
