@@ -153,14 +153,19 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
       body: FutureBuilder<bool>(
         future: _enabledFuture,
         builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done)
+          if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return Center(
-                child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text(
-                        'Secure storage is unavailable: ${snapshot.error}')));
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Secure storage is unavailable: ${snapshot.error}',
+                ),
+              ),
+            );
+          }
           final enabled = snapshot.data ?? false;
           return ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 36),
