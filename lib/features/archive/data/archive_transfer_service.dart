@@ -152,8 +152,10 @@ class ArchiveTransferService {
     }
     final id = value['id'];
     final name = value['name'];
-    if (id is! String || id.trim().isEmpty ||
-        name is! String || name.trim().isEmpty) {
+    if (id is! String ||
+        id.trim().isEmpty ||
+        name is! String ||
+        name.trim().isEmpty) {
       throw const FormatException('Archive category ID or name is invalid.');
     }
     return _ArchiveCategory(
@@ -178,11 +180,16 @@ class ArchiveTransferService {
     final sortOrder = value['sortOrder'];
     final color = value['color'];
 
-    if (id is! String || id.trim().isEmpty ||
-        title is! String || body is! String ||
+    if (id is! String ||
+        id.trim().isEmpty ||
+        title is! String ||
+        body is! String ||
         (categoryId != null && categoryId is! String) ||
-        favorite is! bool || archived is! bool || deleted is! bool ||
-        sortOrder is! int || (color != null && color is! int)) {
+        favorite is! bool ||
+        archived is! bool ||
+        deleted is! bool ||
+        sortOrder is! int ||
+        (color != null && color is! int)) {
       throw const FormatException('Archive note fields are invalid.');
     }
 

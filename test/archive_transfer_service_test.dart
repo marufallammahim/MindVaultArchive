@@ -31,7 +31,8 @@ void main() {
         'Offline-first notes');
   });
 
-  test('imports archive and skips colliding note IDs without overwriting', () async {
+  test('imports archive and skips colliding note IDs without overwriting',
+      () async {
     await database.saveNoteContent('same-id', 'Local title', 'Local content');
     final archive = <String, Object?>{
       'format': ArchiveTransferService.formatName,
