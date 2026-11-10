@@ -18,16 +18,16 @@ only called implemented when the repository contains a usable local workflow.
 ### Capture and productivity
 - Quick Capture for title/body ideas.
 - Five starter templates: daily journal, meeting, project, study and developer notes.
-- Offline tasks with title/details, due date, priority, completion, edit and delete.
+- Offline tasks with title/details, due date, priority, completion, edit/delete and optional note linking.
 - Local drawing canvas with PNG attachment metadata.
 
 ### Search and transfer
 - Home search across title/body in the active note view.
 - Global offline search across note titles/bodies, category names, tag names,
   and task titles/details.
-- Versioned JSON archive transfer v4 for notes, categories, tags, tag links,
+- Versioned JSON archive transfer v5 for notes, categories, tags, tag links,
   tasks and note revisions.
-- Import supports formats v1-v4, validates input before transaction, and
+- Import supports formats v1-v5, validates input before transaction, and
   protects existing note/task IDs from overwrite.
 - Import/export deliberately excludes private device paths and binary
   attachment bytes.
