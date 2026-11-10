@@ -77,6 +77,28 @@ void main() {
     );
   });
 
+  test('note revisions preserve old content and can be restored', () async {
+    await database.saveNoteContent('history-note', 'First title', 'First body');
+    await database.saveNoteContent('history-note', 'Second title', 'Second body');
+
+    var revisions = await (database.select(database.noteRevisions)
+      ..where((revision) => revision.noteId.equals('history-note'))).get();
+    expect(revisions, hasLength(1));
+    expect(revisions.single.title, 'First title');
+    expect(revisions.single.documentContent, 'First body');
+
+    await database.restoreRevision('history-note', revisions.single.id);
+    final restored = await (database.select(database.notes)
+      ..where((note) => note.id.equals('history-note'))).getSingle();
+    expect(restored.title, 'First title');
+    expect(restored.documentContent, 'First body');
+
+    revisions = await (database.select(database.noteRevisions)
+      ..where((revision) => revision.noteId.equals('history-note'))).get();
+    expect(revisions, hasLength(2));
+    expect(revisions.any((revision) => revision.title == 'Second title'), isTrue);
+  });
+
   test('pin state persists and can be cleared', () async {
     await database.saveNoteContent('pin-note', 'Pinned', 'Body');
     await database.setPinned('pin-note', true);
@@ -169,10 +191,12 @@ void main() {
           ),
         );
 
+    await database.saveNoteContent('note-4', 'With attachment', 'Changed body');
     await database.permanentlyDeleteNote('note-4');
 
     expect(await database.select(database.notes).get(), isEmpty);
     expect(await database.select(database.attachments).get(), isEmpty);
+    expect(await database.select(database.noteRevisions).get(), isEmpty);
   });
 
   test('category names cannot be empty', () async {
