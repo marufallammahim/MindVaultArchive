@@ -21,6 +21,12 @@ void main() {
   test('exports notes and categories as a versioned JSON archive', () async {
     await database.saveCategory('work', 'Work');
     await database.saveNoteContent('note-1', 'Research', 'Offline-first notes');
+    await database.saveTask(
+      id: 'task-1',
+      title: 'Review archive',
+      details: 'Check export',
+      priority: 2,
+    );
 
     final document = jsonDecode(await transfer.exportJson()) as Map;
     expect(document['format'], ArchiveTransferService.formatName);
@@ -29,6 +35,7 @@ void main() {
     expect((contents['categories'] as List).single['name'], 'Work');
     expect((contents['notes'] as List).single['documentContent'],
         'Offline-first notes');
+    expect((contents['tasks'] as List).single['title'], 'Review archive');
   });
 
   test('imports archive and skips colliding note IDs without overwriting',
