@@ -11,37 +11,31 @@ and SQLite.
 - Developer: Maruf Allam Mahim
 - Product promise: local-first notes without advertisements or a mandatory account.
 
-## Current features
-- Local SQLite notes with title/body search.
-- Note editing with debounced auto-save, retryable save errors and save-before-exit.
+## Implemented features
+- Local SQLite notes with debounced autosave and save-before-exit.
 - Favorites, pinning, archive, trash, restore and permanent deletion.
-- Category create, rename, delete, note assignment and category filtering.
-- Tag management and multi-tag note assignment.
-- Per-note color palette and tinted note cards.
-- Quick Capture for ideas and thoughts.
-- Lightweight `[[Note title]]` links and live backlinks.
-- Version history with up to 30 previous note snapshots and restore.
-- Local drawing canvas and drawing attachment metadata.
-- Offline tasks with due dates, priorities and completion state.
-- Starter templates for journals, meetings, projects, study and developer notes.
-- Light, dark and system theme preference.
-- Versioned JSON transfer v4 for notes, categories, tags, links, tasks and revisions.
-- Import validation, transactional writes and duplicate record protection.
-- Flutter CI for formatting, analysis, tests and Android builds.
+- Categories, tags, note colors, wikilinks and backlinks.
+- Quick Capture and five reusable note templates.
+- Offline tasks with due dates, priorities and completion tracking.
+- Note version history with up to 30 snapshots and restore.
+- Drawing canvas with local PNG attachment metadata.
+- Home search plus global offline search across notes, categories, tags and tasks.
+- System/light/dark theme preference and Material 3 burgundy branding.
+- Versioned JSON archive v4 for notes, categories, tags, tag links, tasks and
+  note revisions; v1-v3 remain importable.
+- Transactional import validation and duplicate record protection.
 
-## Important archive-transfer limitation
-The JSON transfer includes note, category, tag, task and revision content/metadata
-but does not include attachment file bytes, audio, drawings or other binary
-assets. It is not yet a full archive backup. See
-[Backup and Restore](docs/BACKUP_RESTORE.md).
+## Important limitations
+JSON transfer does not include drawing/audio/PDF attachment bytes or private
+device paths, so it is not yet a full backup. Search is local substring matching,
+not semantic search. The editor is plain text rather than a full block editor.
+See [Feature Specification](docs/FEATURE_SPECIFICATION.md).
 
 ## Not yet implemented
-Remote synchronization, cloud backup, encrypted database/attachments, app lock,
-rich block editor, nested notebooks, full Bengali localization, OCR/PDF
-indexing, audio recording, reminders/notifications, visual boards, collaboration
-and AI archive search. No cloud or AI provider is configured.
-See [Feature Specification](docs/FEATURE_SPECIFICATION.md) and
-[Roadmap](docs/ROADMAP.md) for accurate status.
+Encrypted vault/app lock, full attachment backup, reminders/notifications,
+calendar, audio recording/transcription, OCR/PDF indexing, visual boards,
+remote sync, cloud backup, collaboration and AI archive search. No cloud or AI
+provider is configured. See [Roadmap](docs/ROADMAP.md).
 
 ## Setup
 ```bash
@@ -58,16 +52,15 @@ flutter test
 flutter build apk --debug
 ```
 
-The `Android CI` workflow runs on pushes and pull requests. Use the GitHub
-Actions result for the exact commit to confirm the outcome.
+The `Android CI` workflow runs these checks on pushes and pull requests. Use
+the Actions result for the exact feature-branch commit to confirm the outcome.
 
 ## Android production release
-Production release builds require your own private Android signing keystore.
-Follow [Android release signing setup](docs/ANDROID_RELEASE_SIGNING.md) to
-configure GitHub Actions secrets and run **Actions → Signed Android Release**.
+Production release builds require a private owner-controlled signing keystore.
+Follow [Android release signing setup](docs/ANDROID_RELEASE_SIGNING.md).
 Never commit `android/key.properties`, `*.jks` or signing passwords.
 
 ## Storage and privacy
-Notes are stored locally in an SQLite database in the app documents directory.
-No account, remote sync or AI provider is configured. JSON exports are plaintext;
-protect them as sensitive data.
+Notes and tasks are stored in an app-private SQLite database. No account, remote
+sync or AI provider is configured. JSON exports are plaintext; protect them as
+sensitive personal data.
