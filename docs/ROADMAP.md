@@ -21,7 +21,7 @@
 
 ## Next engineering milestones
 
-1. SQLite FTS5 search, query filters and ranking.
+1. FTS5 token/prefix search for notes and tasks (implemented); add relevance ranking, advanced filters and saved searches.
 2. Nested notebooks, smart views and saved searches.
 3. Block editor with drag/drop, tables and embeds.
 4. Local notifications, recurring tasks and calendar views.
