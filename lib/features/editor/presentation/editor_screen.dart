@@ -241,7 +241,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                         for (final tag in tags)
                                           FilterChip(
                                             label: Text(tag.name),
-                                            selected: selectedIds.contains(tag.id),
+                                            selected:
+                                                selectedIds.contains(tag.id),
                                             onSelected: (selected) async {
                                               final next = {...selectedIds};
                                               if (selected) {

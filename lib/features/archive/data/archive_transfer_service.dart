@@ -92,7 +92,9 @@ class ArchiveTransferService {
     final decoded = jsonDecode(source);
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != formatName ||
-        (decoded['version'] != 1 && decoded['version'] != 2 && decoded['version'] != formatVersion)) {
+        (decoded['version'] != 1 &&
+            decoded['version'] != 2 &&
+            decoded['version'] != formatVersion)) {
       throw const FormatException('Unsupported MindVault archive format.');
     }
 
@@ -106,8 +108,11 @@ class ArchiveTransferService {
     final rawTasks = contents['tasks'] ?? <Object?>[];
     final rawTags = contents['tags'] ?? <Object?>[];
     final rawNoteTags = contents['noteTags'] ?? <Object?>[];
-    if (rawCategories is! List || rawNotes is! List || rawTasks is! List ||
-        rawTags is! List || rawNoteTags is! List) {
+    if (rawCategories is! List ||
+        rawNotes is! List ||
+        rawTasks is! List ||
+        rawTags is! List ||
+        rawNoteTags is! List) {
       throw const FormatException('Archive categories or notes are invalid.');
     }
 
@@ -130,7 +135,8 @@ class ArchiveTransferService {
     if (tagIds.length != parsedTags.length) {
       throw const FormatException('Archive contains duplicate tag IDs.');
     }
-    final relationKeys = parsedNoteTags.map((item) => '${item.noteId}|${item.tagId}').toSet();
+    final relationKeys =
+        parsedNoteTags.map((item) => '${item.noteId}|${item.tagId}').toSet();
     if (relationKeys.length != parsedNoteTags.length) {
       throw const FormatException('Archive contains duplicate note-tag links.');
     }

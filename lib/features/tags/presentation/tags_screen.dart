@@ -30,7 +30,8 @@ class TagsScreen extends ConsumerWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+            onPressed: () =>
+                Navigator.pop(dialogContext, controller.text.trim()),
             child: const Text('Save'),
           ),
         ],
@@ -40,10 +41,10 @@ class TagsScreen extends ConsumerWidget {
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     try {
       await ref.read(databaseProvider).saveTag(
-        tag?.id ?? const Uuid().v4(),
-        name,
-        color: tag?.color,
-      );
+            tag?.id ?? const Uuid().v4(),
+            name,
+            color: tag?.color,
+          );
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +97,8 @@ class TagsScreen extends ConsumerWidget {
         stream: query.watch(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Could not load tags: ${snapshot.error}'));
+            return Center(
+                child: Text('Could not load tags: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
