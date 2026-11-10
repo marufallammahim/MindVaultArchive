@@ -503,7 +503,6 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
     final foreground = color.computeLuminance() > 0.48
         ? const Color(0xFF171717)
         : Colors.white;
