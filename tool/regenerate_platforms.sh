@@ -72,12 +72,14 @@ subprojects { target ->
     def androidExtension = target.extensions.findByName("android")
     if (androidExtension != null) {
         def setter = androidExtension.class.methods.find {
-            (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
-            it.parameterCount == 1
+            (it.name in ["setCompileSdkVersion", "setCompileSdk", "compileSdkVersion"]) &&
+            it.parameterCount == 1 &&
+            (it.parameterTypes[0] == Integer.TYPE || it.parameterTypes[0] == Integer)
         }
-        if (setter != null) {
-            setter.invoke(androidExtension, 36)
+        if (setter == null) {
+            throw new GradleException("Could not find an integer compileSdk setter for ${target.path}")
         }
+        setter.invoke(androidExtension, Integer.valueOf(36))
     }
 }
 GRADLE
@@ -88,11 +90,13 @@ elif [[ -f "$ROOT_GRADLE_KTS" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE_KTS
 subprojects {
     val androidExtension = extensions.findByName("android")
     if (androidExtension != null) {
-        val setter = androidExtension.javaClass.methods.firstOrNull {
-            (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
-                it.parameterCount == 1
-        }
-        setter?.invoke(androidExtension, 36)
+        val setter = androidExtension.javaClass.methods.firstOrNull { method ->
+            method.name in setOf("setCompileSdkVersion", "setCompileSdk", "compileSdkVersion") &&
+                method.parameterCount == 1 &&
+                (method.parameterTypes[0] == Integer.TYPE ||
+                    method.parameterTypes[0] == Integer::class.java)
+        } ?: throw GradleException("Could not find an integer compileSdk setter for $path")
+        setter.invoke(androidExtension, 36)
     }
 }
 GRADLE
