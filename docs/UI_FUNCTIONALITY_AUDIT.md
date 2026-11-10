@@ -24,6 +24,11 @@ Branch: `feature/ultimate-all-in-one-mindvault`
 4. The feature-screen map marks AI, sync, collaboration, and workspace as not implemented; multimedia/OCR and productivity subfeatures are partial.
 5. Task screen supports CRUD, completion state, priority, due date, and linked notes; no Kanban/calendar/habit planner is present in the current route inventory.
 
+## Cross-screen visual consistency pass (2026-11-11)
+- Updated the shared Material 3 theme consumed by every routed screen: pure-black AMOLED canvas, consistent charcoal cards, compact app bars, rounded dense inputs, dialog/bottom-sheet surfaces, popup menus, list tiles, navigation bar, chips, buttons, dividers, and progress indicators.
+- Aligned Settings palette preset and HEX example with default Burgundy #5A0719.
+- This is a global visual-system pass, not a claim that every screen has been individually pixel-matched to the reference. Screens with bespoke hard-coded Container colors or custom layouts still need per-screen visual QA and may need local adjustments.
+
 ## Validation status
 - Source-level review completed for the screens and services listed above.
 - Runtime Flutter analysis, widget tests, Android build, and device QA must be run in CI or a Flutter environment before calling this release-ready.
