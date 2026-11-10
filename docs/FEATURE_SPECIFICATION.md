@@ -21,21 +21,20 @@ only called implemented when the repository contains a usable local workflow.
 - Offline tasks with title/details, due date, priority, completion, edit/delete and optional note linking.
 - Local drawing canvas with PNG attachment metadata.
 
-### Search and transfer
+### Editing, search and transfer
+- Markdown authoring toolbar and selectable rendered preview.
 - Home search across title/body in the active note view.
 - Global offline search across note titles/bodies, category names, tag names,
   and task titles/details.
 - Versioned JSON archive transfer v5 for notes, categories, tags, tag links,
   note-linked tasks and note revisions.
-- Full ZIP backup/restore for attachment bytes, safe relative paths and SHA-256
-  verification, with import metadata in the same database transaction.
-- Import supports formats v1-v5, validates input before transaction, and
-  protects existing note/task IDs from overwrite.
-- Import/export deliberately excludes private device paths and binary
-  attachment bytes.
+- Full ZIP backup/restore for registered attachment bytes, safe relative paths
+  and SHA-256 verification, with attachment metadata in the import transaction.
+- Import supports JSON formats v1-v5 and protects existing IDs from overwrite.
 
-### App foundation
+### App foundation and access
 - Flutter, Riverpod, GoRouter and Drift/SQLite architecture.
+- Optional salted six-digit app PIN using Android secure storage.
 - Persistent system/light/dark theme preference.
 - Material 3 burgundy brand seed.
 - Android CI workflow for dependency resolution, Drift code generation,
@@ -43,27 +42,24 @@ only called implemented when the repository contains a usable local workflow.
 
 ## Partial
 
-- App lock provides a salted six-digit PIN gate using Android secure storage;
-  it is not database/file encryption and has no PIN recovery.
+- App lock is a screen access gate, not database/file encryption; no PIN recovery.
 - Search is local substring matching, not FTS5, semantic or OCR search.
-- Editor stores Markdown source and provides formatting shortcuts plus a
-  selectable rendered preview; it is not a WYSIWYG block editor.
-- Organization supports categories/tags and title-based links; nested
-  notebooks, smart views and a graph visualization are absent.
-- Drawing attachment records are local; export does not package attachment
-  files or verify their hashes.
+- Editor is Markdown authoring/preview, not a WYSIWYG block editor.
+- Organization supports categories/tags and title-based links; nested notebooks,
+  smart views and graph visualization are absent.
+- Drawing/audio attachments are included in full ZIP backup when registered and
+  the source file exists; inline audio recording/transcription and complete
+  attachment preview lifecycle remain incomplete.
 - Task due dates are stored and displayed, but scheduled notifications,
   recurrence and calendar views are absent.
-- Theme supports system/light/dark, not user-defined palettes, fonts or
-  layout customization.
+- Theme supports system/light/dark, not user-defined palettes, fonts or layout.
 - Bengali localization is not complete.
 
 ## Not implemented
 
-- Scheduled notifications, recurrence and calendar views remain unimplemented.
-- Voice recording, audio playback/transcription and OCR/PDF indexing.
+- FTS5 and semantic search, OCR/PDF indexing.
 - Biometric unlock and encrypted database/attachment storage.
-- Local reminder notifications, recurrence, calendar, habits and project boards.
+- Local reminders, recurrence, calendar, habits and project boards.
 - Visual canvas/whiteboard and graph exploration.
 - Cloud sync, WebDAV/Nextcloud provider and multi-device conflict resolution.
 - Collaboration, sharing permissions and multi-user editing.
