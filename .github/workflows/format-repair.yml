@@ -19,6 +19,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Resolve packages
+        run: flutter pub get
       - name: Format Dart source
         run: dart format lib test
       - name: Commit formatter output
