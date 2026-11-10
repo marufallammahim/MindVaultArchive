@@ -51,11 +51,13 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Added regression coverage for literal percent, underscore and backslash metadata searches in `test/archive_search_service_test.dart`.
 - Fixed a revision-restore race: reloading the editor now cancels a pending debounce, waits for queued writes, and resets the saving state; opening revision history first forces the current note to save.
 - Added `test/editor_provider_test.dart` to ensure a pending stale autosave cannot overwrite restored revision content.
-- GitHub Actions Android CI, Code Quality and formatter workflows were triggered by source/test commits; latest observed runs were queued/pending. No pass/fail result is claimed yet.
+- GitHub Actions Android CI and Code Quality ran `flutter pub get` and `build_runner` successfully, then failed at the formatting gate because 24 pre-existing Dart files still need formatting; analyze, tests and APK build were skipped.
+- The formatter auto-commit workflow completed one formatting commit (`5467f3291ad702235babc13d2b1cea607323334e`), but the full formatting gate still needs a clean rerun.
+- Disabled the redundant `Temporary Dart Format Repair` push/PR triggers; it remains manually dispatchable. The single `Format Dart Sources` workflow is the automatic formatter.
 - Latest source/test work is on the same existing branch; no branch was created and `main` was not changed.
 
 ## Exact next steps
-1. Inspect the current Android CI and code-quality workflow results for the latest branch head; fix any format/analyze/test/build failures.
+1. Run the single automatic formatter against the latest branch head and verify its commit is applied; then rerun Android CI and Code Quality to get past the format gate.
 2. Add and run real migration fixtures for schema versions 1–5, including existing task rows and FTS index rebuilds; do not add SQL foreign keys until orphan handling and migration recovery are proven.
 3. Continue the P0 data-safety audit across archive import, full backup restore, attachments and editor autosave/recovery.
 4. Implement one tested P0/P1 source slice at a time; preserve existing user data and update docs/checkpoint with each commit.
@@ -67,6 +69,6 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Documentation files written on feature branch: PASS.
 - Search source fix and regression tests committed: PASS (execution still pending).
 - Database source/migration and FTS logic audit: PASS; migration fixture tests remain outstanding.
-- GitHub Actions Android CI: triggered; latest observed run queued, result pending.
+- GitHub Actions: `flutter pub get` PASS; `build_runner` PASS; format gate FAIL (24 existing files); analyze/tests/APK build SKIPPED.
 - Flutter/Dart commands executed directly in this session: NONE.
 - Android APK generated in this session: NO.
