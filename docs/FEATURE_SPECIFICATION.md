@@ -8,37 +8,42 @@ vision. A feature is not marked complete merely because a route or button exists
 - Offline SQLite notes using Drift.
 - Note creation and editing with debounced autosave and save-before-exit.
 - Favorites, archive, trash, restore and confirmed permanent deletion.
-- Category creation, rename and deletion with note detachment.
+- Category creation, rename, deletion, note assignment and category-filtered view.
 - Local drawing canvas with PNG attachment metadata.
 - Title/body search over the loaded local note list.
 - Light, dark and system theme selection with local persistence.
-- Versioned JSON transfer for note and category records (format v1).
-- Import validation, transactional writes and duplicate note-ID protection.
+- Offline task manager with title/details, due date, priority, completion state,
+  editing and deletion.
+- Reusable starter templates for daily journal, meeting, project plan, study
+  notes and developer notes.
+- Versioned JSON transfer v2 for notes, categories and tasks; v1 remains
+  importable.
+- Import validation, transactional writes and duplicate note/task-ID protection.
 - Existing Flutter CI and Android build workflows.
 
 ## Partial
 
-- Search: local title/body substring matching; no FTS index, filters or OCR index.
+- Search: local title/body substring matching; no FTS index, advanced filters
+  or OCR index.
 - Editor: plain text fields plus drawing attachments; not a block-based rich editor.
-- Organization: categories exist; nested notebooks, folders, tags and smart views
-  are not implemented.
-- Attachments: drawing metadata is stored locally; archive transfer v1 does not
+- Organization: categories and template starters exist; nested notebooks,
+  tags, smart views and backlinks are not implemented.
+- Attachments: drawing metadata is stored locally; archive transfer does not
   package attachment bytes.
 - Security: app-level lock and encrypted database/attachments are not implemented.
 - Sync: no remote sync provider or account is configured.
 - AI: no provider integration or archive RAG is implemented.
-- Localization: Flutter localization dependencies exist, but full Bengali UI
-  translation is not complete.
+- Localization: full Bengali UI translation is not complete.
 
 ## Not implemented yet
 
-Tasks and reminders, calendar, habits, projects, backlinks, knowledge graph,
+Reminders/notifications, calendar, habits, projects, backlinks, knowledge graph,
 semantic search, OCR/PDF indexing, audio recording/transcription, handwriting,
 visual canvas boards, collaboration, cloud backup, WebDAV/Nextcloud sync,
 end-to-end encryption, and full importers for third-party archive formats.
 
 ## External infrastructure required
 
-Cloud sync, collaboration, public sharing and cloud AI require a configured
-backend/provider and user credentials. None is represented as active until a
-real provider is connected and tested.
+Cloud sync, collaboration and cloud AI require a configured backend/provider
+and user credentials. None is represented as active until a real provider is
+connected and tested.
