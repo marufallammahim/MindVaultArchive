@@ -24,7 +24,8 @@ void main() {
 
     var task = await (database.select(
       database.tasks,
-    )..where((row) => row.id.equals('task-1'))).getSingle();
+    )..where((row) => row.id.equals('task-1')))
+        .getSingle();
     expect(task.title, 'Prepare project plan');
     expect(task.priority, 2);
     expect(task.isCompleted, isFalse);
@@ -37,14 +38,16 @@ void main() {
     );
     task = await (database.select(
       database.tasks,
-    )..where((row) => row.id.equals('task-1'))).getSingle();
+    )..where((row) => row.id.equals('task-1')))
+        .getSingle();
     expect(task.title, 'Updated plan');
     expect(task.dueAt, isNull);
 
     await database.setTaskCompleted('task-1', true);
     task = await (database.select(
       database.tasks,
-    )..where((row) => row.id.equals('task-1'))).getSingle();
+    )..where((row) => row.id.equals('task-1')))
+        .getSingle();
     expect(task.isCompleted, isTrue);
     expect(task.completedAt, isNotNull);
 
@@ -69,7 +72,8 @@ void main() {
     );
     final task = await (database.select(
       database.tasks,
-    )..where((row) => row.id.equals('task-priority'))).getSingle();
+    )..where((row) => row.id.equals('task-priority')))
+        .getSingle();
     expect(task.priority, 2);
   });
 }

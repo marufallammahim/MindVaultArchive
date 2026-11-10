@@ -11,8 +11,7 @@ class AppLockSettingsScreen extends ConsumerStatefulWidget {
       _AppLockSettingsScreenState();
 }
 
-class _AppLockSettingsScreenState
-    extends ConsumerState<AppLockSettingsScreen> {
+class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
   final _service = AppLockService();
   late Future<bool> _enabledFuture;
 
