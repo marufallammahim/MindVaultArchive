@@ -27,6 +27,8 @@ only called implemented when the repository contains a usable local workflow.
   and task titles/details.
 - Versioned JSON archive transfer v5 for notes, categories, tags, tag links,
   note-linked tasks and note revisions.
+- Full ZIP backup/restore for attachment bytes, safe relative paths and SHA-256
+  verification, with import metadata in the same database transaction.
 - Import supports formats v1-v5, validates input before transaction, and
   protects existing note/task IDs from overwrite.
 - Import/export deliberately excludes private device paths and binary
@@ -56,7 +58,7 @@ only called implemented when the repository contains a usable local workflow.
 
 ## Not implemented
 
-- Full attachment-aware ZIP backup and staged restore.
+- Scheduled notifications, recurrence and calendar views remain unimplemented.
 - Voice recording, audio playback/transcription and OCR/PDF indexing.
 - App lock, biometric vault and encrypted database/attachment storage.
 - Local reminder notifications, recurrence, calendar, habits and project boards.
