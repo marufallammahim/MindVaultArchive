@@ -56,54 +56,9 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
   fi
 fi
 
-# AndroidX AAR metadata is checked against each Android module's compile SDK.
-# Set API 36 on the app and every Android plugin/library module. Flutter's
-# current scaffold uses a Kotlin-DSL root build file, while older projects use
-# Groovy; support both so plugins such as share_plus do not remain on API 33.
-GRADLE_MARKER="MINDVAULT_COMPILE_SDK_ENFORCEMENT"
-ROOT_GRADLE="android/build.gradle"
-ROOT_GRADLE_KTS="android/build.gradle.kts"
-
-if [[ -f "$ROOT_GRADLE" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE"; then
-  cat >> "$ROOT_GRADLE" <<'GRADLE'
-
-// MINDVAULT_COMPILE_SDK_ENFORCEMENT
-subprojects { target ->
-    def androidExtension = target.extensions.findByName("android")
-    if (androidExtension != null) {
-        def setter = androidExtension.class.methods.find {
-            (it.name in ["setCompileSdkVersion", "setCompileSdk", "compileSdkVersion"]) &&
-            it.parameterCount == 1 &&
-            (it.parameterTypes[0] == Integer.TYPE || it.parameterTypes[0] == Integer)
-        }
-        if (setter == null) {
-            throw new GradleException("Could not find an integer compileSdk setter for ${target.path}")
-        }
-        setter.invoke(androidExtension, Integer.valueOf(36))
-    }
-}
-GRADLE
-elif [[ -f "$ROOT_GRADLE_KTS" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE_KTS"; then
-  cat >> "$ROOT_GRADLE_KTS" <<'GRADLE'
-
-// MINDVAULT_COMPILE_SDK_ENFORCEMENT
-subprojects {
-    val androidExtension = extensions.findByName("android")
-    if (androidExtension != null) {
-        val setter = androidExtension.javaClass.methods.firstOrNull { method ->
-            method.name in setOf("setCompileSdkVersion", "setCompileSdk", "compileSdkVersion") &&
-                method.parameterCount == 1 &&
-                (method.parameterTypes[0] == Integer.TYPE ||
-                    method.parameterTypes[0] == Integer::class.java)
-        } ?: throw GradleException("Could not find an integer compileSdk setter for $path")
-        setter.invoke(androidExtension, 36)
-    }
-}
-GRADLE
-elif [[ ! -f "$ROOT_GRADLE" && ! -f "$ROOT_GRADLE_KTS" ]]; then
-  echo "Android root Gradle build file is missing after scaffolding." >&2
-  exit 1
-fi
+# The app module's compileSdk is pinned to API 36 in
+# android/app/build.gradle. Do not mutate third-party plugin build files here:
+# Flutter resolves plugin packages only after "flutter pub get".
 
 # Ensure the Gradle wrapper can be executed on Linux runners.
 if [[ -f android/gradlew ]]; then
