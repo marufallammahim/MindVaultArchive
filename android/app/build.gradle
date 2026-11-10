@@ -1,3 +1,11 @@
+import java.util.Properties
+
+def signingProperties = new Properties()
+def signingPropertiesFile = rootProject.file("key.properties")
+if (signingPropertiesFile.exists()) {
+    signingProperties.load(new FileInputStream(signingPropertiesFile))
+}
+
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -28,10 +36,27 @@ android {
         versionName "1.0.0"
     }
 
+    signingConfigs {
+        release {
+            if (!signingPropertiesFile.exists()) {
+                throw new GradleException("Missing android/key.properties. Configure a private release keystore before building a release.")
+            }
+            def storePath = signingProperties["storeFile"]
+            if (storePath == null || storePath.toString().trim().isEmpty()) {
+                throw new GradleException("key.properties must define storeFile")
+            }
+            storeFile file(storePath)
+            storePassword signingProperties["storePassword"]
+            keyAlias signingProperties["keyAlias"]
+            keyPassword signingProperties["keyPassword"]
+        }
+    }
+
     buildTypes {
         release {
-            // Replace with a release keystore before publishing.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }
