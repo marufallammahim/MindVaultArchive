@@ -130,8 +130,9 @@ fi
 test -f pubspec.yaml
 test -f lib/main.dart
 grep -q '^name: mindvault_archive$' pubspec.yaml
-grep -q 'MindVaultArchiveApp' lib/main.dart || {
-  echo "lib/main.dart no longer contains the MindVault Archive app entry point." >&2
+grep -q 'MindVaultArchiveApp' lib/main.dart
+grep -q 'class MindVaultArchiveApp' lib/app/app.dart || {
+  echo "MindVault Archive app widget is missing from lib/app/app.dart." >&2
   exit 1
 }
 
