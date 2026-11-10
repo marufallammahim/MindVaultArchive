@@ -9,6 +9,8 @@ vision. A feature is not marked complete merely because a route or button exists
 - Note creation and editing with debounced autosave and save-before-exit.
 - Favorites, archive, trash, restore and confirmed permanent deletion.
 - Category creation, rename, deletion, note assignment and category-filtered view.
+- Per-note color selection and tinted archive cards.
+- Quick Capture for fast local idea capture.
 - Local drawing canvas with PNG attachment metadata.
 - Title/body search over the loaded local note list.
 - Light, dark and system theme selection with local persistence.
