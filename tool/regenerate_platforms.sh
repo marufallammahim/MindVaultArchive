@@ -43,6 +43,17 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
   # that are absent (Gradle wrapper, settings, Xcode project, etc.).
   cp -Rn "$tmp_dir/scaffold/android/." android/
   cp -Rn "$tmp_dir/scaffold/ios/." ios/
+
+  # Never leave two competing Gradle DSL files in the same project directory.
+  if [[ -f android/app/build.gradle && -f android/app/build.gradle.kts ]]; then
+    rm android/app/build.gradle.kts
+  fi
+  if [[ -f android/settings.gradle && -f android/settings.gradle.kts ]]; then
+    rm android/settings.gradle.kts
+  fi
+  if [[ -f android/build.gradle && -f android/build.gradle.kts ]]; then
+    rm android/build.gradle.kts
+  fi
 fi
 
 # Ensure the Gradle wrapper can be executed on Linux runners.
