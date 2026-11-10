@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show OrderingTerm;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,8 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final db = ref.watch(databaseProvider);
     final notesQuery = db.select(db.notes)
-      ..where((note) =>
-          note.isDeleted.equals(false) & note.isArchived.equals(false))
+      ..where((note) => note.isDeleted.equals(false) & note.isArchived.equals(false))
       ..orderBy([(note) => OrderingTerm.desc(note.updatedAt)]);
 
     return Scaffold(
@@ -70,8 +70,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               decoration: BoxDecoration(color: Color(0xFF5A0719)),
               child: Align(
                 alignment: Alignment.bottomLeft,
-                child: Text('MindVault Archive',
-                    style: TextStyle(color: Colors.white, fontSize: 24)),
+                child: Text(
+                  'MindVault Archive',
+                  style: TextStyle(color: Colors.white, fontSize: 24),
+                ),
               ),
             ),
             ListTile(
@@ -110,9 +112,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final query = _query.toLowerCase();
           final notes = query.isEmpty
               ? allNotes
-              : allNotes.where((note) =>
-                  note.title.toLowerCase().contains(query) ||
-                  note.documentContent.toLowerCase().contains(query)).toList();
+              : allNotes
+                  .where((note) =>
+                      note.title.toLowerCase().contains(query) ||
+                      note.documentContent.toLowerCase().contains(query))
+                  .toList();
 
           if (notes.isEmpty) {
             return Center(
@@ -122,13 +126,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      query.isEmpty ? Icons.edit_note_rounded : Icons.search_off,
+                      query.isEmpty
+                          ? Icons.edit_note_rounded
+                          : Icons.search_off,
                       size: 76,
                       color: Theme.of(context).disabledColor,
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      query.isEmpty ? 'Your archive is waiting.' : 'No matching notes',
+                      query.isEmpty
+                          ? 'Your archive is waiting.'
+                          : 'No matching notes',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 8),
@@ -168,7 +176,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           note.title.isNotEmpty ? note.title : 'Untitled',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.titleMedium
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
                               ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
