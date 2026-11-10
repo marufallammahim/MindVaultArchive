@@ -98,7 +98,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   title: Text(
                     dueAt == null
                         ? 'No due date'
-                        : 'Due \${MaterialLocalizations.of(context).formatMediumDate(dueAt!)}',
+                        : 'Due ${MaterialLocalizations.of(context).formatMediumDate(dueAt!)}',
                   ),
                   trailing: IconButton(
                     icon: const Icon(Icons.calendar_month_outlined),
@@ -210,7 +210,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
-                    child: Text('Could not load tasks: \${snapshot.error}'),
+                    child: Text('Could not load tasks: ${snapshot.error}'),
                   );
                 }
                 if (!snapshot.hasData) {
@@ -276,13 +276,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                               spacing: 12,
                               children: [
                                 Text(
-                                  'Priority: \${_priorityLabel(item.priority)}',
+                                  'Priority: ${_priorityLabel(item.priority)}',
                                 ),
                                 if (item.noteId != null)
                                   const Text('Linked to a note'),
                                 if (item.dueAt != null)
                                   Text(
-                                    'Due \${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                    'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
                                     style: TextStyle(
                                       color: overdue
                                           ? Theme.of(context).colorScheme.error
