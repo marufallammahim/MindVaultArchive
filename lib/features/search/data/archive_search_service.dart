@@ -172,7 +172,7 @@ class ArchiveSearchService {
   String _toFtsQuery(String rawQuery) {
     final terms = rawQuery
         .trim()
-        .split(RegExp(r'\\s+'))
+        .split(RegExp(r'\s+'))
         .map((term) => term.replaceAll('"', '').trim())
         .where((term) => term.isNotEmpty)
         .map((term) => '"$term"*');
@@ -182,7 +182,7 @@ class ArchiveSearchService {
   String _snippet(String value, String query) {
     final normalized = value.trim();
     if (normalized.isEmpty) return 'No preview text';
-    final terms = query.toLowerCase().split(RegExp(r'\\s+'));
+    final terms = query.toLowerCase().split(RegExp(r'\s+'));
     final lower = normalized.toLowerCase();
     var index = -1;
     for (final term in terms) {
