@@ -47,9 +47,9 @@ class SettingsScreen extends ConsumerWidget {
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     try {
       await ref.read(databaseProvider).saveCategory(
-        category?.id ?? const Uuid().v4(),
-        name,
-      );
+            category?.id ?? const Uuid().v4(),
+            name,
+          );
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -128,7 +128,9 @@ class SettingsScreen extends ConsumerWidget {
             ],
             selected: {mode},
             onSelectionChanged: (selection) {
-              ref.read(themeModeProvider.notifier).setThemeMode(selection.first);
+              ref
+                  .read(themeModeProvider.notifier)
+                  .setThemeMode(selection.first);
             },
           ),
           const SizedBox(height: 24),
@@ -136,7 +138,8 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('Categories'),
-            subtitle: const Text('Create, rename, and organize note categories'),
+            subtitle:
+                const Text('Create, rename, and organize note categories'),
             trailing: IconButton(
               tooltip: 'Add category',
               icon: const Icon(Icons.add),

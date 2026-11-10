@@ -61,11 +61,11 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (m) async => m.createAll(),
-    beforeOpen: (details) async {
-      await customStatement('PRAGMA foreign_keys = ON');
-    },
-  );
+        onCreate: (m) async => m.createAll(),
+        beforeOpen: (details) async {
+          await customStatement('PRAGMA foreign_keys = ON');
+        },
+      );
 
   Future<void> setFavorite(String id, bool value) {
     return (update(notes)..where((note) => note.id.equals(id))).write(
@@ -119,7 +119,8 @@ class AppDatabase extends _$AppDatabase {
       );
       await (delete(
         categories,
-      )..where((category) => category.id.equals(id))).go();
+      )..where((category) => category.id.equals(id)))
+          .go();
     });
   }
 
@@ -127,7 +128,8 @@ class AppDatabase extends _$AppDatabase {
     return transaction(() async {
       final existing = await (select(
         notes,
-      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      )..where((t) => t.id.equals(id)))
+          .getSingleOrNull();
       if (existing != null) {
         await update(notes).replace(
           existing.copyWith(

@@ -22,7 +22,8 @@ void main() {
 
       final note = await (database.select(
         database.notes,
-      )..where((row) => row.id.equals('note-1'))).getSingle();
+      )..where((row) => row.id.equals('note-1')))
+          .getSingle();
 
       expect(note.title, 'Updated title');
       expect(note.documentContent, 'Updated body');
@@ -38,7 +39,8 @@ void main() {
 
     final note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-2'))).getSingle();
+    )..where((row) => row.id.equals('note-2')))
+        .getSingle();
 
     expect(note.isFavorite, isTrue);
     expect(note.isArchived, isTrue);
@@ -47,7 +49,8 @@ void main() {
     await database.setDeleted('note-2', false);
     final restored = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-2'))).getSingle();
+    )..where((row) => row.id.equals('note-2')))
+        .getSingle();
     expect(restored.isDeleted, isFalse);
   });
 
@@ -61,22 +64,22 @@ void main() {
 
     final category = await (database.select(
       database.categories,
-    )..where((row) => row.id.equals('work'))).getSingle();
+    )..where((row) => row.id.equals('work')))
+        .getSingle();
     expect(category.name, 'Projects');
 
     await database.deleteCategory('work');
     final note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-3'))).getSingle();
+    )..where((row) => row.id.equals('note-3')))
+        .getSingle();
     expect(note.categoryId, isNull);
     expect(await database.select(database.categories).get(), isEmpty);
   });
 
   test('permanent deletion removes note and its attachment metadata', () async {
     await database.saveNoteContent('note-4', 'With attachment', 'Body');
-    await database
-        .into(database.attachments)
-        .insert(
+    await database.into(database.attachments).insert(
           AttachmentsCompanion.insert(
             id: 'attachment-1',
             noteId: 'note-4',

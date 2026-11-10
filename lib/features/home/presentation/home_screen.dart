@@ -198,12 +198,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final notes = query.isEmpty
               ? allNotes
               : allNotes
-                    .where(
-                      (note) =>
-                          note.title.toLowerCase().contains(query) ||
-                          note.documentContent.toLowerCase().contains(query),
-                    )
-                    .toList();
+                  .where(
+                    (note) =>
+                        note.title.toLowerCase().contains(query) ||
+                        note.documentContent.toLowerCase().contains(query),
+                  )
+                  .toList();
 
           if (notes.isEmpty) {
             return Center(
@@ -272,7 +272,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 note.title.isNotEmpty ? note.title : 'Untitled',
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.titleMedium
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
                                     ?.copyWith(fontWeight: FontWeight.bold),
                               ),
                             ),

@@ -63,9 +63,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       canPop: !state.isSaving,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
-        final saved = await ref
-            .read(editorProvider(widget.noteId).notifier)
-            .forceSave();
+        final saved =
+            await ref.read(editorProvider(widget.noteId).notifier).forceSave();
         if (saved && mounted) context.pop();
       },
       child: Scaffold(
@@ -74,13 +73,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             state.saveError != null
                 ? 'Save failed'
                 : state.isSaving
-                ? 'Saving…'
-                : 'Saved',
+                    ? 'Saving…'
+                    : 'Saved',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: state.saveError != null
-                  ? Theme.of(context).colorScheme.error
-                  : null,
-            ),
+                  color: state.saveError != null
+                      ? Theme.of(context).colorScheme.error
+                      : null,
+                ),
           ),
           actions: [
             IconButton(
@@ -98,7 +97,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(saved ? 'Note saved.' : 'Could not save note.'),
+                    content:
+                        Text(saved ? 'Note saved.' : 'Could not save note.'),
                   ),
                 );
               },
@@ -133,7 +133,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               TextField(
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context).textTheme.headlineMedium
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
