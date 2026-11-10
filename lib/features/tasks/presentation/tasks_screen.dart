@@ -249,7 +249,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                               color: Theme.of(context).colorScheme.primary),
                           const SizedBox(height: 14),
                           Text(
-                            _completed ? 'Nothing completed yet' : 'Nothing on your list',
+                            _completed
+                                ? 'Nothing completed yet'
+                                : 'Nothing on your list',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           const SizedBox(height: 6),
@@ -313,7 +315,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                          color: foreground.withValues(alpha: 0.82),
+                                          color: foreground.withValues(
+                                              alpha: 0.82),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -323,7 +326,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                       spacing: 7,
                                       runSpacing: 5,
                                       children: [
-                                        _taskPill(foreground, _priorityLabel(item.priority)),
+                                        _taskPill(foreground,
+                                            _priorityLabel(item.priority)),
                                         if (item.noteId != null)
                                           _taskPill(foreground, 'Linked note'),
                                         if (item.dueAt != null)
@@ -371,7 +375,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                       PopupMenuItem(
                                           value: 'edit', child: Text('Edit')),
                                       PopupMenuItem(
-                                          value: 'delete', child: Text('Delete')),
+                                          value: 'delete',
+                                          child: Text('Delete')),
                                     ],
                                   ),
                                 ],

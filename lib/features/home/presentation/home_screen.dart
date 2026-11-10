@@ -42,9 +42,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               CircleAvatar(
                 radius: 38,
-                backgroundImage: avatar == null
-                    ? null
-                    : MemoryImage(base64Decode(avatar!)),
+                backgroundImage:
+                    avatar == null ? null : MemoryImage(base64Decode(avatar!)),
                 child: avatar == null
                     ? const Icon(Icons.person_outline, size: 38)
                     : null,
@@ -287,7 +286,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         child: ChoiceChip(
                                           label: Text('#${category.name}'),
                                           selected: _view == 'category' &&
-                                              _selectedCategoryId == category.id,
+                                              _selectedCategoryId ==
+                                                  category.id,
                                           onSelected: (_) => setState(() {
                                             _view = 'category';
                                             _selectedCategoryId = category.id;
@@ -367,7 +367,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 size: 62, color: accent),
                             const SizedBox(height: 14),
                             Text(
-                              term.isEmpty ? 'Your archive is waiting' : 'No matches found',
+                              term.isEmpty
+                                  ? 'Your archive is waiting'
+                                  : 'No matches found',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             const SizedBox(height: 6),
