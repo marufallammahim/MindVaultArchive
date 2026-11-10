@@ -32,7 +32,7 @@ class FlutterSecureValueStore implements SecureValueStore {
 /// attachment files, and must never be described as vault encryption.
 class AppLockService {
   AppLockService({SecureValueStore? store})
-    : _store = store ?? const FlutterSecureValueStore();
+      : _store = store ?? const FlutterSecureValueStore();
 
   static const _enabledKey = 'mindvault.app_lock.enabled';
   static const _saltKey = 'mindvault.app_lock.salt';
