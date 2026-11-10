@@ -132,6 +132,7 @@ class _AppLockGateState extends State<AppLockGate>
       return _UnlockScreen(
         onUnlock: _unlock,
         onSuccess: _unlockSucceeded,
+        lockoutRemaining: _service.lockoutRemaining,
       );
     }
     return widget.child;
@@ -139,10 +140,15 @@ class _AppLockGateState extends State<AppLockGate>
 }
 
 class _UnlockScreen extends StatefulWidget {
-  const _UnlockScreen({required this.onUnlock, required this.onSuccess});
+  const _UnlockScreen({
+    required this.onUnlock,
+    required this.onSuccess,
+    required this.lockoutRemaining,
+  });
 
   final Future<bool> Function(String pin) onUnlock;
   final VoidCallback onSuccess;
+  final Future<Duration?> Function() lockoutRemaining;
 
   @override
   State<_UnlockScreen> createState() => _UnlockScreenState();
@@ -181,9 +187,13 @@ class _UnlockScreenState extends State<_UnlockScreen> {
       setState(() => _busy = false);
       widget.onSuccess();
     } else {
+      final remaining = await widget.lockoutRemaining();
+      if (!mounted) return;
       setState(() {
         _busy = false;
-        _error = 'Incorrect PIN. Try again.';
+        _error = remaining == null
+            ? 'Incorrect PIN. Try again.'
+            : 'Too many attempts. Try again in ${remaining.inSeconds.ceil()} seconds.';
         _controller.clear();
       });
     }
