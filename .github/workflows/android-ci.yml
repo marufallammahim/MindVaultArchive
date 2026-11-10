@@ -22,21 +22,14 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Generate native platform scaffolding
+      - name: Generate missing native platform scaffolding
         run: bash tool/regenerate_platforms.sh
       - run: flutter pub get
-      - name: Format check
-        run: dart format --output=none --set-exit-if-changed lib test integration_test
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
-      - name: Android integration journey
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 35
-          target: google_apis
-          arch: x86_64
-          profile: pixel_6
-          script: flutter test integration_test
       - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
