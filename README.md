@@ -16,15 +16,15 @@ and SQLite.
 - Favorites, pinning, archive, trash, restore and permanent deletion.
 - Categories, tags, note colors, wikilinks and backlinks.
 - Quick Capture and five reusable note templates.
-- Offline tasks with due dates, priorities and completion tracking.
+- Offline tasks with due dates, priorities, completion tracking and note linking.
 - Note version history with up to 30 snapshots and restore.
 - Markdown authoring toolbar with bold, italic, headings, lists, checklists,
   quotes, links and code snippets, plus rendered preview.
 - Drawing canvas with local PNG attachment metadata.
 - Home search plus global offline search across notes, categories, tags and tasks.
 - System/light/dark theme preference and Material 3 burgundy branding.
-- Versioned JSON archive v4 for notes, categories, tags, tag links, tasks and
-  note revisions; v1-v3 remain importable.
+- Versioned JSON archive v5 for notes, categories, tags, tag links, tasks and
+  note revisions; v1-v4 remain importable.
 - Transactional import validation and duplicate record protection.
 
 ## Important limitations
