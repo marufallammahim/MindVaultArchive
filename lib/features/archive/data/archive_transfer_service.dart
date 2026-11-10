@@ -13,7 +13,7 @@ class ArchiveTransferService {
   final AppDatabase _database;
 
   static const formatName = 'mindvault-archive';
-  static const formatVersion = 2;
+  static const formatVersion = 3;
 
   Future<String> exportJson() async {
     final categories = await _database.select(_database.categories).get();
@@ -47,6 +47,21 @@ class ArchiveTransferService {
                   'sortOrder': item.sortOrder,
                 })
             .toList(),
+        'tags': (await _database.select(_database.tags).get())
+            .map((item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'color': item.color,
+                  'createdAt': item.createdAt.toUtc().toIso8601String(),
+                })
+            .toList(),
+        'noteTags': (await _database.select(_database.noteTags).get())
+            .map((item) => <String, Object?>{
+                  'noteId': item.noteId,
+                  'tagId': item.tagId,
+                  'createdAt': item.createdAt.toUtc().toIso8601String(),
+                })
+            .toList(),
         'tasks': (await _database.select(_database.tasks).get())
             .map((item) => <String, Object?>{
                   'id': item.id,
@@ -77,7 +92,7 @@ class ArchiveTransferService {
     final decoded = jsonDecode(source);
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != formatName ||
-        (decoded['version'] != 1 && decoded['version'] != formatVersion)) {
+        (decoded['version'] != 1 && decoded['version'] != 2 && decoded['version'] != formatVersion)) {
       throw const FormatException('Unsupported MindVault archive format.');
     }
 
@@ -89,13 +104,18 @@ class ArchiveTransferService {
     final rawCategories = contents['categories'];
     final rawNotes = contents['notes'];
     final rawTasks = contents['tasks'] ?? <Object?>[];
-    if (rawCategories is! List || rawNotes is! List || rawTasks is! List) {
+    final rawTags = contents['tags'] ?? <Object?>[];
+    final rawNoteTags = contents['noteTags'] ?? <Object?>[];
+    if (rawCategories is! List || rawNotes is! List || rawTasks is! List ||
+        rawTags is! List || rawNoteTags is! List) {
       throw const FormatException('Archive categories or notes are invalid.');
     }
 
     final parsedCategories = rawCategories.map(_parseCategory).toList();
     final parsedNotes = rawNotes.map(_parseNote).toList();
     final parsedTasks = rawTasks.map(_parseTask).toList();
+    final parsedTags = rawTags.map(_parseTag).toList();
+    final parsedNoteTags = rawNoteTags.map(_parseNoteTag).toList();
 
     final categoryIds = parsedCategories.map((item) => item.id).toSet();
     if (categoryIds.length != parsedCategories.length) {
@@ -104,6 +124,15 @@ class ArchiveTransferService {
     final noteIds = parsedNotes.map((item) => item.id).toSet();
     if (noteIds.length != parsedNotes.length) {
       throw const FormatException('Archive contains duplicate note IDs.');
+    }
+
+    final tagIds = parsedTags.map((item) => item.id).toSet();
+    if (tagIds.length != parsedTags.length) {
+      throw const FormatException('Archive contains duplicate tag IDs.');
+    }
+    final relationKeys = parsedNoteTags.map((item) => '${item.noteId}|${item.tagId}').toSet();
+    if (relationKeys.length != parsedNoteTags.length) {
+      throw const FormatException('Archive contains duplicate note-tag links.');
     }
 
     final taskIds = parsedTasks.map((item) => item.id).toSet();
@@ -115,6 +144,9 @@ class ArchiveTransferService {
     var skipped = 0;
     var importedTasks = 0;
     var skippedTasks = 0;
+    var importedTags = 0;
+    var skippedTags = 0;
+    final skippedNoteIds = <String>{};
     await _database.transaction(() async {
       for (final category in parsedCategories) {
         await _database.into(_database.categories).insertOnConflictUpdate(
@@ -138,6 +170,7 @@ class ArchiveTransferService {
             .getSingleOrNull();
         if (existing != null) {
           skipped++;
+          skippedNoteIds.add(note.id);
           continue;
         }
 
@@ -162,6 +195,45 @@ class ArchiveTransferService {
               ),
             );
         imported++;
+      }
+
+      for (final tag in parsedTags) {
+        final existing = await (_database.select(_database.tags)
+              ..where((row) => row.id.equals(tag.id)))
+            .getSingleOrNull();
+        if (existing == null) {
+          importedTags++;
+        } else {
+          skippedTags++;
+        }
+        await _database.into(_database.tags).insertOnConflictUpdate(
+              TagsCompanion.insert(
+                id: tag.id,
+                name: tag.name,
+                color: Value(tag.color),
+                createdAt: Value(tag.createdAt),
+              ),
+            );
+      }
+
+      final availableTags = await _database.select(_database.tags).get();
+      final availableTagIds = availableTags.map((item) => item.id).toSet();
+      for (final link in parsedNoteTags) {
+        if (skippedNoteIds.contains(link.noteId) ||
+            !availableTagIds.contains(link.tagId)) {
+          continue;
+        }
+        final noteExists = await (_database.select(_database.notes)
+              ..where((row) => row.id.equals(link.noteId)))
+            .getSingleOrNull();
+        if (noteExists == null) continue;
+        await _database.into(_database.noteTags).insertOnConflictUpdate(
+              NoteTagsCompanion.insert(
+                noteId: link.noteId,
+                tagId: link.tagId,
+                createdAt: Value(link.createdAt),
+              ),
+            );
       }
 
       for (final task in parsedTasks) {
@@ -194,6 +266,8 @@ class ArchiveTransferService {
       skipped: skipped,
       importedTasks: importedTasks,
       skippedTasks: skippedTasks,
+      importedTags: importedTags,
+      skippedTags: skippedTags,
     );
   }
 
@@ -259,6 +333,47 @@ class ArchiveTransferService {
     );
   }
 
+  _ArchiveTag _parseTag(Object? value) {
+    if (value is! Map<String, dynamic>) {
+      throw const FormatException('Archive contains an invalid tag.');
+    }
+    final id = value['id'];
+    final name = value['name'];
+    final color = value['color'];
+    if (id is! String ||
+        id.trim().isEmpty ||
+        name is! String ||
+        name.trim().isEmpty ||
+        (color != null && color is! int)) {
+      throw const FormatException('Archive tag fields are invalid.');
+    }
+    return _ArchiveTag(
+      id: id,
+      name: name.trim(),
+      color: color as int?,
+      createdAt: _date(value['createdAt']),
+    );
+  }
+
+  _ArchiveNoteTag _parseNoteTag(Object? value) {
+    if (value is! Map<String, dynamic>) {
+      throw const FormatException('Archive contains an invalid note-tag link.');
+    }
+    final noteId = value['noteId'];
+    final tagId = value['tagId'];
+    if (noteId is! String ||
+        noteId.trim().isEmpty ||
+        tagId is! String ||
+        tagId.trim().isEmpty) {
+      throw const FormatException('Archive note-tag link fields are invalid.');
+    }
+    return _ArchiveNoteTag(
+      noteId: noteId,
+      tagId: tagId,
+      createdAt: _date(value['createdAt']),
+    );
+  }
+
   _ArchiveTask _parseTask(Object? value) {
     if (value is! Map<String, dynamic>) {
       throw const FormatException('Archive contains an invalid task.');
@@ -312,12 +427,16 @@ class ArchiveImportResult {
     required this.skipped,
     this.importedTasks = 0,
     this.skippedTasks = 0,
+    this.importedTags = 0,
+    this.skippedTags = 0,
   });
 
   final int imported;
   final int skipped;
   final int importedTasks;
   final int skippedTasks;
+  final int importedTags;
+  final int skippedTags;
 }
 
 class _ArchiveCategory {
@@ -384,4 +503,30 @@ class _ArchiveTask {
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? completedAt;
+}
+
+class _ArchiveTag {
+  const _ArchiveTag({
+    required this.id,
+    required this.name,
+    required this.color,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String name;
+  final int? color;
+  final DateTime createdAt;
+}
+
+class _ArchiveNoteTag {
+  const _ArchiveNoteTag({
+    required this.noteId,
+    required this.tagId,
+    required this.createdAt,
+  });
+
+  final String noteId;
+  final String tagId;
+  final DateTime createdAt;
 }
