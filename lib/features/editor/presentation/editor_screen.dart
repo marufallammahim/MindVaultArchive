@@ -67,9 +67,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final router = GoRouter.of(context);
-        final saved = await ref
-            .read(editorProvider(widget.noteId).notifier)
-            .forceSave();
+        final saved =
+            await ref.read(editorProvider(widget.noteId).notifier).forceSave();
         if (!mounted) return;
         if (saved) router.pop();
       },
@@ -79,13 +78,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             state.saveError != null
                 ? 'Save failed'
                 : state.isSaving
-                ? 'Saving…'
-                : 'Saved',
+                    ? 'Saving…'
+                    : 'Saved',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: state.saveError != null
-                  ? Theme.of(context).colorScheme.error
-                  : null,
-            ),
+                  color: state.saveError != null
+                      ? Theme.of(context).colorScheme.error
+                      : null,
+                ),
           ),
           actions: [
             IconButton(
@@ -187,31 +186,32 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               TextField(
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context).textTheme.headlineMedium
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
                     ?.copyWith(fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
               ),
               StreamBuilder<List<Category>>(
-                stream:
-                    (db.select(db.categories)..orderBy([
-                          (category) => OrderingTerm.asc(category.name),
-                        ]))
-                        .watch(),
+                stream: (db.select(db.categories)
+                      ..orderBy([
+                        (category) => OrderingTerm.asc(category.name),
+                      ]))
+                    .watch(),
                 builder: (context, categoriesSnapshot) {
                   final categories = categoriesSnapshot.data ?? [];
                   return StreamBuilder<Note?>(
-                    stream:
-                        (db.select(db.notes)
-                              ..where((note) => note.id.equals(widget.noteId)))
-                            .watchSingleOrNull(),
+                    stream: (db.select(db.notes)
+                          ..where((note) => note.id.equals(widget.noteId)))
+                        .watchSingleOrNull(),
                     builder: (context, noteSnapshot) {
                       final selectedId = noteSnapshot.data?.categoryId;
                       return DropdownButtonFormField<String?>(
                         initialValue:
                             categories.any((item) => item.id == selectedId)
-                            ? selectedId
-                            : null,
+                                ? selectedId
+                                : null,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.folder_outlined),
@@ -255,15 +255,16 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               StreamBuilder<List<Tag>>(
                 stream: (db.select(
                   db.tags,
-                )..orderBy([(tag) => OrderingTerm.asc(tag.name)])).watch(),
+                )..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
+                    .watch(),
                 builder: (context, tagsSnapshot) {
                   final tags = tagsSnapshot.data ?? [];
                   return StreamBuilder<List<NoteTag>>(
-                    stream:
-                        (db.select(db.noteTags)..where(
-                              (item) => item.noteId.equals(widget.noteId),
-                            ))
-                            .watch(),
+                    stream: (db.select(db.noteTags)
+                          ..where(
+                            (item) => item.noteId.equals(widget.noteId),
+                          ))
+                        .watch(),
                     builder: (context, selectedSnapshot) {
                       final selectedIds = (selectedSnapshot.data ?? [])
                           .map((item) => item.tagId)
@@ -328,14 +329,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 },
               ),
               StreamBuilder<List<VaultTask>>(
-                stream:
-                    (db.select(db.tasks)
-                          ..where((task) => task.noteId.equals(widget.noteId))
-                          ..orderBy([
-                            (task) => OrderingTerm.asc(task.dueAt),
-                            (task) => OrderingTerm.desc(task.updatedAt),
-                          ]))
-                        .watch(),
+                stream: (db.select(db.tasks)
+                      ..where((task) => task.noteId.equals(widget.noteId))
+                      ..orderBy([
+                        (task) => OrderingTerm.asc(task.dueAt),
+                        (task) => OrderingTerm.desc(task.updatedAt),
+                      ]))
+                    .watch(),
                 builder: (context, taskSnapshot) {
                   final tasks = taskSnapshot.data ?? [];
                   if (tasks.isEmpty) return const SizedBox.shrink();
@@ -394,14 +394,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   final backlinks = currentTitle.isEmpty
                       ? <Note>[]
                       : allNotes
-                            .where(
-                              (note) =>
-                                  note.id != widget.noteId &&
-                                  note.documentContent.toLowerCase().contains(
-                                    '[[${currentTitle.toLowerCase()}]]',
-                                  ),
-                            )
-                            .toList();
+                          .where(
+                            (note) =>
+                                note.id != widget.noteId &&
+                                note.documentContent.toLowerCase().contains(
+                                      '[[${currentTitle.toLowerCase()}]]',
+                                    ),
+                          )
+                          .toList();
                   if (linkedNotes.isEmpty && backlinks.isEmpty) {
                     return const SizedBox.shrink();
                   }

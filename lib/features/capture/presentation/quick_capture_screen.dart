@@ -38,9 +38,7 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     setState(() => _saving = true);
     final id = const Uuid().v4();
     try {
-      await ref
-          .read(databaseProvider)
-          .saveNoteContent(
+      await ref.read(databaseProvider).saveNoteContent(
             id,
             title.isEmpty ? 'Quick capture' : title,
             content,

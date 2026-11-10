@@ -44,8 +44,7 @@ class AppLockService {
 
   final SecureValueStore _store;
 
-  Future<bool> isEnabled() async =>
-      await _store.read(_enabledKey) == 'true';
+  Future<bool> isEnabled() async => await _store.read(_enabledKey) == 'true';
 
   Future<void> setPin(String pin) async {
     if (!RegExp(r'^\d{6}$').hasMatch(pin)) {

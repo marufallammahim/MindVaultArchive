@@ -166,9 +166,8 @@ class ArchiveTransferService {
     if (tagIds.length != parsedTags.length) {
       throw const FormatException('Archive contains duplicate tag IDs.');
     }
-    final relationKeys = parsedNoteTags
-        .map((item) => '${item.noteId}|${item.tagId}')
-        .toSet();
+    final relationKeys =
+        parsedNoteTags.map((item) => '${item.noteId}|${item.tagId}').toSet();
     if (relationKeys.length != parsedNoteTags.length) {
       throw const FormatException('Archive contains duplicate note-tag links.');
     }
@@ -230,9 +229,7 @@ class ArchiveTransferService {
     final skippedNoteIds = <String>{};
     await _database.transaction(() async {
       for (final category in parsedCategories) {
-        await _database
-            .into(_database.categories)
-            .insertOnConflictUpdate(
+        await _database.into(_database.categories).insertOnConflictUpdate(
               CategoriesCompanion.insert(
                 id: category.id,
                 name: category.name,
@@ -242,32 +239,28 @@ class ArchiveTransferService {
             );
       }
 
-      final existingCategoryRows = await _database
-          .select(_database.categories)
-          .get();
-      final availableCategoryIds = existingCategoryRows
-          .map((item) => item.id)
-          .toSet();
+      final existingCategoryRows =
+          await _database.select(_database.categories).get();
+      final availableCategoryIds =
+          existingCategoryRows.map((item) => item.id).toSet();
 
       for (final note in parsedNotes) {
         final existing = await (_database.select(
           _database.notes,
-        )..where((row) => row.id.equals(note.id))).getSingleOrNull();
+        )..where((row) => row.id.equals(note.id)))
+            .getSingleOrNull();
         if (existing != null) {
           skipped++;
           skippedNoteIds.add(note.id);
           continue;
         }
 
-        final categoryId =
-            note.categoryId != null &&
+        final categoryId = note.categoryId != null &&
                 availableCategoryIds.contains(note.categoryId)
             ? note.categoryId
             : null;
 
-        await _database
-            .into(_database.notes)
-            .insert(
+        await _database.into(_database.notes).insert(
               NotesCompanion.insert(
                 id: note.id,
                 title: Value(note.title),
@@ -288,14 +281,13 @@ class ArchiveTransferService {
       for (final tag in parsedTags) {
         final existing = await (_database.select(
           _database.tags,
-        )..where((row) => row.id.equals(tag.id))).getSingleOrNull();
+        )..where((row) => row.id.equals(tag.id)))
+            .getSingleOrNull();
         if (existing != null) {
           skippedTags++;
           continue;
         }
-        await _database
-            .into(_database.tags)
-            .insert(
+        await _database.into(_database.tags).insert(
               TagsCompanion.insert(
                 id: tag.id,
                 name: tag.name,
@@ -315,11 +307,10 @@ class ArchiveTransferService {
         }
         final noteExists = await (_database.select(
           _database.notes,
-        )..where((row) => row.id.equals(link.noteId))).getSingleOrNull();
+        )..where((row) => row.id.equals(link.noteId)))
+            .getSingleOrNull();
         if (noteExists == null) continue;
-        await _database
-            .into(_database.noteTags)
-            .insertOnConflictUpdate(
+        await _database.into(_database.noteTags).insertOnConflictUpdate(
               NoteTagsCompanion.insert(
                 noteId: link.noteId,
                 tagId: link.tagId,
@@ -335,18 +326,18 @@ class ArchiveTransferService {
         }
         final exists = await (_database.select(
           _database.notes,
-        )..where((note) => note.id.equals(revision.noteId))).getSingleOrNull();
+        )..where((note) => note.id.equals(revision.noteId)))
+            .getSingleOrNull();
         if (exists == null) continue;
         final revisionExists = await (_database.select(
           _database.noteRevisions,
-        )..where((row) => row.id.equals(revision.id))).getSingleOrNull();
+        )..where((row) => row.id.equals(revision.id)))
+            .getSingleOrNull();
         if (revisionExists != null) {
           skippedRevisions++;
           continue;
         }
-        await _database
-            .into(_database.noteRevisions)
-            .insert(
+        await _database.into(_database.noteRevisions).insert(
               NoteRevisionsCompanion.insert(
                 id: revision.id,
                 noteId: revision.noteId,
@@ -363,16 +354,16 @@ class ArchiveTransferService {
           .where((id) => !skippedNoteIds.contains(id))
           .toSet();
       for (final noteId in revisionNoteIds) {
-        final history =
-            await (_database.select(_database.noteRevisions)
-                  ..where((item) => item.noteId.equals(noteId))
-                  ..orderBy([(item) => OrderingTerm.desc(item.createdAt)]))
-                .get();
+        final history = await (_database.select(_database.noteRevisions)
+              ..where((item) => item.noteId.equals(noteId))
+              ..orderBy([(item) => OrderingTerm.desc(item.createdAt)]))
+            .get();
         if (history.length > 30) {
           final expiredIds = history.skip(30).map((item) => item.id).toList();
           await (_database.delete(
             _database.noteRevisions,
-          )..where((item) => item.id.isIn(expiredIds))).go();
+          )..where((item) => item.id.isIn(expiredIds)))
+              .go();
         }
       }
 
@@ -381,24 +372,22 @@ class ArchiveTransferService {
           skippedAttachments++;
           continue;
         }
-        final noteExists =
-            await (_database.select(_database.notes)
-                  ..where((note) => note.id.equals(attachment.noteId)))
-                .getSingleOrNull();
+        final noteExists = await (_database.select(_database.notes)
+              ..where((note) => note.id.equals(attachment.noteId)))
+            .getSingleOrNull();
         if (noteExists == null) {
           skippedAttachments++;
           continue;
         }
         final existing = await (_database.select(
           _database.attachments,
-        )..where((row) => row.id.equals(attachment.id))).getSingleOrNull();
+        )..where((row) => row.id.equals(attachment.id)))
+            .getSingleOrNull();
         if (existing != null) {
           skippedAttachments++;
           continue;
         }
-        await _database
-            .into(_database.attachments)
-            .insert(
+        await _database.into(_database.attachments).insert(
               AttachmentsCompanion.insert(
                 id: attachment.id,
                 noteId: attachment.noteId,
@@ -424,14 +413,13 @@ class ArchiveTransferService {
       for (final task in parsedTasks) {
         final existing = await (_database.select(
           _database.tasks,
-        )..where((row) => row.id.equals(task.id))).getSingleOrNull();
+        )..where((row) => row.id.equals(task.id)))
+            .getSingleOrNull();
         if (existing != null) {
           skippedTasks++;
           continue;
         }
-        await _database
-            .into(_database.tasks)
-            .insert(
+        await _database.into(_database.tasks).insert(
               TasksCompanion.insert(
                 id: task.id,
                 title: task.title,
