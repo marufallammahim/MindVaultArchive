@@ -22,8 +22,7 @@ void main() {
 
       final note = await (database.select(
         database.notes,
-      )..where((row) => row.id.equals('note-1')))
-          .getSingle();
+      )..where((row) => row.id.equals('note-1'))).getSingle();
 
       expect(note.title, 'Updated title');
       expect(note.documentContent, 'Updated body');
@@ -61,15 +60,13 @@ void main() {
     await database.setNoteCategory('note-category', 'ideas');
     var note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-category')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-category'))).getSingle();
     expect(note.categoryId, 'ideas');
 
     await database.setNoteCategory('note-category', null);
     note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-category')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-category'))).getSingle();
     expect(note.categoryId, isNull);
     await expectLater(
       database.setNoteCategory('note-category', 'missing'),
@@ -87,8 +84,7 @@ void main() {
 
     var revisions = await (database.select(
       database.noteRevisions,
-    )..where((revision) => revision.noteId.equals('history-note')))
-        .get();
+    )..where((revision) => revision.noteId.equals('history-note'))).get();
     expect(revisions, hasLength(1));
     expect(revisions.single.title, 'First title');
     expect(revisions.single.documentContent, 'First body');
@@ -96,15 +92,13 @@ void main() {
     await database.restoreRevision('history-note', revisions.single.id);
     final restored = await (database.select(
       database.notes,
-    )..where((note) => note.id.equals('history-note')))
-        .getSingle();
+    )..where((note) => note.id.equals('history-note'))).getSingle();
     expect(restored.title, 'First title');
     expect(restored.documentContent, 'First body');
 
     revisions = await (database.select(
       database.noteRevisions,
-    )..where((revision) => revision.noteId.equals('history-note')))
-        .get();
+    )..where((revision) => revision.noteId.equals('history-note'))).get();
     expect(revisions, hasLength(2));
     expect(
       revisions.any((revision) => revision.title == 'Second title'),
@@ -123,8 +117,7 @@ void main() {
     }
     final revisions = await (database.select(
       database.noteRevisions,
-    )..where((revision) => revision.noteId.equals('bounded-history')))
-        .get();
+    )..where((revision) => revision.noteId.equals('bounded-history'))).get();
     expect(revisions, hasLength(30));
   });
 
@@ -133,15 +126,13 @@ void main() {
     await database.setPinned('pin-note', true);
     var note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('pin-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('pin-note'))).getSingle();
     expect(note.sortOrder, 1);
 
     await database.setPinned('pin-note', false);
     note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('pin-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('pin-note'))).getSingle();
     expect(note.sortOrder, 0);
   });
 
@@ -150,15 +141,13 @@ void main() {
     await database.setNoteColor('color-note', 0xFFFFF0D8);
     var note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('color-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('color-note'))).getSingle();
     expect(note.color, 0xFFFFF0D8);
 
     await database.setNoteColor('color-note', null);
     note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('color-note')))
-        .getSingle();
+    )..where((row) => row.id.equals('color-note'))).getSingle();
     expect(note.color, isNull);
   });
 
@@ -170,8 +159,7 @@ void main() {
 
     final note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-2')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-2'))).getSingle();
 
     expect(note.isFavorite, isTrue);
     expect(note.isArchived, isTrue);
@@ -180,8 +168,7 @@ void main() {
     await database.setDeleted('note-2', false);
     final restored = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-2')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-2'))).getSingle();
     expect(restored.isDeleted, isFalse);
   });
 
@@ -195,22 +182,22 @@ void main() {
 
     final category = await (database.select(
       database.categories,
-    )..where((row) => row.id.equals('work')))
-        .getSingle();
+    )..where((row) => row.id.equals('work'))).getSingle();
     expect(category.name, 'Projects');
 
     await database.deleteCategory('work');
     final note = await (database.select(
       database.notes,
-    )..where((row) => row.id.equals('note-3')))
-        .getSingle();
+    )..where((row) => row.id.equals('note-3'))).getSingle();
     expect(note.categoryId, isNull);
     expect(await database.select(database.categories).get(), isEmpty);
   });
 
   test('permanent deletion removes note and its attachment metadata', () async {
     await database.saveNoteContent('note-4', 'With attachment', 'Body');
-    await database.into(database.attachments).insert(
+    await database
+        .into(database.attachments)
+        .insert(
           AttachmentsCompanion.insert(
             id: 'attachment-1',
             noteId: 'note-4',
@@ -242,15 +229,13 @@ void main() {
 
       var task = await (database.select(
         database.tasks,
-      )..where((item) => item.id.equals('linked-task')))
-          .getSingle();
+      )..where((item) => item.id.equals('linked-task'))).getSingle();
       expect(task.noteId, 'task-note');
 
       await database.permanentlyDeleteNote('task-note');
       task = await (database.select(
         database.tasks,
-      )..where((item) => item.id.equals('linked-task')))
-          .getSingle();
+      )..where((item) => item.id.equals('linked-task'))).getSingle();
       expect(task.noteId, isNull);
     },
   );

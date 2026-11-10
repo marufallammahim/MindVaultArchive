@@ -146,10 +146,11 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           StreamBuilder<List<Category>>(
-            stream: (db.select(
-              db.categories,
-            )..orderBy([(category) => OrderingTerm.asc(category.name)]))
-                .watch(),
+            stream:
+                (db.select(
+                      db.categories,
+                    )..orderBy([(category) => OrderingTerm.asc(category.name)]))
+                    .watch(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Text('Could not load categories: ${snapshot.error}');
