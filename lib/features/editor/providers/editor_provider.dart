@@ -78,7 +78,12 @@ class EditorNotifier extends StateNotifier<EditorState> {
     }
   }
 
-  Future<void> reloadFromDatabase() => _loadNote();
+  Future<void> reloadFromDatabase() async {
+    // An older debounce must never overwrite a revision restored elsewhere.
+    _debounce?.cancel();
+    await _saveQueue;
+    await _loadNote();
+  }
 
   void updateContent(String title, String content) {
     if (!mounted) return;
