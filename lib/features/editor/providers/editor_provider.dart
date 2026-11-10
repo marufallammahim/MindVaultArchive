@@ -8,6 +8,7 @@ class EditorState {
   final String title;
   final String content;
   final bool isSaving;
+  final bool isLoaded;
   final DateTime? lastSaved;
 
   EditorState({
@@ -15,6 +16,7 @@ class EditorState {
     this.title = '',
     this.content = '',
     this.isSaving = false,
+    this.isLoaded = false,
     this.lastSaved,
   });
 
@@ -22,6 +24,7 @@ class EditorState {
     String? title,
     String? content,
     bool? isSaving,
+    bool? isLoaded,
     DateTime? lastSaved,
   }) {
     return EditorState(
@@ -29,6 +32,7 @@ class EditorState {
       title: title ?? this.title,
       content: content ?? this.content,
       isSaving: isSaving ?? this.isSaving,
+      isLoaded: isLoaded ?? this.isLoaded,
       lastSaved: lastSaved ?? this.lastSaved,
     );
   }
@@ -44,24 +48,33 @@ class EditorNotifier extends StateNotifier<EditorState> {
   }
 
   Future<void> _loadNote() async {
-    final note = await (_db.select(_db.notes)
-          ..where((t) => t.id.equals(state.noteId)))
-        .getSingleOrNull();
-    if (note != null && mounted) {
-      state = state.copyWith(title: note.title, content: note.documentContent);
+    try {
+      final note = await (_db.select(_db.notes)
+            ..where((t) => t.id.equals(state.noteId)))
+          .getSingleOrNull();
+      if (!mounted) return;
+      if (note != null) {
+        state = state.copyWith(
+          title: note.title,
+          content: note.documentContent,
+          isLoaded: true,
+        );
+      } else {
+        state = state.copyWith(isLoaded: true);
+      }
+    } catch (_) {
+      if (mounted) state = state.copyWith(isLoaded: true);
     }
   }
 
   void updateContent(String title, String content) {
     state = state.copyWith(title: title, content: content, isSaving: true);
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 700), () {
-      _saveToDb();
-    });
+    _debounce = Timer(const Duration(milliseconds: 700), _saveToDb);
   }
 
   Future<void> _saveToDb() async {
-    if (!mounted) return;
+    if (!mounted || !state.isLoaded) return;
     final snapshot = state;
     await _db.saveNoteContent(snapshot.noteId, snapshot.title, snapshot.content);
     if (mounted &&
