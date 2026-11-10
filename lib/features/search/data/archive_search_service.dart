@@ -68,12 +68,10 @@ class ArchiveSearchService {
 
     final results = <ArchiveSearchResult>[];
     for (final note in notes) {
-      final category = note.categoryId == null
-          ? null
-          : categoryById[note.categoryId!];
+      final category =
+          note.categoryId == null ? null : categoryById[note.categoryId!];
       final noteTagNames = tagsByNote[note.id] ?? const <String>[];
-      final matches =
-          _contains(note.title, query) ||
+      final matches = _contains(note.title, query) ||
           _contains(note.documentContent, query) ||
           (category != null && matchedCategoryIds.contains(category.id)) ||
           matchedNoteIdsFromTags.contains(note.id);
@@ -122,9 +120,8 @@ class ArchiveSearchService {
     final normalized = value.trim();
     if (normalized.isEmpty) return 'No preview text';
     final index = normalized.toLowerCase().indexOf(query);
-    final start = index < 0
-        ? 0
-        : (index - 55).clamp(0, normalized.length).toInt();
+    final start =
+        index < 0 ? 0 : (index - 55).clamp(0, normalized.length).toInt();
     final end = (start + 180).clamp(0, normalized.length).toInt();
     final prefix = start > 0 ? '…' : '';
     final suffix = end < normalized.length ? '…' : '';
