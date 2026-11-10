@@ -101,7 +101,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
         final value = Map<String, dynamic>.from(item);
         if (value['id'] is! String ||
             value['title'] is! String ||
-            value['content'] is! String) continue;
+            value['content'] is! String) {
+          continue;
+        }
         loaded.add(NoteTemplate(
           id: value['id'] as String,
           title: value['title'] as String,
@@ -188,7 +190,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                     child: FilledButton.icon(
                       onPressed: () {
                         if (title.text.trim().isEmpty ||
-                            content.text.trim().isEmpty) return;
+                            content.text.trim().isEmpty) {
+                          return;
+                        }
                         Navigator.pop(sheetContext, true);
                       },
                       icon: const Icon(Icons.bookmark_add_outlined),
@@ -204,8 +208,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     title.dispose();
     description.dispose();
     content.dispose();
-    if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty)
+    if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty) {
       return;
+    }
     setState(() => _custom = [
           ..._custom,
           NoteTemplate(
@@ -382,8 +387,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                       PopupMenuButton<String>(
                                           tooltip: 'Template actions',
                                           onSelected: (value) {
-                                            if (value == 'delete')
+                                            if (value == 'delete') {
                                               _deleteCustom(item);
+                                            }
                                           },
                                           itemBuilder: (_) => const [
                                                 PopupMenuItem(
