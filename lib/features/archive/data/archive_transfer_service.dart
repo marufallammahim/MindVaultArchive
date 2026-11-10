@@ -5,7 +5,7 @@ import 'package:mindvault_archive/core/database/database.dart';
 
 /// Portable, versioned JSON transfer for notes, categories, tags, tasks and revisions.
 ///
-/// Format v4 includes note revision history; attachment file bytes are still excluded. It never
+/// Format v5 includes linked tasks and note revision history; attachment file bytes are still excluded. It never
 /// serializes private device paths, and import never overwrites existing notes.
 class ArchiveTransferService {
   ArchiveTransferService(this._database);
@@ -87,7 +87,7 @@ class ArchiveTransferService {
             .toList(),
       },
       'limitations': <String>[
-        'Attachment file bytes are not included in format version 4.',
+        'Attachment file bytes are not included in format version 5.',
       ],
     };
 
@@ -328,6 +328,12 @@ class ArchiveTransferService {
         }
       }
 
+      final currentNotes = await _database.select(_database.notes).get();
+      final activeNoteIds = currentNotes
+          .where((item) => !item.isDeleted)
+          .map((item) => item.id)
+          .toSet();
+
       for (final task in parsedTasks) {
         final existing = await (_database.select(_database.tasks)
               ..where((row) => row.id.equals(task.id)))
@@ -341,7 +347,11 @@ class ArchiveTransferService {
                 id: task.id,
                 title: task.title,
                 details: Value(task.details),
-                noteId: Value(task.noteId),
+                noteId: Value(
+                  task.noteId != null && activeNoteIds.contains(task.noteId)
+                      ? task.noteId
+                      : null,
+                ),
                 dueAt: Value(task.dueAt),
                 priority: Value(task.priority),
                 isCompleted: Value(task.isCompleted),
