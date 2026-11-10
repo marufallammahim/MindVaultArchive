@@ -88,11 +88,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
   }
 
-
   Future<void> _attachFile() async {
-    final saved = await ref
-        .read(editorProvider(widget.noteId).notifier)
-        .forceSave();
+    final saved =
+        await ref.read(editorProvider(widget.noteId).notifier).forceSave();
     if (!mounted) {
       return;
     }
@@ -125,35 +123,36 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       );
       await directory.create(recursive: true);
       final id = const Uuid().v4();
-      final safeName = p
-          .basename(picked.name)
-          .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+      final safeName =
+          p.basename(picked.name).replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
       final filename = '${id}_${safeName.isEmpty ? 'attachment' : safeName}';
       target = File(p.join(directory.path, filename));
       await target.writeAsBytes(bytes, flush: true);
       final extension = p.extension(picked.name).toLowerCase();
-      final type = {
-        '.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'
-      }.contains(extension)
-          ? 'image'
-          : {'.mp3', '.m4a', '.wav', '.ogg', '.aac'}.contains(extension)
-              ? 'audio'
-              : {'.mp4', '.mov', '.mkv', '.webm'}.contains(extension)
-                  ? 'video'
-                  : extension == '.pdf'
-                      ? 'pdf'
-                      : 'file';
-      await ref.read(databaseProvider).into(
-        ref.read(databaseProvider).attachments,
-      ).insert(
-        AttachmentsCompanion.insert(
-          id: id,
-          noteId: widget.noteId,
-          type: type,
-          localPath: target.path,
-          filename: picked.name,
-        ),
-      );
+      final type =
+          {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'}.contains(extension)
+              ? 'image'
+              : {'.mp3', '.m4a', '.wav', '.ogg', '.aac'}.contains(extension)
+                  ? 'audio'
+                  : {'.mp4', '.mov', '.mkv', '.webm'}.contains(extension)
+                      ? 'video'
+                      : extension == '.pdf'
+                          ? 'pdf'
+                          : 'file';
+      await ref
+          .read(databaseProvider)
+          .into(
+            ref.read(databaseProvider).attachments,
+          )
+          .insert(
+            AttachmentsCompanion.insert(
+              id: id,
+              noteId: widget.noteId,
+              type: type,
+              localPath: target.path,
+              filename: picked.name,
+            ),
+          );
       if (!mounted) {
         return;
       }
@@ -194,8 +193,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             child: Image.file(
               file,
               fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Padding(
+              errorBuilder: (context, error, stackTrace) => const Padding(
                 padding: EdgeInsets.all(24),
                 child: Text('This image could not be displayed.'),
               ),
@@ -207,7 +205,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
     try {
       await Share.shareXFiles(
-        [XFile(file.path, mimeType: attachment.type == 'pdf' ? 'application/pdf' : null)],
+        [
+          XFile(file.path,
+              mimeType: attachment.type == 'pdf' ? 'application/pdf' : null)
+        ],
         text: 'Open this MindVault Archive attachment with a compatible app.',
       );
     } catch (error) {
@@ -242,8 +243,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
     try {
       await (ref.read(databaseProvider).delete(
-        ref.read(databaseProvider).attachments,
-      )..where((item) => item.id.equals(attachment.id))).go();
+                ref.read(databaseProvider).attachments,
+              )..where((item) => item.id.equals(attachment.id)))
+          .go();
       final file = File(attachment.localPath);
       if (await file.exists()) {
         await file.delete();
@@ -778,7 +780,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   if (snapshot.hasError) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child: Text('Could not load attachments: ${snapshot.error}'),
+                      child:
+                          Text('Could not load attachments: ${snapshot.error}'),
                     );
                   }
                   final attachments = snapshot.data ?? [];
@@ -801,7 +804,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                               dense: true,
                               leading: Icon(_attachmentIcon(item)),
                               title: Text(item.filename,
-                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                                  maxLines: 1, overflow: TextOverflow.ellipsis),
                               subtitle: Text(item.type.toUpperCase()),
                               onTap: () => _openAttachment(item),
                               trailing: IconButton(
