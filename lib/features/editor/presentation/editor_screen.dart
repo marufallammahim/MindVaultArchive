@@ -32,12 +32,18 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   void _onTextChanged() {
     ref.read(editorProvider(widget.noteId).notifier)
-      .updateContent(_titleController.text, _contentController.text);
+        .updateContent(_titleController.text, _contentController.text);
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(editorProvider(widget.noteId));
+
+    if (!state.isLoaded) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     if (!_initialized) {
       _titleController.text = state.title;
@@ -47,12 +53,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     return PopScope(
       onPopInvoked: (didPop) async {
-        if (didPop) await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+        if (didPop) {
+          await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+        }
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(state.isSaving ? 'Saving…' : 'Saved',
-            style: Theme.of(context).textTheme.labelLarge),
+              style: Theme.of(context).textTheme.labelLarge),
           actions: [
             IconButton(
               tooltip: 'Draw',
@@ -81,7 +89,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
               ),
