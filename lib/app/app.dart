@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/app/router.dart';
 import 'package:mindvault_archive/app/theme.dart';
+import 'package:mindvault_archive/features/security/presentation/app_lock_gate.dart';
 
 class MindVaultArchiveApp extends ConsumerWidget {
   const MindVaultArchiveApp({super.key});
