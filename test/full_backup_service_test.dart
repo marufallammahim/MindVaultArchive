@@ -44,9 +44,7 @@ void main() {
     final drawing = File(p.join(sourceDirectory.path, 'drawing.png'));
     final originalBytes = <int>[137, 80, 78, 71, 13, 10, 26, 10, 1, 2, 3];
     await drawing.writeAsBytes(originalBytes);
-    await sourceDatabase
-        .into(sourceDatabase.attachments)
-        .insert(
+    await sourceDatabase.into(sourceDatabase.attachments).insert(
           AttachmentsCompanion.insert(
             id: 'drawing-attachment',
             noteId: 'backup-note',
@@ -67,12 +65,14 @@ void main() {
     expect(result.importedAttachments, 1);
     final restoredNote = await (targetDatabase.select(
       targetDatabase.notes,
-    )..where((note) => note.id.equals('backup-note'))).getSingle();
+    )..where((note) => note.id.equals('backup-note')))
+        .getSingle();
     expect(restoredNote.title, 'Drawing note');
 
     final restoredAttachment = await (targetDatabase.select(
       targetDatabase.attachments,
-    )..where((item) => item.id.equals('drawing-attachment'))).getSingle();
+    )..where((item) => item.id.equals('drawing-attachment')))
+        .getSingle();
     final restoredFile = File(restoredAttachment.localPath);
     expect(await restoredFile.exists(), isTrue);
     expect(await restoredFile.readAsBytes(), originalBytes);
@@ -86,9 +86,7 @@ void main() {
         'Missing file',
         'This backup must fail.',
       );
-      await sourceDatabase
-          .into(sourceDatabase.attachments)
-          .insert(
+      await sourceDatabase.into(sourceDatabase.attachments).insert(
             AttachmentsCompanion.insert(
               id: 'missing-attachment',
               noteId: 'missing-file-note',
@@ -115,9 +113,7 @@ void main() {
       );
       final sourceFile = File(p.join(sourceDirectory.path, 'source.bin'));
       await sourceFile.writeAsBytes([1, 2, 3, 4]);
-      await sourceDatabase
-          .into(sourceDatabase.attachments)
-          .insert(
+      await sourceDatabase.into(sourceDatabase.attachments).insert(
             AttachmentsCompanion.insert(
               id: 'same-attachment',
               noteId: 'collision-note',
@@ -134,9 +130,7 @@ void main() {
       );
       final localFile = File(p.join(restoreDirectory.path, 'local.bin'));
       await localFile.writeAsBytes([9, 9, 9]);
-      await targetDatabase
-          .into(targetDatabase.attachments)
-          .insert(
+      await targetDatabase.into(targetDatabase.attachments).insert(
             AttachmentsCompanion.insert(
               id: 'same-attachment',
               noteId: 'collision-note',
@@ -156,7 +150,8 @@ void main() {
       expect(result.skippedAttachments, 1);
       final note = await (targetDatabase.select(
         targetDatabase.notes,
-      )..where((item) => item.id.equals('collision-note'))).getSingle();
+      )..where((item) => item.id.equals('collision-note')))
+          .getSingle();
       expect(note.title, 'Local note');
       expect(await localFile.readAsBytes(), [9, 9, 9]);
     },
