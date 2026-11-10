@@ -186,9 +186,8 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> setNoteTags(String noteId, List<String> tagIds) async {
     final uniqueIds = tagIds.toSet().toList();
-    final available = await (select(tags)
-          ..where((tag) => tag.id.isIn(uniqueIds)))
-        .get();
+    final available =
+        await (select(tags)..where((tag) => tag.id.isIn(uniqueIds))).get();
     if (available.length != uniqueIds.length) {
       throw ArgumentError('One or more selected tags do not exist.');
     }
@@ -199,7 +198,8 @@ class AppDatabase extends _$AppDatabase {
       if (existingNote == null) {
         await into(notes).insert(NotesCompanion.insert(id: noteId));
       }
-      await (delete(noteTags)..where((item) => item.noteId.equals(noteId))).go();
+      await (delete(noteTags)..where((item) => item.noteId.equals(noteId)))
+          .go();
       for (final tagId in uniqueIds) {
         await into(noteTags).insert(
           NoteTagsCompanion.insert(noteId: noteId, tagId: tagId),
