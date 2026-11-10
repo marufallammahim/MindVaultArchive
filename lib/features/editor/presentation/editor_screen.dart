@@ -97,7 +97,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             IconButton(
               tooltip: 'Tasks linked to this note',
               icon: const Icon(Icons.task_alt_outlined),
-              onPressed: () => context.push('/tasks?noteId=\${widget.noteId}'),
+              onPressed: () => context.push('/tasks?noteId=${widget.noteId}'),
             ),
             IconButton(
               tooltip: 'Version history',
@@ -328,7 +328,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   return Card(
                     child: ExpansionTile(
                       leading: const Icon(Icons.task_alt_outlined),
-                      title: Text('Linked tasks (\${tasks.length})'),
+                      title: Text('Linked tasks (${tasks.length})'),
                       children: [
                         for (final task in tasks)
                           ListTile(
@@ -350,7 +350,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             subtitle: task.dueAt == null
                                 ? null
                                 : Text(
-                                    'Due \${MaterialLocalizations.of(context).formatShortDate(task.dueAt!)}',
+                                    'Due ${MaterialLocalizations.of(context).formatShortDate(task.dueAt!)}',
                                   ),
                           ),
                       ],
