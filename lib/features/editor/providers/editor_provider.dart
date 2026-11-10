@@ -132,7 +132,21 @@ class EditorNotifier extends StateNotifier<EditorState> {
 
   Future<bool> forceSave() async {
     _debounce?.cancel();
-    return _saveToDb();
+    while (mounted) {
+      final snapshot = state;
+      final saved = await _saveToDb();
+      if (!saved) return false;
+      if (!mounted) return true;
+      if (!state.isSaving &&
+          state.title == snapshot.title &&
+          state.content == snapshot.content) {
+        return true;
+      }
+      // Text changed while a previous write was in flight. Cancel its
+      // debounce and immediately persist the newest snapshot before leaving.
+      _debounce?.cancel();
+    }
+    return false;
   }
 
   @override
