@@ -183,7 +183,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.noteId == null ? 'to-do list' : 'note tasks'),
+        title: Text(widget.noteId == null ? 'To-do list' : 'Note tasks'),
         actions: [
           IconButton(
             tooltip: 'Settings',
@@ -199,7 +199,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(18, 4, 18, 16),
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 12),
             child: Row(
               children: [
                 Expanded(
@@ -268,9 +268,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   const Color(0xFF4D91F0),
                 ];
                 return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(18, 0, 18, 110),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 11),
+                  separatorBuilder: (_, __) => const SizedBox(height: 9),
                   itemBuilder: (context, index) {
                     final item = items[index];
                     final overdue = !item.isCompleted &&
@@ -283,12 +283,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         : Colors.white;
                     return Material(
                       color: color,
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(19),
                       clipBehavior: Clip.antiAlias,
                       child: InkWell(
                         onTap: () => _editTask(task: item),
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                          padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
                           child: Row(
                             children: [
                               Expanded(
@@ -301,7 +301,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                       overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: foreground,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.w900,
                                         decoration: item.isCompleted
                                             ? TextDecoration.lineThrough
