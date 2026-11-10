@@ -20,18 +20,20 @@ and SQLite.
 - Per-note color palette and tinted note cards.
 - Quick Capture for ideas and thoughts.
 - Lightweight `[[Note title]]` links and live backlinks.
+- Version history with up to 30 previous note snapshots and restore.
 - Local drawing canvas and drawing attachment metadata.
 - Offline tasks with due dates, priorities and completion state.
 - Starter templates for journals, meetings, projects, study and developer notes.
 - Light, dark and system theme preference.
-- Versioned JSON transfer v3 for notes, categories, tags, tag links and tasks.
+- Versioned JSON transfer v4 for notes, categories, tags, links, tasks and revisions.
 - Import validation, transactional writes and duplicate record protection.
 - Flutter CI for formatting, analysis, tests and Android builds.
 
 ## Important archive-transfer limitation
-The JSON transfer includes note, category, tag and task content/metadata but
-does not include attachment file bytes, audio, drawings or other binary assets.
-It is not yet a full archive backup. See [Backup and Restore](docs/BACKUP_RESTORE.md).
+The JSON transfer includes note, category, tag, task and revision content/metadata
+but does not include attachment file bytes, audio, drawings or other binary
+assets. It is not yet a full archive backup. See
+[Backup and Restore](docs/BACKUP_RESTORE.md).
 
 ## Not yet implemented
 Remote synchronization, cloud backup, encrypted database/attachments, app lock,
