@@ -52,7 +52,7 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Fixed a revision-restore race: reloading the editor now cancels a pending debounce, waits for queued writes, and resets the saving state; opening revision history first forces the current note to save.
 - Added `test/editor_provider_test.dart` to ensure a pending stale autosave cannot overwrite restored revision content.
 - GitHub Actions Android CI and Code Quality ran `flutter pub get` and `build_runner` successfully, then failed at the formatting gate because 24 pre-existing Dart files still need formatting; analyze, tests and APK build were skipped.
-- The formatter auto-commit workflow completed one formatting commit (`5467f3291ad702235babc13d2b1cea607323334e`), but the full formatting gate still needs a clean rerun.
+- The single `Format Dart Sources` workflow completed successfully and committed the repository-wide Dart formatting pass (`10e3450`).
 - Disabled the redundant `Temporary Dart Format Repair` push/PR triggers; it remains manually dispatchable. The single `Format Dart Sources` workflow is the automatic formatter.
 - Latest source/test work is on the same existing branch; no branch was created and `main` was not changed.
 
@@ -69,6 +69,6 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Documentation files written on feature branch: PASS.
 - Search source fix and regression tests committed: PASS (execution still pending).
 - Database source/migration and FTS logic audit: PASS; migration fixture tests remain outstanding.
-- GitHub Actions: `flutter pub get` PASS; `build_runner` PASS; format gate FAIL (24 existing files); analyze/tests/APK build SKIPPED.
+- GitHub Actions on the pre-format checkpoint: `flutter pub get` PASS; `build_runner` PASS; format gate FAIL (24 existing files); analyze/tests/APK build SKIPPED. A successful repository-wide formatting commit is now on the branch; CI must be rerun against that latest commit.
 - Flutter/Dart commands executed directly in this session: NONE.
 - Android APK generated in this session: NO.
