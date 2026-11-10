@@ -11,29 +11,38 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
           const ListTile(
+            contentPadding: EdgeInsets.zero,
             title: Text('Appearance'),
             subtitle: Text('Choose how MindVault Archive looks'),
           ),
-          RadioListTile<ThemeMode>(
-            title: const Text('System default'),
-            value: ThemeMode.system,
-            groupValue: mode,
-            onChanged: (value) => ref.read(themeModeProvider.notifier).state = value!,
+          const SizedBox(height: 12),
+          SegmentedButton<ThemeMode>(
+            segments: const [
+              ButtonSegment(
+                value: ThemeMode.system,
+                label: Text('System'),
+                icon: Icon(Icons.settings_suggest_outlined),
+              ),
+              ButtonSegment(
+                value: ThemeMode.light,
+                label: Text('Light'),
+                icon: Icon(Icons.light_mode_outlined),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                label: Text('Dark'),
+                icon: Icon(Icons.dark_mode_outlined),
+              ),
+            ],
+            selected: {mode},
+            onSelectionChanged: (selection) {
+              ref.read(themeModeProvider.notifier).state = selection.first;
+            },
           ),
-          RadioListTile<ThemeMode>(
-            title: const Text('Light'),
-            value: ThemeMode.light,
-            groupValue: mode,
-            onChanged: (value) => ref.read(themeModeProvider.notifier).state = value!,
-          ),
-          RadioListTile<ThemeMode>(
-            title: const Text('Dark'),
-            value: ThemeMode.dark,
-            groupValue: mode,
-            onChanged: (value) => ref.read(themeModeProvider.notifier).state = value!,
-          ),
+          const SizedBox(height: 24),
           const Divider(),
           const ListTile(
             title: Text('Storage'),
