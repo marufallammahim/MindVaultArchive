@@ -135,9 +135,11 @@ class SettingsScreen extends ConsumerWidget {
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             title: const Text('AMOLED black theme'),
-            subtitle: const Text('Use a true black background when dark mode is active.'),
+            subtitle: const Text(
+                'Use a true black background when dark mode is active.'),
             value: amoledEnabled,
-            onChanged: (value) => ref.read(amoledThemeProvider.notifier).setEnabled(value),
+            onChanged: (value) =>
+                ref.read(amoledThemeProvider.notifier).setEnabled(value),
           ),
           const SizedBox(height: 24),
           const Divider(),

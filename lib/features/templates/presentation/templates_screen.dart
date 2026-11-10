@@ -26,26 +26,41 @@ class NoteTemplate {
 }
 
 const noteTemplates = <NoteTemplate>[
-  NoteTemplate(id: 'daily-journal', title: 'Daily journal',
-    description: 'Reflect on the day and capture what matters.',
-    icon: Icons.book_outlined,
-    content: '## Today\n\nDate: \n\n### Highlights\n- \n\n### What I learned\n- \n\n### Challenges\n- \n\n### Tomorrow\n- '),
-  NoteTemplate(id: 'meeting', title: 'Meeting notes',
-    description: 'Agenda, decisions, and action items.',
-    icon: Icons.groups_outlined,
-    content: '## Meeting\n\nDate: \nAttendees: \n\n### Agenda\n- \n\n### Discussion\n\n\n### Decisions\n- \n\n### Action items\n- [ ] '),
-  NoteTemplate(id: 'project-plan', title: 'Project plan',
-    description: 'Define goals, milestones, risks, and next steps.',
-    icon: Icons.rocket_launch_outlined,
-    content: '## Project overview\n\nGoal: \n\n### Scope\n- \n\n### Milestones\n1. \n2. \n\n### Risks\n- \n\n### Next actions\n- [ ] '),
-  NoteTemplate(id: 'study', title: 'Study notes',
-    description: 'Organize concepts, examples, and questions.',
-    icon: Icons.school_outlined,
-    content: '## Topic\n\nSubject: \nSource: \n\n### Key concepts\n- \n\n### Explanation\n\n\n### Examples\n- \n\n### Questions to revisit\n- '),
-  NoteTemplate(id: 'developer', title: 'Developer notebook',
-    description: 'Record code ideas, commands, and debugging notes.',
-    icon: Icons.terminal_outlined,
-    content: '## Technical note\n\nProject: \nLanguage / tool: \n\n### Problem or idea\n\n\n### Approach\n\n\n### Commands / snippets\n\n\n### Result\n\n\n### Follow-up\n- [ ] '),
+  NoteTemplate(
+      id: 'daily-journal',
+      title: 'Daily journal',
+      description: 'Reflect on the day and capture what matters.',
+      icon: Icons.book_outlined,
+      content:
+          '## Today\n\nDate: \n\n### Highlights\n- \n\n### What I learned\n- \n\n### Challenges\n- \n\n### Tomorrow\n- '),
+  NoteTemplate(
+      id: 'meeting',
+      title: 'Meeting notes',
+      description: 'Agenda, decisions, and action items.',
+      icon: Icons.groups_outlined,
+      content:
+          '## Meeting\n\nDate: \nAttendees: \n\n### Agenda\n- \n\n### Discussion\n\n\n### Decisions\n- \n\n### Action items\n- [ ] '),
+  NoteTemplate(
+      id: 'project-plan',
+      title: 'Project plan',
+      description: 'Define goals, milestones, risks, and next steps.',
+      icon: Icons.rocket_launch_outlined,
+      content:
+          '## Project overview\n\nGoal: \n\n### Scope\n- \n\n### Milestones\n1. \n2. \n\n### Risks\n- \n\n### Next actions\n- [ ] '),
+  NoteTemplate(
+      id: 'study',
+      title: 'Study notes',
+      description: 'Organize concepts, examples, and questions.',
+      icon: Icons.school_outlined,
+      content:
+          '## Topic\n\nSubject: \nSource: \n\n### Key concepts\n- \n\n### Explanation\n\n\n### Examples\n- \n\n### Questions to revisit\n- '),
+  NoteTemplate(
+      id: 'developer',
+      title: 'Developer notebook',
+      description: 'Record code ideas, commands, and debugging notes.',
+      icon: Icons.terminal_outlined,
+      content:
+          '## Technical note\n\nProject: \nLanguage / tool: \n\n### Problem or idea\n\n\n### Approach\n\n\n### Commands / snippets\n\n\n### Result\n\n\n### Follow-up\n- [ ] '),
 ];
 
 class TemplatesScreen extends ConsumerStatefulWidget {
@@ -101,12 +116,14 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
       final preferences = await SharedPreferences.getInstance();
       await preferences.setString(
         _storageKey,
-        jsonEncode(_customTemplates.map((template) => {
-          'id': template.id,
-          'title': template.title,
-          'description': template.description,
-          'content': template.content,
-        }).toList()),
+        jsonEncode(_customTemplates
+            .map((template) => {
+                  'id': template.id,
+                  'title': template.title,
+                  'description': template.description,
+                  'content': template.content,
+                })
+            .toList()),
       );
     } catch (error) {
       if (mounted) {
@@ -129,20 +146,30 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
           width: 560,
           child: SingleChildScrollView(
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              TextField(controller: title, autofocus: true,
-                decoration: const InputDecoration(labelText: 'Template name')),
-              TextField(controller: description,
-                decoration: const InputDecoration(labelText: 'Description')),
-              TextField(controller: content, minLines: 6, maxLines: 12,
-                decoration: const InputDecoration(labelText: 'Markdown content')),
+              TextField(
+                  controller: title,
+                  autofocus: true,
+                  decoration:
+                      const InputDecoration(labelText: 'Template name')),
+              TextField(
+                  controller: description,
+                  decoration: const InputDecoration(labelText: 'Description')),
+              TextField(
+                  controller: content,
+                  minLines: 6,
+                  maxLines: 12,
+                  decoration:
+                      const InputDecoration(labelText: 'Markdown content')),
             ]),
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Save template')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Save template')),
         ],
       ),
     );
@@ -152,14 +179,16 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     title.dispose();
     description.dispose();
     content.dispose();
-    if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty) return;
+    if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty)
+      return;
     setState(() {
       _customTemplates = [
         ..._customTemplates,
         NoteTemplate(
           id: const Uuid().v4(),
           title: cleanTitle,
-          description: cleanDescription.isEmpty ? 'Custom template' : cleanDescription,
+          description:
+              cleanDescription.isEmpty ? 'Custom template' : cleanDescription,
           icon: Icons.bookmark_outline,
           content: cleanContent,
           isCustom: true,
@@ -174,24 +203,30 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete template?'),
-        content: Text('Remove "${template.title}" from your custom library? Existing notes will not be affected.'),
+        content: Text(
+            'Remove "${template.title}" from your custom library? Existing notes will not be affected.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Delete')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel')),
+          FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete')),
         ],
       ),
     );
     if (confirmed != true) return;
-    setState(() => _customTemplates.removeWhere((item) => item.id == template.id));
+    setState(
+        () => _customTemplates.removeWhere((item) => item.id == template.id));
     await _persistCustomTemplates();
   }
 
   Future<void> _createFromTemplate(NoteTemplate template) async {
     final id = const Uuid().v4();
     try {
-      await ref.read(databaseProvider).saveNoteContent(id, template.title, template.content);
+      await ref
+          .read(databaseProvider)
+          .saveNoteContent(id, template.title, template.content);
       if (!mounted) return;
       context.push('/editor/$id');
     } catch (error) {
@@ -203,24 +238,24 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
   }
 
   Widget _templateTile(NoteTemplate template) => Card(
-    child: ListTile(
-      contentPadding: const EdgeInsets.all(16),
-      leading: CircleAvatar(child: Icon(template.icon)),
-      title: Text(template.title),
-      subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4),
-        child: Text(template.description),
-      ),
-      trailing: template.isCustom
-          ? IconButton(
-              tooltip: 'Delete custom template',
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () => _deleteCustomTemplate(template),
-            )
-          : const Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: () => _createFromTemplate(template),
-    ),
-  );
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(16),
+          leading: CircleAvatar(child: Icon(template.icon)),
+          title: Text(template.title),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(template.description),
+          ),
+          trailing: template.isCustom
+              ? IconButton(
+                  tooltip: 'Delete custom template',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _deleteCustomTemplate(template),
+                )
+              : const Icon(Icons.arrow_forward_ios, size: 16),
+          onTap: () => _createFromTemplate(template),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -239,16 +274,18 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           Text('Start with a useful structure',
-            style: Theme.of(context).textTheme.titleLarge),
+              style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 6),
           const Text('Choose a template or build your own reusable structure.'),
           const SizedBox(height: 18),
-          Text('Built-in templates', style: Theme.of(context).textTheme.titleMedium),
+          Text('Built-in templates',
+              style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 10),
           for (final template in noteTemplates) _templateTile(template),
           if (_customTemplates.isNotEmpty) ...[
             const SizedBox(height: 20),
-            Text('Your templates', style: Theme.of(context).textTheme.titleMedium),
+            Text('Your templates',
+                style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 10),
             for (final template in _customTemplates) _templateTile(template),
           ],

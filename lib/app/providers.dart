@@ -73,7 +73,6 @@ class AmoledThemeNotifier extends StateNotifier<bool> {
   }
 }
 
-final amoledThemeProvider =
-    StateNotifierProvider<AmoledThemeNotifier, bool>(
+final amoledThemeProvider = StateNotifierProvider<AmoledThemeNotifier, bool>(
   (ref) => AmoledThemeNotifier(),
 );
