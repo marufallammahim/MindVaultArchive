@@ -49,7 +49,7 @@ preserved.
 Open **Settings → Archive transfer**. Use **Create full ZIP backup** and the
 system share sheet to save/share the complete archive. Use **Restore full ZIP
 backup** to choose and validate a backup. For text-only exchange, generate
-JSON and copy/share it; JSON files can also be selected for import. The app reports imported and skipped note/task/tag/revision counts.
+JSON and copy/share it; JSON files can also be selected for import. The app reports imported and skipped note/task/tag/revision/attachment counts.
 
 ## Safety
 
