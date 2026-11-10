@@ -9,10 +9,11 @@
 - Tag management and multi-tag note assignment.
 - Per-note color selection, quick capture and drawing canvas.
 - Title-based wikilinks and live backlinks.
+- Version history with bounded retention and restore.
 - Offline tasks with priorities, due dates and completion state.
 - Five reusable note starter templates.
-- JSON transfer v3 for notes, categories, tags, note-tag links and tasks, with
-  v1/v2 import compatibility.
+- JSON transfer v4 for notes, categories, tags, note-tag links, tasks and
+  revision history, with v1-v3 import compatibility.
 - Transactional validation and duplicate record protection.
 
 ## Next engineering milestones
@@ -20,7 +21,7 @@
 1. Attachment-aware full backup with checksums and safe restore staging.
 2. Nested notebooks and smart views.
 3. Full-text and semantic search with incremental indexing.
-4. Block document editor, markdown preview and version history.
+4. Block document editor, markdown preview and version history diff.
 5. Local notifications for task reminders and calendar views.
 6. Local encryption and app lock.
 7. Sync outbox plus a real provider implementation.
