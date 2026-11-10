@@ -71,6 +71,7 @@ void main() {
     expect(results.single.id, 'visible');
     expect(await search.search('   '), isEmpty);
   });
+
   test('FTS indexes stay synchronized when note content changes', () async {
     await database.saveNoteContent(
       'indexed-note',
@@ -124,6 +125,7 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single.title.toLowerCase(), startsWith('flutter'));
   });
+
   test('treats SQL LIKE wildcard characters as literal metadata text', () async {
     await database.saveCategory('percent', 'Progress % complete');
     await database.saveCategory('ordinary', 'Progress X complete');
@@ -144,5 +146,4 @@ void main() {
 
     expect(results.map((item) => item.id), ['percent-note']);
   });
-
 }
