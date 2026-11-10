@@ -195,6 +195,14 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 24),
           const Divider(),
           ListTile(
+            leading: const Icon(Icons.sell_outlined),
+            title: const Text('Tags'),
+            subtitle: const Text('Create and manage reusable note tags'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/tags'),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
             leading: const Icon(Icons.inventory_2_outlined),
             title: const Text('Archive transfer'),
             subtitle: const Text('Export or import a portable JSON archive'),
