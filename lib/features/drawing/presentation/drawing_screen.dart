@@ -21,8 +21,8 @@ class DrawingScreen extends ConsumerStatefulWidget {
 
 class _DrawingScreenState extends ConsumerState<DrawingScreen> {
   late final SignatureController _controller = SignatureController(
-    penStrokeWidth: 3,
-    penColor: Colors.black,
+    penStrokeWidth: 3.2,
+    penColor: Colors.white,
     exportBackgroundColor: Colors.white,
   );
   bool _saving = false;
@@ -92,7 +92,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: const Text('Drawing Canvas'),
+          title: const Text('Sketch pad'),
           actions: [
             IconButton(
               tooltip: 'Save drawing',
@@ -110,11 +110,11 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
         body: Signature(
           controller: _controller,
           backgroundColor:
-              Theme.of(context).colorScheme.surfaceContainerHighest,
+              Theme.of(context).colorScheme.surfaceContainerLow,
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               IconButton(
                 tooltip: 'Undo',
