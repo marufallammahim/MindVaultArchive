@@ -31,6 +31,23 @@ void main() {
     },
   );
 
+  test('note category assignment validates and persists', () async {
+    await database.saveCategory('ideas', 'Ideas');
+    await database.setNoteCategory('note-category', 'ideas');
+    var note = await (database.select(database.notes)
+      ..where((row) => row.id.equals('note-category'))).getSingle();
+    expect(note.categoryId, 'ideas');
+
+    await database.setNoteCategory('note-category', null);
+    note = await (database.select(database.notes)
+      ..where((row) => row.id.equals('note-category'))).getSingle();
+    expect(note.categoryId, isNull);
+    await expectLater(
+      database.setNoteCategory('note-category', 'missing'),
+      throwsArgumentError,
+    );
+  });
+
   test('favorite, archive and trash state persist in SQLite', () async {
     await database.saveNoteContent('note-2', 'Lifecycle', 'Test');
     await database.setFavorite('note-2', true);
