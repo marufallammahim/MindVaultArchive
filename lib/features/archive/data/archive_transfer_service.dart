@@ -182,7 +182,8 @@ class ArchiveTransferService {
     }
     for (final attachment in attachments) {
       if (!noteIds.contains(attachment.noteId)) {
-        throw const FormatException('Backup contains an attachment for a missing note.');
+        throw const FormatException(
+            'Backup contains an attachment for a missing note.');
       }
     }
 
