@@ -1,15 +1,14 @@
-import java.util.Properties
-
-def signingProperties = new Properties()
-def signingPropertiesFile = rootProject.file("key.properties")
-if (signingPropertiesFile.exists()) {
-    signingProperties.load(new FileInputStream(signingPropertiesFile))
-}
-
 plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+}
+
+// Load private signing data from android/key.properties (never commit this file).
+def signingProperties = new java.util.Properties()
+def signingPropertiesFile = rootProject.file("key.properties")
+if (signingPropertiesFile.exists()) {
+    signingProperties.load(new FileInputStream(signingPropertiesFile))
 }
 
 android {
