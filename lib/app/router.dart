@@ -11,6 +11,8 @@ import 'package:mindvault_archive/features/templates/presentation/templates_scre
 import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 import 'package:mindvault_archive/features/history/presentation/revision_history_screen.dart';
+import 'package:mindvault_archive/features/search/presentation/archive_search_screen.dart';
+import 'package:mindvault_archive/features/security/presentation/app_lock_settings_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -32,7 +34,11 @@ final appRouter = GoRouter(
       builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
-    GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
+    GoRoute(
+      path: '/tasks',
+      builder: (context, state) =>
+          TasksScreen(noteId: state.uri.queryParameters['noteId']),
+    ),
     GoRoute(
       path: '/templates',
       builder: (context, state) => const TemplatesScreen(),
@@ -41,15 +47,19 @@ final appRouter = GoRouter(
       path: '/capture',
       builder: (context, state) => const QuickCaptureScreen(),
     ),
-    GoRoute(
-      path: '/tags',
-      builder: (context, state) => const TagsScreen(),
-    ),
+    GoRoute(path: '/tags', builder: (context, state) => const TagsScreen()),
     GoRoute(
       path: '/history/:id',
-      builder: (context, state) => RevisionHistoryScreen(
-        noteId: state.pathParameters['id']!,
-      ),
+      builder: (context, state) =>
+          RevisionHistoryScreen(noteId: state.pathParameters['id']!),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const ArchiveSearchScreen(),
+    ),
+    GoRoute(
+      path: '/app-lock',
+      builder: (context, state) => const AppLockSettingsScreen(),
     ),
     GoRoute(
       path: '/archive-tools',
