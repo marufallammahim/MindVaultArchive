@@ -39,7 +39,14 @@ class ArchiveSearchService {
 
     final safeLimit = limit.clamp(1, 500).toInt();
     final ftsQuery = _toFtsQuery(query);
-    final likeQuery = '%${query.toLowerCase()}%';
+    // LIKE treats '%' and '_' as wildcards. Escape user input so metadata
+    // searches behave as literal substring matches, just like FTS search.
+    final escapedQuery = query
+        .toLowerCase()
+        .replaceAll('\\', '\\\\')
+        .replaceAll('%', '\\%')
+        .replaceAll('_', '\\_');
+    final likeQuery = '%$escapedQuery%';
 
     final noteConditions = <String>[];
     final noteVariables = <Variable<Object>>[];
@@ -50,8 +57,8 @@ class ArchiveSearchService {
       noteVariables.add(Variable.withString(ftsQuery));
     }
     noteConditions
-      ..add('LOWER(categories.name) LIKE ?')
-      ..add('LOWER(tags.name) LIKE ?');
+      ..add('LOWER(categories.name) LIKE ? ESCAPE char(92)')
+      ..add('LOWER(tags.name) LIKE ? ESCAPE char(92)');
     noteVariables
       ..add(Variable.withString(likeQuery))
       ..add(Variable.withString(likeQuery));
@@ -165,7 +172,7 @@ class ArchiveSearchService {
   String _toFtsQuery(String rawQuery) {
     final terms = rawQuery
         .trim()
-        .split(RegExp(r'\s+'))
+        .split(RegExp(r'\\s+'))
         .map((term) => term.replaceAll('"', '').trim())
         .where((term) => term.isNotEmpty)
         .map((term) => '"$term"*');
@@ -175,7 +182,7 @@ class ArchiveSearchService {
   String _snippet(String value, String query) {
     final normalized = value.trim();
     if (normalized.isEmpty) return 'No preview text';
-    final terms = query.toLowerCase().split(RegExp(r'\s+'));
+    final terms = query.toLowerCase().split(RegExp(r'\\s+'));
     final lower = normalized.toLowerCase();
     var index = -1;
     for (final term in terms) {
