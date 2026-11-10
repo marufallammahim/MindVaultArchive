@@ -129,21 +129,34 @@ void main() {
   test('treats SQL LIKE wildcard characters as literal metadata text', () async {
     await database.saveCategory('percent', 'Progress % complete');
     await database.saveCategory('ordinary', 'Progress X complete');
-    await database.saveNoteContent(
-      'percent-note',
-      'Percent metadata',
-      'A unique note body.',
-    );
-    await database.saveNoteContent(
-      'ordinary-note',
-      'Ordinary metadata',
-      'A different unique body.',
-    );
-    await database.setNoteCategory('percent-note', 'percent');
-    await database.setNoteCategory('ordinary-note', 'ordinary');
+    await database.saveCategory('underscore', 'under_score status');
+    await database.saveCategory('underscore-other', 'underXscore status');
+    await database.saveCategory('backslash', r'folder\\name');
+    await database.saveCategory('backslash-other', 'folderXname');
 
-    final results = await search.search('progress %');
+    for (final id in [
+      'percent',
+      'ordinary',
+      'underscore',
+      'underscore-other',
+      'backslash',
+      'backslash-other',
+    ]) {
+      await database.saveNoteContent(id, 'Metadata test $id', 'Unique body.');
+      await database.setNoteCategory(id, id);
+    }
 
-    expect(results.map((item) => item.id), ['percent-note']);
+    expect(
+      (await search.search('progress %')).map((item) => item.id),
+      ['percent'],
+    );
+    expect(
+      (await search.search('under_')).map((item) => item.id),
+      ['underscore'],
+    );
+    expect(
+      (await search.search(r'folder\\')).map((item) => item.id),
+      ['backslash'],
+    );
   });
 }
