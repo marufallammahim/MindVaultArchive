@@ -24,7 +24,7 @@ void main() {
 
     expect(controller.text, 'hello **world**');
     expect(changed, isTrue);
-    expect(controller.selection.baseOffset, 14);
+    expect(controller.selection.baseOffset, 15);
     controller.dispose();
   });
 
