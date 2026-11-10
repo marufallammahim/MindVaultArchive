@@ -68,17 +68,15 @@ if [[ -f "$ROOT_GRADLE" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE"; then
   cat >> "$ROOT_GRADLE" <<'GRADLE'
 
 // MINDVAULT_COMPILE_SDK_ENFORCEMENT
-subprojects {
-    afterEvaluate { target ->
-        def androidExtension = target.extensions.findByName("android")
-        if (androidExtension != null) {
-            def setter = androidExtension.class.methods.find {
-                (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
-                it.parameterCount == 1
-            }
-            if (setter != null) {
-                setter.invoke(androidExtension, 36)
-            }
+subprojects { target ->
+    def androidExtension = target.extensions.findByName("android")
+    if (androidExtension != null) {
+        def setter = androidExtension.class.methods.find {
+            (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
+            it.parameterCount == 1
+        }
+        if (setter != null) {
+            setter.invoke(androidExtension, 36)
         }
     }
 }
@@ -88,16 +86,13 @@ elif [[ -f "$ROOT_GRADLE_KTS" ]] && ! grep -q "$GRADLE_MARKER" "$ROOT_GRADLE_KTS
 
 // MINDVAULT_COMPILE_SDK_ENFORCEMENT
 subprojects {
-    val targetProject = this
-    afterEvaluate {
-        val androidExtension = targetProject.extensions.findByName("android")
-        if (androidExtension != null) {
-            val setter = androidExtension.javaClass.methods.firstOrNull {
-                (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
-                    it.parameterCount == 1
-            }
-            setter?.invoke(androidExtension, 36)
+    val androidExtension = extensions.findByName("android")
+    if (androidExtension != null) {
+        val setter = androidExtension.javaClass.methods.firstOrNull {
+            (it.name == "setCompileSdkVersion" || it.name == "setCompileSdk") &&
+                it.parameterCount == 1
         }
+        setter?.invoke(androidExtension, 36)
     }
 }
 GRADLE
