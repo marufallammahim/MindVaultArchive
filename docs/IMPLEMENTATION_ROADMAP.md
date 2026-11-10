@@ -29,6 +29,7 @@ All 22 feature categories remain in scope. Phase completion does not remove late
 - Added locally persisted custom Markdown templates with create/apply/delete workflows.
 - Added an optional true-black AMOLED dark theme preference.
 - Added Markdown export/share from the note editor.
+- Added local note file attachments with a 25 MB per-file guard, app-private copy, attachment listing, image preview, compatible-app share handoff and removal.
 - These additions improve F01, F03, F15, F16, F17 and F22; they do not close those feature categories. See the master checklist for remaining gates.
 
 ## Remaining high-priority work

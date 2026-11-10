@@ -12,7 +12,7 @@ This map is a workflow inventory. Shared screens are allowed; no route should ex
 | Knowledge | Backlinks, linked/unlinked mentions, related/orphan notes, graph, timeline and local archive health | Note details / Archive / Settings | F02,F15,F17 | Partial (timeline and deterministic health checks available) |
 | Capture | Quick capture, thought inbox, voice/camera/share capture | Create action | F03,F17,F18 | Partial |
 | AI | AI home, conversation, Ask Notes, source references, provider and consent settings | AI navigation | F04 | Not implemented |
-| Multimedia | Attachment library, image/PDF viewer, scanner, OCR, audio, video, drawing | Attachments / Create | F05 | Partial |
+| Multimedia | Local file attachment picker/list, image preview, external share/open handoff and drawing; PDF annotation, scanner, OCR and recording pipelines remain pending | Editor / Attachments / Create | F05 | Partial |
 | Productivity | Task dashboard/list/editor/details, subtasks, Kanban, calendar, planner, habits, goals, focus | Tasks navigation | F06 | Partial |
 | Workspace | Canvas, mind map, flowchart, research/project boards, element properties | Workspace navigation | F11 | Not implemented |
 | Templates | Five built-in templates plus locally persisted custom Markdown templates | Create / Templates | F12 | Partial (custom templates available; variables/import/export pending) |

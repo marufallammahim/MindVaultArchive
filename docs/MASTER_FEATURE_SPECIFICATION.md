@@ -74,7 +74,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Offline/backend:** LOCAL for downloaded/local files; DEVICE SERVICE for capture/recording; HYBRID for optional remote processing.
 - **Security/errors:** Validate MIME/type/size; never trust imported paths; preserve referenced files; report unsupported formats.
 - **Acceptance/tests:** Attach/reopen; remove one reference without deleting shared content; backup/restore bytes and metadata; OCR indexing.
-- **Baseline:** PARTIAL — drawing and ZIP attachment backup exist; scanner, OCR, PDF annotation and audio pipelines are incomplete.
+- **Baseline:** PARTIAL — drawing, ZIP attachment backup and local file attachment add/list/remove with image preview/share handoff now exist; scanner, OCR, PDF annotation, audio/video capture and full attachment lifecycle tests remain incomplete.
 
 ### F06 — Task Manager and Productivity
 - **Purpose/workflow:** Create tasks in notes or globally, schedule and track progress across projects.
@@ -116,7 +116,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** Versioned transfer schema, mapping, duplicate policy, attachment bytes, metadata and relationship preservation.
 - **Offline/backend:** LOCAL for local files; cloud destinations require configured provider.
 - **Acceptance/tests:** Invalid archive rejection; no destructive action before validation; JSON/ZIP round-trip; report partial failures.
-- **Baseline:** PARTIAL — versioned JSON transfer, ZIP backup/restore and individual Markdown note share/export exist; broad third-party importers, multi-note Markdown export and additional formats remain incomplete.
+- **Baseline:** PARTIAL — versioned JSON transfer, ZIP backup/restore, individual Markdown note share/export and file attachment handoff exist; broad third-party importers, multi-note Markdown export and additional formats remain incomplete.
 
 ### F11 — Visual Workspace
 - **Purpose/workflow:** Arrange notes/tasks/projects spatially and connect them visually.

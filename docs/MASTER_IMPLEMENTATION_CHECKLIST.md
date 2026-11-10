@@ -62,6 +62,7 @@ F01 Partial; F02 Partial; F03 Partial; F04 Not started; F05 Partial; F06 Partial
 - [ ] Material 3 shared theme tokens and optional AMOLED mode have been added; reusable component contract and adaptive UI audit remain outstanding.
 - [ ] User-created Markdown templates can be saved, applied and deleted locally; template variables/import/export tests remain outstanding.
 - [ ] Individual notes can be shared/exported as Markdown; broader export/import format coverage and round-trip tests remain outstanding.
+- [ ] Local note file attachments can be added, listed, image-previewed, shared and removed; PDF annotation, OCR, audio/video capture and attachment lifecycle/backup acceptance tests remain outstanding.
 
 ## Evidence log
 Record commit SHA, environment, exact command, exit status and artifact path for each test run. Never infer a passing test from an old README statement.

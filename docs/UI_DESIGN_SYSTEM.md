@@ -20,6 +20,7 @@ MindVault Archive uses a deep burgundy brand (#5A0719) and Material 3 color sche
 - User-created Markdown templates stored locally in preferences.
 - Optional true-black AMOLED theme for dark mode.
 - Markdown note export through the Android share sheet.
+- Note attachments can be imported into app-private storage, listed, image-previewed, shared with compatible apps and removed from the note.
 - Editor word count, character count and estimated reading time.
 
 ## Remaining UI/UX work
