@@ -124,4 +124,25 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single.title.toLowerCase(), startsWith('flutter'));
   });
+  test('treats SQL LIKE wildcard characters as literal metadata text', () async {
+    await database.saveCategory('percent', 'Progress % complete');
+    await database.saveCategory('ordinary', 'Progress X complete');
+    await database.saveNoteContent(
+      'percent-note',
+      'Percent metadata',
+      'A unique note body.',
+    );
+    await database.saveNoteContent(
+      'ordinary-note',
+      'Ordinary metadata',
+      'A different unique body.',
+    );
+    await database.setNoteCategory('percent-note', 'percent');
+    await database.setNoteCategory('ordinary-note', 'ordinary');
+
+    final results = await search.search('progress %');
+
+    expect(results.map((item) => item.id), ['percent-note']);
+  });
+
 }
