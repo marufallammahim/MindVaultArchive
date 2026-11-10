@@ -153,7 +153,8 @@ class ArchiveTransferService {
     }
     for (final link in parsedNoteTags) {
       if (!noteIds.contains(link.noteId) || !tagIds.contains(link.tagId)) {
-        throw const FormatException('Archive contains an orphan note-tag link.');
+        throw const FormatException(
+            'Archive contains an orphan note-tag link.');
       }
     }
 
@@ -163,7 +164,8 @@ class ArchiveTransferService {
     }
     for (final revision in parsedRevisions) {
       if (!noteIds.contains(revision.noteId)) {
-        throw const FormatException('Archive contains an orphan note revision.');
+        throw const FormatException(
+            'Archive contains an orphan note revision.');
       }
     }
 

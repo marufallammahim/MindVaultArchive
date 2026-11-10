@@ -21,7 +21,8 @@ void main() {
   test('exports notes and categories as a versioned JSON archive', () async {
     await database.saveCategory('work', 'Work');
     await database.saveNoteContent('note-1', 'Research', 'Offline-first notes');
-    await database.saveNoteContent('note-1', 'Research updated', 'Updated body');
+    await database.saveNoteContent(
+        'note-1', 'Research updated', 'Updated body');
     await database.saveTag('important', 'Important');
     await database.setNoteTags('note-1', ['important']);
     await database.saveTask(
@@ -36,8 +37,8 @@ void main() {
     expect(document['version'], ArchiveTransferService.formatVersion);
     final contents = document['contents'] as Map;
     expect((contents['categories'] as List).single['name'], 'Work');
-    expect((contents['notes'] as List).single['documentContent'],
-        'Updated body');
+    expect(
+        (contents['notes'] as List).single['documentContent'], 'Updated body');
     expect((contents['revisions'] as List).single['title'], 'Research');
     expect((contents['tasks'] as List).single['title'], 'Review archive');
     expect((contents['tags'] as List).single['name'], 'Important');

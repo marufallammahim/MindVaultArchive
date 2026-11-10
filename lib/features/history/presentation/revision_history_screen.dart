@@ -94,7 +94,7 @@ class RevisionHistoryScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(MaterialLocalizations.of(context)
-                        .formatFullDate(revision.createdAt)),
+                          .formatFullDate(revision.createdAt)),
                       const SizedBox(height: 4),
                       Text(
                         revision.documentContent,

@@ -102,7 +102,15 @@ class Attachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Notes, Categories, Attachments, Tasks, Tags, NoteTags, NoteRevisions])
+@DriftDatabase(tables: [
+  Notes,
+  Categories,
+  Attachments,
+  Tasks,
+  Tags,
+  NoteTags,
+  NoteRevisions
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
@@ -311,7 +319,8 @@ class AppDatabase extends _$AppDatabase {
     return transaction(() async {
       await (delete(attachments)..where((item) => item.noteId.equals(id))).go();
       await (delete(noteTags)..where((item) => item.noteId.equals(id))).go();
-      await (delete(noteRevisions)..where((item) => item.noteId.equals(id))).go();
+      await (delete(noteRevisions)..where((item) => item.noteId.equals(id)))
+          .go();
       await (delete(notes)..where((note) => note.id.equals(id))).go();
     });
   }
@@ -322,7 +331,8 @@ class AppDatabase extends _$AppDatabase {
               item.id.equals(revisionId) & item.noteId.equals(noteId)))
         .getSingleOrNull();
     if (revision == null) {
-      throw ArgumentError.value(revisionId, 'revisionId', 'Revision not found.');
+      throw ArgumentError.value(
+          revisionId, 'revisionId', 'Revision not found.');
     }
     await saveNoteContent(noteId, revision.title, revision.documentContent);
   }

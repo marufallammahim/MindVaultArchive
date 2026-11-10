@@ -88,9 +88,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Version history',
               icon: const Icon(Icons.history),
               onPressed: () async {
-                final restored = await context.push<bool>('/history/${widget.noteId}');
+                final restored =
+                    await context.push<bool>('/history/${widget.noteId}');
                 if (restored != true || !mounted) return;
-                await ref.read(editorProvider(widget.noteId).notifier)
+                await ref
+                    .read(editorProvider(widget.noteId).notifier)
                     .reloadFromDatabase();
                 if (!mounted) return;
                 final refreshed = ref.read(editorProvider(widget.noteId));
@@ -307,19 +309,22 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       .map((match) => match.group(1)!.trim())
                       .where((title) => title.isNotEmpty)
                       .toSet();
-                  final linkedNotes = allNotes.where((note) =>
-                    note.id != widget.noteId &&
-                    matches.any((title) =>
-                      note.title.trim().toLowerCase() == title.toLowerCase())
-                  ).toList();
+                  final linkedNotes = allNotes
+                      .where((note) =>
+                          note.id != widget.noteId &&
+                          matches.any((title) =>
+                              note.title.trim().toLowerCase() ==
+                              title.toLowerCase()))
+                      .toList();
                   final backlinks = currentTitle.isEmpty
                       ? <Note>[]
-                      : allNotes.where((note) =>
-                          note.id != widget.noteId &&
-                          note.documentContent.toLowerCase().contains(
-                            '[[' + currentTitle.toLowerCase() + ']]',
-                          )
-                        ).toList();
+                      : allNotes
+                          .where((note) =>
+                              note.id != widget.noteId &&
+                              note.documentContent.toLowerCase().contains(
+                                    '[[' + currentTitle.toLowerCase() + ']]',
+                                  ))
+                          .toList();
                   if (linkedNotes.isEmpty && backlinks.isEmpty) {
                     return const SizedBox.shrink();
                   }
@@ -343,7 +348,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                 ActionChip(
                                   avatar: const Icon(Icons.link, size: 16),
                                   label: Text(note.title),
-                                  onPressed: () => context.push('/editor/${note.id}'),
+                                  onPressed: () =>
+                                      context.push('/editor/${note.id}'),
                                 ),
                             ],
                           ),
@@ -359,8 +365,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                               for (final note in backlinks)
                                 ActionChip(
                                   avatar: const Icon(Icons.reply, size: 16),
-                                  label: Text(note.title.isEmpty ? 'Untitled' : note.title),
-                                  onPressed: () => context.push('/editor/${note.id}'),
+                                  label: Text(note.title.isEmpty
+                                      ? 'Untitled'
+                                      : note.title),
+                                  onPressed: () =>
+                                      context.push('/editor/${note.id}'),
                                 ),
                             ],
                           ),
