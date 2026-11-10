@@ -2,7 +2,7 @@
 
 ## Repository identity
 - Canonical repository: https://github.com/marufallammahim/MindVaultArchive
-- User-supplied URL: https://github.com/marufallammahim/MindVaultArchive-.git (resolves to canonical repository name above).
+- Uploaded repository pointer contained a trailing hyphen (MindVaultArchive-.git); the verified canonical repository is MindVaultArchive.
 - Existing working branch: `feature/ultimate-all-in-one-mindvault`
 - Default branch: `main`
 - Rules: continue on the existing working branch; do not create another branch, do not force-push, do not modify `main` directly.
@@ -41,6 +41,12 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - `pubspec.lock` was not found at the inspected branch path; verify tracking and generate/commit it through a real Flutter environment.
 - Existing GoRouter is a flat route list; adaptive shell navigation/route guards are not complete.
 
+## Latest branch head
+- Commit: c8d371ecddcaff44c704f66862c05be012fc9b4d — feat: preserve quick-capture drafts and show editor metrics.
+- Previous source slice: 0f082d00f0aa6b7c52aa0d9a8727e6e62f9ef4bb — local insights, timeline, developer notebook, routing and theme work.
+- Both commits were applied to the existing feature/ultimate-all-in-one-mindvault branch using fast-forward ref updates.
+- main was not modified and no new branch was created.
+
 ## Work completed in this session
 - Verified repository and write permission.
 - Confirmed existing branch and used it; no branch creation.
@@ -54,10 +60,19 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - GitHub Actions Android CI and Code Quality ran `flutter pub get` and `build_runner` successfully, then failed at the formatting gate because 24 pre-existing Dart files still need formatting; analyze, tests and APK build were skipped.
 - The single `Format Dart Sources` workflow completed successfully and committed the repository-wide Dart formatting pass (`10e3450`).
 - Disabled the redundant `Temporary Dart Format Repair` push/PR triggers; it remains manually dispatchable. The single `Format Dart Sources` workflow is the automatic formatter.
-- Latest source/test work is on the same existing branch; no branch was created and `main` was not changed.
+- Latest source work is on the same existing branch; no branch was created and main was not changed.
+- Added a local archive insights screen with note/task aggregates, possible duplicate-title groups and missing-wikilink target reporting. Results are advisory and do not mutate notes.
+- Added a unified chronological timeline for note and task update activity.
+- Added a developer notebook that stores code snippets as ordinary canonical note records.
+- Added local preference-backed Quick Capture draft restoration and clear-on-success behavior.
+- Added live editor word count, character count and estimated reading time.
+- Expanded the Material 3 theme with shared surface, card, input, button, navigation and snackbar styling.
+- Added routes and Settings entry points for Insights, Timeline and Developer Notebook.
+- Updated design, screen map, roadmap, checklist and master feature specification to describe delivered work and remaining gaps.
+- Latest Flutter CI has not yet been verified for commit c8d371ecddcaff44c704f66862c05be012fc9b4d; no build/test success is claimed.
 
 ## Exact next steps
-1. Run the single automatic formatter against the latest branch head and verify its commit is applied; then rerun Android CI and Code Quality to get past the format gate.
+1. Run the formatter and Android CI/Code Quality against c8d371ecddcaff44c704f66862c05be012fc9b4d; verify formatting, analysis, tests and APK artifact before reporting success.
 2. Add and run real migration fixtures for schema versions 1–5, including existing task rows and FTS index rebuilds; do not add SQL foreign keys until orphan handling and migration recovery are proven.
 3. Continue the P0 data-safety audit across archive import, full backup restore, attachments and editor autosave/recovery.
 4. Implement one tested P0/P1 source slice at a time; preserve existing user data and update docs/checkpoint with each commit.
@@ -70,5 +85,5 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Search source fix and regression tests committed: PASS (execution still pending).
 - Database source/migration and FTS logic audit: PASS; migration fixture tests remain outstanding.
 - GitHub Actions on the pre-format checkpoint: `flutter pub get` PASS; `build_runner` PASS; format gate FAIL (24 existing files); analyze/tests/APK build SKIPPED. A successful repository-wide formatting commit is now on the branch; CI must be rerun against that latest commit.
-- Flutter/Dart commands executed directly in this session: NONE.
+- Flutter/Dart commands executed directly in this session: NONE; the container could not resolve github.com for a local clone, and no local Flutter SDK is available.
 - Android APK generated in this session: NO.

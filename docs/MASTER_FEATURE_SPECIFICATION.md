@@ -38,7 +38,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Offline/backend/permissions:** LOCAL; no backend; file/media permissions only when a platform API requires them.
 - **Security/errors:** Never lose unsaved edits silently; surface save failures; exclude private text from logs.
 - **Acceptance/tests:** Create/edit/reopen persistence; autosave after interruption; failed-write recovery; formatting round-trip; block ordering and attachment reopen.
-- **Baseline:** PARTIAL — Markdown authoring/preview and autosave exist; WYSIWYG/block editor, advanced formatting and full recovery remain incomplete.
+- **Baseline:** PARTIAL — Markdown authoring/preview and autosave exist; live word/character/reading-time indicators and Quick Capture draft recovery were added in the latest source slice. WYSIWYG/block editor, advanced formatting and full recovery acceptance tests remain incomplete.
 
 ### F02 — Advanced Organization
 - **Purpose/workflow:** Organize notes through notebooks, folders, tags, saved searches and lifecycle states.
@@ -56,7 +56,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Offline/backend:** LOCAL; Android device services for widgets, intents, speech and notifications.
 - **Permissions:** Request camera/microphone/notification permissions only at point of use.
 - **Acceptance/tests:** Capture offline, survive app restart, recover drafts, convert capture without losing content.
-- **Baseline:** PARTIAL — in-app Quick Capture exists; widgets, notification capture, share intents and voice capture require implementation/verification.
+- **Baseline:** PARTIAL — in-app Quick Capture now restores a local draft; widgets, notification capture, share intents, voice capture and thought-inbox processing require implementation/verification.
 
 ### F04 — AI-Powered MindVault
 - **Purpose/workflow:** Optional writing assistance and source-grounded questions over selected notes/archive.
@@ -140,7 +140,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** UserPreferences with schema/version and defaults.
 - **Offline/backend:** LOCAL.
 - **Acceptance/tests:** Preferences survive restart; themes apply consistently; text scaling and reduced motion work.
-- **Baseline:** PARTIAL — system/light/dark theme preference exists; AMOLED, custom palettes, typography/layout controls and complete Bengali localization remain incomplete.
+- **Baseline:** PARTIAL — system/light/dark theme preference and shared Material 3 visual tokens exist; AMOLED, custom palettes, typography/layout controls, adaptive shell and complete Bengali localization remain incomplete.
 
 ### F14 — Collaboration and Sharing
 - **Purpose/workflow:** Share local content safely and optionally collaborate through a real service.
@@ -157,7 +157,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** Deterministic local analyzers, derived relationship records and optional AI suggestions.
 - **Offline/backend:** LOCAL deterministic features; HYBRID AI enhancements.
 - **Acceptance/tests:** Explainable suggestions; user approval before mutation; no false claim of automatic accuracy.
-- **Baseline:** PARTIAL — title-based links/backlinks exist; semantic similarity, duplicate detection and health checks remain incomplete.
+- **Baseline:** PARTIAL — title-based links/backlinks plus deterministic duplicate-title and broken-wikilink checks now exist; semantic similarity, orphan-note analysis and richer review workflows remain incomplete.
 
 ### F16 — Developer and Technical Notebook
 - **Purpose/workflow:** Store and retrieve code snippets, commands, API notes, diagrams and technical references.
@@ -166,7 +166,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Offline/backend:** LOCAL.
 - **Security:** Never execute arbitrary shell/code inside the note editor.
 - **Acceptance/tests:** Code round-trip, syntax highlighting, copy behavior and safe rendering of untrusted content.
-- **Baseline:** PARTIAL — Markdown/code snippet authoring exists; full technical notebook and language coverage remain incomplete.
+- **Baseline:** PARTIAL — Markdown/code snippet authoring and a basic developer snippet notebook now exist; syntax highlighting, safe language-specific previews and broader technical tools remain incomplete.
 
 ### F17 — Unique MindVault Features
 - **Purpose/workflow:** Provide a unified memory timeline, thought connections, life archive, inbox, knowledge analytics and portable digital legacy.
@@ -174,7 +174,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** Journal/events, connections, aggregate statistics and portable manifest.
 - **Offline/backend:** LOCAL; optional AI suggestions are HYBRID.
 - **Acceptance/tests:** Chronological filtering, correct aggregates, relationship integrity and restore-ready export verification.
-- **Baseline:** PARTIAL — archive/backup primitives exist; dedicated timeline, analytics and legacy export UX remain incomplete.
+- **Baseline:** PARTIAL — archive/backup primitives plus a note/task activity timeline and basic local archive aggregates/health checks now exist; richer historical events, productivity trends and legacy export UX remain incomplete.
 
 ### F18 — Android-Specific Experience
 - **Purpose/workflow:** Integrate widgets, intents, shortcuts, system services and adaptive Android UX.
