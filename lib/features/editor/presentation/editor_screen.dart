@@ -84,6 +84,20 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
           ),
           actions: [
+            IconButton(
+              tooltip: 'Version history',
+              icon: const Icon(Icons.history),
+              onPressed: () async {
+                final restored = await context.push<bool>('/history/${widget.noteId}');
+                if (restored != true || !mounted) return;
+                await ref.read(editorProvider(widget.noteId).notifier)
+                    .reloadFromDatabase();
+                if (!mounted) return;
+                final refreshed = ref.read(editorProvider(widget.noteId));
+                _titleController.text = refreshed.title;
+                _contentController.text = refreshed.content;
+              },
+            ),
             PopupMenuButton<int>(
               tooltip: 'Note color',
               icon: const Icon(Icons.palette_outlined),
