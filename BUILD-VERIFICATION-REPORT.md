@@ -2,51 +2,65 @@
 
 Updated: 2026-11-10
 
-## Current source
+## Repository and branch
 - Repository: `marufallammahim/MindVaultArchive`
 - Working branch: `feature/ultimate-all-in-one-mindvault`
-- Base branch: `main`
 - Android application ID: `com.marufallammahim.mindvaultarchive`
 - Android compile SDK: 36
 
-## Verified CI checkpoint
-Commit `34ab8a1bbe72601e587ecf22c4009d1585f30e08` completed all three GitHub Actions workflows successfully:
-
-- Drift code generation: passed.
-- Dart formatting: passed.
-- Flutter static analysis: passed with no issues.
+## Last verified CI checkpoint
+Commit `34ab8a1bbe72601e587ecf22c4009d1585f30e08` completed the repository's
+three historical GitHub Actions workflows successfully:
+- Drift code generation and Dart formatting passed.
+- Flutter static analysis passed with no issues.
 - Flutter tests: 17 passed.
-- Android debug APK: built and uploaded.
-- Release-mode APK and AAB candidate: built.
-- APK/AAB signature verification: passed using an ephemeral CI-only test key.
-- Debug APK artifact: `mindvault-archive-debug-apk-be41b529998e715d97edd8683e165b7af22c65b1`.
-- Release candidate artifact: `mindvault-archive-release-candidate-148-be41b529998e715d97edd8683e165b7af22c65b1`.
+- Android debug APK built and uploaded.
+- Release-mode APK and AAB candidate built and signature-verified with an
+  ephemeral CI-only test key.
+- Debug and release-candidate artifacts were uploaded for that checkpoint.
 
-The release candidate is not signed with a permanent owner-controlled production key. It must not be treated as the final F-Droid publishing build.
+The ephemeral CI key is not a permanent owner-controlled publishing identity.
+Those artifacts are not the final F-Droid publishing build.
 
-## Changes after that verified checkpoint
-The branch has continued with:
-- Note pinning and title-based wikilinks/backlinks.
-- Schema v4 note revision history, bounded to 30 snapshots, with restore UI.
-- Archive transfer v4 including revision snapshots and compatibility for v1-v3.
-- Additional tests for revision retention, restore and archive compatibility.
+## Changes requiring a fresh CI run
+The following source changes are newer than the verified checkpoint:
+- Archive transfer v4 with notes, categories, tags, tag links, tasks and
+  revision history.
+- Archive import validation and duplicate-record protection.
+- Offline global search across note titles/bodies, category names, tag names,
+  and task titles/details.
+- Search UI, route and home-screen entry points.
+- Search service tests covering case-insensitive matching, categories, tags,
+  tasks, deleted-note exclusion and result limits.
+- Documentation refresh for actual implementation status.
 
-These later changes require a fresh CI run. The successful checkpoint above does not verify the newest branch head.
+The latest branch head has not yet been verified by a completed CI run. Do not
+interpret the earlier successful run as verification of these newer changes.
 
-## Implemented in this branch
-- Existing offline Drift/SQLite note database and app identity retained.
-- Existing note create/edit, autosave, favorites, archive/trash lifecycle, category management and drawing workflow retained.
-- Category assignment/filtering, tags, note color, pinning and title-based links.
-- Quick Capture, five templates and offline task manager.
-- Versioned JSON transfer v4 for notes, categories, tags, links, tasks and revisions.
-- Transactional validation and duplicate note/task protection.
-- Architecture, database, backup, security, AI, sync, UI and roadmap docs.
+## Current implemented functionality
+- Offline notes, debounced autosave and save-before-exit.
+- Favorites, pinning, archive, trash, restore and permanent deletion.
+- Categories, tags, note colors, wikilinks and backlinks.
+- Quick Capture and five starter templates.
+- Offline tasks with due dates, priorities and completion.
+- Note revision history with up to 30 snapshots and restore.
+- Local drawing canvas and attachment metadata.
+- Home search and global offline search.
+- Versioned JSON archive transfer v4.
 
-## Explicit limitations
-- JSON transfer v4 does not include attachment bytes or binary media and is not a full archive backup.
-- Rich block editing, nested notebooks, calendar, reminders, OCR, PDF annotation, audio recording/transcription, encryption, app lock, remote sync, cloud backup, collaboration and AI provider integration are not yet implemented.
-- Full Bengali localization and comprehensive device accessibility testing remain outstanding.
-- No production signing key is present in the repository.
+## Known limitations
+- JSON transfer excludes binary attachment bytes and private local paths; it is
+  not a complete device backup.
+- The editor is plain text, not a full block-based rich editor.
+- Search is local substring matching, not FTS5, semantic search or OCR.
+- Scheduled notifications, calendar, audio recording/transcription, OCR/PDF
+  indexing, visual boards, encryption, app lock, remote sync, collaboration
+  and AI provider integration are not yet implemented.
+- Full Bengali localization and device accessibility testing remain outstanding.
+- No production signing key or cloud/AI provider is configured.
 
-## External infrastructure
-Cloud sync, collaboration and cloud AI require real provider infrastructure and user authorization. No such service is configured at this time.
+## Required next verification
+Run the Android CI workflow on the latest branch commit and confirm dependency
+resolution, Drift generation, formatting, analysis, all tests and debug APK
+build. Check the workflow's actual result and uploaded artifact before claiming
+a release candidate is available.
