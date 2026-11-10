@@ -18,6 +18,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String _query = '';
   bool _searchOpen = false;
   String _view = 'all';
+  String? _selectedCategoryId;
 
   @override
   void dispose() {
@@ -29,6 +30,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.pop(context);
     setState(() {
       _view = view;
+      _selectedCategoryId = null;
+      _query = '';
+      _searchController.clear();
+    });
+  }
+
+  void _selectCategory(String categoryId) {
+    Navigator.pop(context);
+    setState(() {
+      _view = 'category';
+      _selectedCategoryId = categoryId;
       _query = '';
       _searchController.clear();
     });
@@ -90,6 +102,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return note.isDeleted.equals(false) & note.isArchived.equals(true);
           case 'trash':
             return note.isDeleted.equals(true);
+          case 'category':
+            return note.isDeleted.equals(false) &
+                note.isArchived.equals(false) &
+                note.categoryId.equals(_selectedCategoryId!);
           default:
             return note.isDeleted.equals(false) & note.isArchived.equals(false);
         }
@@ -165,6 +181,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               title: const Text('Trash'),
               selected: _view == 'trash',
               onTap: () => _selectView('trash'),
+            ),
+            const Divider(),
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+              child: Text('CATEGORIES'),
+            ),
+            StreamBuilder<List<Category>>(
+              stream: (db.select(db.categories)
+                    ..orderBy([(category) => OrderingTerm.asc(category.name)]))
+                  .watch(),
+              builder: (context, snapshot) => Column(
+                children: [
+                  for (final category in snapshot.data ?? [])
+                    ListTile(
+                      leading: const Icon(Icons.folder_outlined),
+                      title: Text(category.name),
+                      selected: _view == 'category' &&
+                          _selectedCategoryId == category.id,
+                      onTap: () => _selectCategory(category.id),
+                    ),
+                ],
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.checklist_rounded),
