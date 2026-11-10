@@ -84,12 +84,18 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     try {
       final preferences = await SharedPreferences.getInstance();
       final raw = preferences.getString(_storageKey);
-      if (raw == null) return;
+      if (raw == null) {
+        return;
+      }
       final decoded = jsonDecode(raw);
-      if (decoded is! List) return;
+      if (decoded is! List) {
+        return;
+      }
       final templates = <NoteTemplate>[];
       for (final item in decoded) {
-        if (item is! Map) continue;
+        if (item is! Map) {
+          continue;
+        }
         final value = Map<String, dynamic>.from(item);
         if (value['id'] is! String ||
             value['title'] is! String ||
@@ -105,7 +111,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
           isCustom: true,
         ));
       }
-      if (mounted) setState(() => _customTemplates = templates);
+      if (mounted) {
+        setState(() => _customTemplates = templates);
+      }
     } catch (_) {
       // Invalid or unavailable preferences do not affect built-in templates.
     }
@@ -179,8 +187,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     title.dispose();
     description.dispose();
     content.dispose();
-    if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty)
+    if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty) {
       return;
+    }
     setState(() {
       _customTemplates = [
         ..._customTemplates,
@@ -215,7 +224,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
         ],
       ),
     );
-    if (confirmed != true) return;
+    if (confirmed != true) {
+      return;
+    }
     setState(
         () => _customTemplates.removeWhere((item) => item.id == template.id));
     await _persistCustomTemplates();
@@ -227,7 +238,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
       await ref
           .read(databaseProvider)
           .saveNoteContent(id, template.title, template.content);
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       context.push('/editor/$id');
     } catch (error) {
       if (!mounted) return;

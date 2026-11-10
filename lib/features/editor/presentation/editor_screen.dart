@@ -49,7 +49,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   Future<void> _shareMarkdown() async {
     final saved =
         await ref.read(editorProvider(widget.noteId).notifier).forceSave();
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     if (!saved) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Save the note before exporting it.')),
@@ -73,7 +75,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         text: 'Exported from MindVault Archive',
       );
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Could not export Markdown: $error')),
       );
