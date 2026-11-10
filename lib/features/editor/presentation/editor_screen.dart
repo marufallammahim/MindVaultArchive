@@ -95,6 +95,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               onPressed: () => setState(() => _previewMode = !_previewMode),
             ),
             IconButton(
+              tooltip: 'Tasks linked to this note',
+              icon: const Icon(Icons.task_alt_outlined),
+              onPressed: () => context.push('/tasks?noteId=\${widget.noteId}'),
+            ),
+            IconButton(
               tooltip: 'Version history',
               icon: const Icon(Icons.history),
               onPressed: () async {
@@ -306,6 +311,50 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         ),
                       );
                     },
+                  );
+                },
+              ),
+              StreamBuilder<List<VaultTask>>(
+                stream: (db.select(db.tasks)
+                      ..where((task) => task.noteId.equals(widget.noteId))
+                      ..orderBy([
+                        (task) => OrderingTerm.asc(task.dueAt),
+                        (task) => OrderingTerm.desc(task.updatedAt),
+                      ]))
+                    .watch(),
+                builder: (context, taskSnapshot) {
+                  final tasks = taskSnapshot.data ?? [];
+                  if (tasks.isEmpty) return const SizedBox.shrink();
+                  return Card(
+                    child: ExpansionTile(
+                      leading: const Icon(Icons.task_alt_outlined),
+                      title: Text('Linked tasks (\${tasks.length})'),
+                      children: [
+                        for (final task in tasks)
+                          ListTile(
+                            leading: Checkbox(
+                              value: task.isCompleted,
+                              onChanged: (value) => db.setTaskCompleted(
+                                task.id,
+                                value ?? false,
+                              ),
+                            ),
+                            title: Text(
+                              task.title,
+                              style: task.isCompleted
+                                  ? const TextStyle(
+                                      decoration: TextDecoration.lineThrough,
+                                    )
+                                  : null,
+                            ),
+                            subtitle: task.dueAt == null
+                                ? null
+                                : Text(
+                                    'Due \${MaterialLocalizations.of(context).formatShortDate(task.dueAt!)}',
+                                  ),
+                          ),
+                      ],
+                    ),
                   );
                 },
               ),
