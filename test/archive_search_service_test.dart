@@ -90,7 +90,8 @@ void main() {
     expect(await search.search('replacement'), hasLength(1));
   });
 
-  test('FTS indexes task titles and details and remove deleted tasks', () async {
+  test('FTS indexes task titles and details and remove deleted tasks',
+      () async {
     await database.saveTask(
       id: 'indexed-task',
       title: 'Prepare release',
@@ -121,5 +122,4 @@ void main() {
     expect(results, hasLength(1));
     expect(results.single.title.toLowerCase(), startsWith('flutter'));
   });
-
 }

@@ -85,7 +85,8 @@ class ArchiveSearchService {
         ? <Note>[]
         : await (_database.select(
             _database.notes,
-          )..where((note) => note.id.isIn(noteIds))).get();
+          )..where((note) => note.id.isIn(noteIds)))
+            .get();
 
     final categories = await _database.select(_database.categories).get();
     final tags = await _database.select(_database.tags).get();
@@ -103,9 +104,8 @@ class ArchiveSearchService {
 
     final results = <ArchiveSearchResult>[];
     for (final note in noteRecords) {
-      final category = note.categoryId == null
-          ? null
-          : categoryById[note.categoryId!];
+      final category =
+          note.categoryId == null ? null : categoryById[note.categoryId!];
       results.add(
         ArchiveSearchResult(
           kind: ArchiveSearchKind.note,
@@ -134,13 +134,13 @@ class ArchiveSearchService {
         ],
         readsFrom: {_database.tasks},
       ).get();
-      final taskIds = taskRows
-          .map((row) => row.read<String>('task_id'))
-          .toList();
+      final taskIds =
+          taskRows.map((row) => row.read<String>('task_id')).toList();
       if (taskIds.isNotEmpty) {
         final taskRecords = await (_database.select(
           _database.tasks,
-        )..where((task) => task.id.isIn(taskIds))).get();
+        )..where((task) => task.id.isIn(taskIds)))
+            .get();
         for (final task in taskRecords) {
           results.add(
             ArchiveSearchResult(
@@ -181,9 +181,8 @@ class ArchiveSearchService {
       final found = lower.indexOf(term);
       if (found >= 0 && (index < 0 || found < index)) index = found;
     }
-    final start = index < 0
-        ? 0
-        : (index - 55).clamp(0, normalized.length).toInt();
+    final start =
+        index < 0 ? 0 : (index - 55).clamp(0, normalized.length).toInt();
     final end = (start + 180).clamp(0, normalized.length).toInt();
     final prefix = start > 0 ? '…' : '';
     final suffix = end < normalized.length ? '…' : '';
