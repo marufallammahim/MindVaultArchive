@@ -88,7 +88,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Note color',
               icon: const Icon(Icons.palette_outlined),
               onSelected: (value) async {
-                await db.setNoteColor(widget.noteId, value == -1 ? null : value);
+                await db.setNoteColor(
+                    widget.noteId, value == -1 ? null : value);
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(value: -1, child: Text('Default color')),
