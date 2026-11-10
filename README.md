@@ -18,6 +18,8 @@ and SQLite.
 - Quick Capture and five reusable note templates.
 - Offline tasks with due dates, priorities and completion tracking.
 - Note version history with up to 30 snapshots and restore.
+- Markdown authoring toolbar with bold, italic, headings, lists, checklists,
+  quotes, links and code snippets, plus rendered preview.
 - Drawing canvas with local PNG attachment metadata.
 - Home search plus global offline search across notes, categories, tags and tasks.
 - System/light/dark theme preference and Material 3 burgundy branding.
@@ -28,7 +30,7 @@ and SQLite.
 ## Important limitations
 JSON transfer does not include drawing/audio/PDF attachment bytes or private
 device paths, so it is not yet a full backup. Search is local substring matching,
-not semantic search. The editor is plain text rather than a full block editor.
+not semantic search. The editor supports Markdown authoring and preview, but is not a full WYSIWYG block editor.
 See [Feature Specification](docs/FEATURE_SPECIFICATION.md).
 
 ## Not yet implemented
