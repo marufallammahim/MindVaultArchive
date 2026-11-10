@@ -16,7 +16,7 @@ import 'package:uuid/uuid.dart';
 /// new app-private path and its SHA-256 checksum is verified before import.
 class FullBackupService {
   FullBackupService(this._database, {Directory? restoreDirectory})
-      : _restoreDirectory = restoreDirectory;
+    : _restoreDirectory = restoreDirectory;
 
   static const backupFormat = 'mindvault-full-backup';
   static const backupVersion = 1;
@@ -265,7 +265,8 @@ class FullBackupService {
   }
 
   Future<Directory> _attachmentsDirectory() async {
-    final root = _restoreDirectory ??
+    final root =
+        _restoreDirectory ??
         Directory(
           p.join(
             (await getApplicationDocumentsDirectory()).path,
