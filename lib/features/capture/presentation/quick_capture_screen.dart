@@ -29,7 +29,8 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     final content = _content.text.trim();
     if (title.isEmpty && content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Write a title or capture an idea first.')),
+        const SnackBar(
+            content: Text('Write a title or capture an idea first.')),
       );
       return;
     }
@@ -37,10 +38,10 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     final id = const Uuid().v4();
     try {
       await ref.read(databaseProvider).saveNoteContent(
-        id,
-        title.isEmpty ? 'Quick capture' : title,
-        content,
-      );
+            id,
+            title.isEmpty ? 'Quick capture' : title,
+            content,
+          );
       if (!mounted) return;
       if (openEditor) {
         context.go('/editor/$id');

@@ -35,12 +35,14 @@ void main() {
     await database.saveCategory('ideas', 'Ideas');
     await database.setNoteCategory('note-category', 'ideas');
     var note = await (database.select(database.notes)
-      ..where((row) => row.id.equals('note-category'))).getSingle();
+          ..where((row) => row.id.equals('note-category')))
+        .getSingle();
     expect(note.categoryId, 'ideas');
 
     await database.setNoteCategory('note-category', null);
     note = await (database.select(database.notes)
-      ..where((row) => row.id.equals('note-category'))).getSingle();
+          ..where((row) => row.id.equals('note-category')))
+        .getSingle();
     expect(note.categoryId, isNull);
     await expectLater(
       database.setNoteCategory('note-category', 'missing'),
