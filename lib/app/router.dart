@@ -8,6 +8,7 @@ import 'package:mindvault_archive/features/about/presentation/about_screen.dart'
 import 'package:mindvault_archive/features/archive/presentation/archive_tools_screen.dart';
 import 'package:mindvault_archive/features/tasks/presentation/tasks_screen.dart';
 import 'package:mindvault_archive/features/templates/presentation/templates_screen.dart';
+import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
