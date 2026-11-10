@@ -288,7 +288,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 builder: (context, notesSnapshot) {
                   final allNotes = notesSnapshot.data ?? [];
                   final currentTitle = state.title.trim();
-                  final matches = RegExp(r'\\[\\[([^\\]]+)\\]\\]')
+                  final matches = RegExp(r'\[\[([^\]]+)\]\]')
                       .allMatches(state.content)
                       .map((match) => match.group(1)!.trim())
                       .where((title) => title.isNotEmpty)
