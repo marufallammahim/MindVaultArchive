@@ -84,8 +84,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
   Future<void> _exportFullBackup() async {
     setState(() => _busy = true);
     try {
-      final bytes =
-          await FullBackupService(ref.read(databaseProvider)).exportZip();
+      final bytes = await FullBackupService(ref.read(databaseProvider))
+          .exportZip();
       await Share.shareXFiles([
         XFile.fromData(
           bytes,
@@ -138,8 +138,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
       if (confirmed != true || !mounted) return;
 
       setState(() => _busy = true);
-      final result =
-          await FullBackupService(ref.read(databaseProvider)).importZip(bytes);
+      final result = await FullBackupService(ref.read(databaseProvider))
+          .importZip(bytes);
       if (!mounted) return;
       _showMessage(
         'Restored ${result.imported} notes, ${result.importedTasks} tasks and '
