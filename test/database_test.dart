@@ -52,6 +52,23 @@ void main() {
     );
   });
 
+  test('note color is persisted and can be reset', () async {
+    await database.saveNoteContent('color-note', 'Colored', 'Body');
+    await database.setNoteColor('color-note', 0xFFFFF0D8);
+    var note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('color-note')))
+        .getSingle();
+    expect(note.color, 0xFFFFF0D8);
+
+    await database.setNoteColor('color-note', null);
+    note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('color-note')))
+        .getSingle();
+    expect(note.color, isNull);
+  });
+
   test('favorite, archive and trash state persist in SQLite', () async {
     await database.saveNoteContent('note-2', 'Lifecycle', 'Test');
     await database.setFavorite('note-2', true);
@@ -117,6 +134,9 @@ void main() {
   });
 
   test('category names cannot be empty', () async {
-    expect(() => database.saveCategory('empty', '   '), throwsArgumentError);
+    await expectLater(
+      database.saveCategory('empty', '   '),
+      throwsArgumentError,
+    );
   });
 }
