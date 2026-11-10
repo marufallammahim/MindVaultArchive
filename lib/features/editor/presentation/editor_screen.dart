@@ -212,6 +212,76 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   );
                 },
               ),
+              StreamBuilder<List<Tag>>(
+                stream: (db.select(db.tags)
+                      ..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
+                    .watch(),
+                builder: (context, tagsSnapshot) {
+                  final tags = tagsSnapshot.data ?? [];
+                  return StreamBuilder<List<NoteTag>>(
+                    stream: (db.select(db.noteTags)
+                          ..where((item) => item.noteId.equals(widget.noteId)))
+                        .watch(),
+                    builder: (context, selectedSnapshot) {
+                      final selectedIds = (selectedSnapshot.data ?? [])
+                          .map((item) => item.tagId)
+                          .toSet();
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: tags.isEmpty
+                                  ? const Text('No tags yet')
+                                  : Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
+                                      children: [
+                                        for (final tag in tags)
+                                          FilterChip(
+                                            label: Text(tag.name),
+                                            selected: selectedIds.contains(tag.id),
+                                            onSelected: (selected) async {
+                                              final next = {...selectedIds};
+                                              if (selected) {
+                                                next.add(tag.id);
+                                              } else {
+                                                next.remove(tag.id);
+                                              }
+                                              try {
+                                                await db.setNoteTags(
+                                                  widget.noteId,
+                                                  next.toList(),
+                                                );
+                                              } catch (error) {
+                                                if (!context.mounted) return;
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      'Could not update tags: $error',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          ),
+                                      ],
+                                    ),
+                            ),
+                            IconButton(
+                              tooltip: 'Manage tags',
+                              icon: const Icon(Icons.settings_outlined),
+                              onPressed: () => context.push('/tags'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               Expanded(
                 child: TextField(
                   controller: _contentController,
