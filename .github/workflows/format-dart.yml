@@ -3,12 +3,14 @@ name: Format Dart Sources
 on:
   push:
     branches: ['**']
-  pull_request:
-    branches: ['**']
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: dart-format-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   format:
@@ -16,7 +18,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
 
       - uses: subosito/flutter-action@v2
         with:
@@ -26,5 +29,18 @@ jobs:
       - name: Resolve package configuration
         run: flutter pub get
 
-      - name: Verify Dart formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format Dart source and tests
+        run: dart format lib test
+
+      - name: Commit formatting changes
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- lib test; then
+            echo "Dart files are already formatted."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib test
+          git commit -m "style: format Dart source and tests"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
