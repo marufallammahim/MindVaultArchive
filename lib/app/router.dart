@@ -33,7 +33,12 @@ final appRouter = GoRouter(
       builder: (context, state) => const SettingsScreen(),
     ),
     GoRoute(path: '/about', builder: (context, state) => const AboutScreen()),
-    GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
+    GoRoute(
+      path: '/tasks',
+      builder: (context, state) => TasksScreen(
+        noteId: state.uri.queryParameters['noteId'],
+      ),
+    ),
     GoRoute(
       path: '/templates',
       builder: (context, state) => const TemplatesScreen(),
