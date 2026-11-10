@@ -219,7 +219,8 @@ void main() {
     expect(await database.select(database.noteRevisions).get(), isEmpty);
   });
 
-  test('tasks can be linked to notes and are detached on permanent deletion', () async {
+  test('tasks can be linked to notes and are detached on permanent deletion',
+      () async {
     await database.saveNoteContent('task-note', 'Project note', 'Details');
     await database.saveTask(
       id: 'linked-task',

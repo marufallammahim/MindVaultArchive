@@ -151,7 +151,8 @@ class AppDatabase extends _$AppDatabase {
   }) async {
     final normalizedTitle = title.trim();
     if (noteId != null) {
-      final linkedNote = await (select(notes)..where((note) => note.id.equals(noteId)))
+      final linkedNote = await (select(notes)
+            ..where((note) => note.id.equals(noteId)))
           .getSingleOrNull();
       if (linkedNote == null || linkedNote.isDeleted) {
         throw ArgumentError.value(noteId, 'noteId', 'Linked note not found.');

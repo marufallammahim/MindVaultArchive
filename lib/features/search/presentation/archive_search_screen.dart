@@ -126,8 +126,7 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
                         itemCount: _results.length,
-                        separatorBuilder: (_, __) =>
-                            const SizedBox(height: 6),
+                        separatorBuilder: (_, __) => const SizedBox(height: 6),
                         itemBuilder: (context, index) {
                           final item = _results[index];
                           final isNote = item.kind == ArchiveSearchKind.note;

@@ -179,7 +179,8 @@ class ArchiveTransferService {
     }
     for (final task in parsedTasks) {
       if (task.noteId != null && !noteIds.contains(task.noteId)) {
-        throw const FormatException('Archive contains a task linked to a missing note.');
+        throw const FormatException(
+            'Archive contains a task linked to a missing note.');
       }
     }
 
