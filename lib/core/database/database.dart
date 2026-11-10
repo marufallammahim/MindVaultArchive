@@ -52,6 +52,27 @@ class Tasks extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('Tag')
+class Tags extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  IntColumn get color => integer().nullable()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
+@DataClassName('NoteTag')
+class NoteTags extends Table {
+  TextColumn get noteId => text()();
+  TextColumn get tagId => text()();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => {noteId, tagId};
+}
+
 @DataClassName('Attachment')
 class Attachments extends Table {
   TextColumn get id => text()();
@@ -68,12 +89,12 @@ class Attachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Notes, Categories, Attachments, Tasks])
+@DriftDatabase(tables: [Notes, Categories, Attachments, Tasks, Tags, NoteTags])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -81,6 +102,10 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.createTable(tasks);
+          }
+          if (from < 3) {
+            await m.createTable(tags);
+            await m.createTable(noteTags);
           }
         },
         beforeOpen: (details) async {
@@ -136,6 +161,51 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> deleteTask(String id) {
     return (delete(tasks)..where((task) => task.id.equals(id))).go();
+  }
+
+  Future<void> saveTag(String id, String name, {int? color}) async {
+    final normalizedName = name.trim();
+    if (normalizedName.isEmpty) {
+      throw ArgumentError.value(name, 'name', 'Tag name cannot be empty.');
+    }
+    await into(tags).insertOnConflictUpdate(
+      TagsCompanion.insert(
+        id: id,
+        name: normalizedName,
+        color: Value(color),
+      ),
+    );
+  }
+
+  Future<void> deleteTag(String id) {
+    return transaction(() async {
+      await (delete(noteTags)..where((item) => item.tagId.equals(id))).go();
+      await (delete(tags)..where((tag) => tag.id.equals(id))).go();
+    });
+  }
+
+  Future<void> setNoteTags(String noteId, List<String> tagIds) async {
+    final uniqueIds = tagIds.toSet().toList();
+    final available = await (select(tags)
+          ..where((tag) => tag.id.isIn(uniqueIds)))
+        .get();
+    if (available.length != uniqueIds.length) {
+      throw ArgumentError('One or more selected tags do not exist.');
+    }
+    await transaction(() async {
+      final existingNote = await (select(notes)
+            ..where((note) => note.id.equals(noteId)))
+          .getSingleOrNull();
+      if (existingNote == null) {
+        await into(notes).insert(NotesCompanion.insert(id: noteId));
+      }
+      await (delete(noteTags)..where((item) => item.noteId.equals(noteId))).go();
+      for (final tagId in uniqueIds) {
+        await into(noteTags).insert(
+          NoteTagsCompanion.insert(noteId: noteId, tagId: tagId),
+        );
+      }
+    });
   }
 
   Future<void> setNoteCategory(String noteId, String? categoryId) async {
