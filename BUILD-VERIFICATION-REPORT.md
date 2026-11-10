@@ -2,66 +2,61 @@
 
 Updated: 2026-11-10
 
-## Scope
-This report describes the repository state on `feature/mindvault-archive-implementation`.
-It does not claim that an APK or AAB has been built successfully.
+## Verified source
+- Branch: `feature/mindvault-archive-implementation`
+- Verified commit: `a90d14a9dad0ff90766e8937fbf7b26569f6ba4a`
+- Android application ID: `com.marufallammahim.mindvaultarchive`
 
-## Environment limitation
-Flutter, Dart, Android SDK, and Xcode are not available through the GitHub
-connector execution environment used for these edits. No local Flutter
-compilation, analyzer, formatter, or device test is claimed.
+## Automated verification
 
-## Changes committed in this repair pass
-- Added `tool/regenerate_platforms.sh`. CI regenerates native scaffolding
-  when Android Gradle wrapper/settings or the iOS Xcode project are missing.
-- The script enforces Android application ID and iOS bundle ID
-  `com.marufallammahim.mindvaultarchive`, and adds microphone permission /
-  usage disclosure.
-- Added a Flutter unit test for light/dark Material 3 theme configuration.
-- Fixed CI formatting commands so they do not reference a missing
-  `integration_test/` directory.
-- Added Drift code generation to Android CI and Android build jobs before
-  compilation so `database.g.dart` is generated.
-- Implemented local title/body search on the home screen.
-- Connected Settings theme selection to app-wide Riverpod theme state.
-- Fixed the editor loading race so the asynchronous database read completes
-  before controllers initialize and saving is enabled.
+All three GitHub Actions workflows completed successfully for the verified commit.
 
-## Current implementation status
-Implemented:
-- Flutter app entry point, routing, splash, home, editor, settings, and about.
+| Check | Result |
+|---|---|
+| Flutter dependency resolution | Passed |
+| Drift code generation | Passed |
+| Dart formatting | Passed |
+| Flutter analyze | Passed |
+| Flutter unit tests | Passed |
+| Android debug APK | Built and uploaded |
+| Android release APK | Built and uploaded |
+| Android App Bundle | Built and uploaded |
+| Artifact collection/upload | Passed |
+
+Workflow runs:
+- [Android CI](https://github.com/marufallammahim/MindVaultArchive/actions/runs/42798040064)
+- [Android Build](https://github.com/marufallammahim/MindVaultArchive/actions/runs/42798040123)
+- [Code Quality](https://github.com/marufallammahim/MindVaultArchive/actions/runs/42798040480)
+
+The Android Build artifact contains `app-release.apk`, `app-release.aab`, and `build-info.txt`. The Android CI artifact contains the debug APK.
+
+## Release-signing limitation
+
+The current Android release build uses Gradle's debug signing configuration as a build placeholder. The generated release APK/AAB are useful for installation/testing, but they are **not production release-signed**. Configure a private release keystore and protect its credentials in GitHub Actions secrets before publishing.
+
+## Implemented
+
+- Flutter app entry point, routing, splash, home, editor, settings, and about screens.
 - Drift SQLite schema for notes, categories, and attachment metadata.
-- Debounced note auto-save.
+- Local note persistence and debounced auto-save.
 - Local title/content search.
-- Light, dark, and system theme selection (currently session-only).
-- Drawing canvas UI with undo/redo/clear controls.
+- Light, dark, and system theme selection (session-only).
+- Drawing canvas with undo/redo/clear controls.
+- Android application ID and API 36 compile SDK configuration.
+- CI scaffolding that preserves the app's source and manifest.
 
-Still incomplete:
-- Drawing export, persistence, attachment preview, and reopening an existing
-  drawing are not implemented.
-- Voice recording and inline audio playback are not yet wired into the editor;
-  dependencies are present but this feature is incomplete.
-- Category/tag management screens and category assignment are incomplete.
-- Favorites, archive, trash, restore, and permanent-delete flows are not yet
-  exposed as complete user workflows.
-- Backup/restore including attachment files is not implemented.
+## Known product gaps
+
+These are feature-completeness gaps, not current analyzer or build failures:
+
+- Voice recording and inline audio playback are not wired into the editor.
+- Category/tag management and category assignment workflows are incomplete.
+- Favorites, archive, trash, restore, and permanent-delete workflows are incomplete.
+- Backup/restore, including attachment files, is not implemented.
 - Rich-text editing is currently a plain text editor.
 - Bengali localization is incomplete.
-- A full integration-test suite is not present.
+- Drawing export, attachment lifecycle management, and reopening existing drawings need further end-to-end testing.
+- Theme preference is session-only and is not persisted.
+- A full integration/device test suite is not present.
 
-## Automated checks
-| Check | Status |
-|---|---|
-| GitHub source updates | Committed successfully |
-| Flutter dependency resolution | Not run here |
-| Dart formatting | Not run here |
-| Flutter analyze | Not run here |
-| Flutter unit tests | Not run here |
-| Android debug APK | Not built here |
-| Android release APK | Not built here |
-| Android App Bundle | Not built here |
-| iOS build | Not run here |
-
-The three GitHub Actions workflows are configured for branch pushes, pull
-requests, and manual dispatch. A successful GitHub Actions run is still
-required before this project can be described as build-verified.
+A successful Android build confirms compilation and artifact generation; it does not by itself verify every runtime workflow on a physical device.
