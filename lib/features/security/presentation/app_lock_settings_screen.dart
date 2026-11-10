@@ -127,7 +127,7 @@ class _AppLockSettingsScreenState
           }
           if (snapshot.hasError) {
             return Center(
-              child: Text('Secure storage unavailable: \${snapshot.error}'),
+              child: Text('Secure storage unavailable: ${snapshot.error}'),
             );
           }
           final enabled = snapshot.data ?? false;
