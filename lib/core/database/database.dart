@@ -36,6 +36,22 @@ class Categories extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('VaultTask')
+class Tasks extends Table {
+  TextColumn get id => text()();
+  TextColumn get title => text()();
+  TextColumn get details => text().withDefault(const Constant(''))();
+  DateTimeColumn get dueAt => dateTime().nullable()();
+  IntColumn get priority => integer().withDefault(const Constant(1))();
+  BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get completedAt => dateTime().nullable()();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DataClassName('Attachment')
 class Attachments extends Table {
   TextColumn get id => text()();
@@ -52,20 +68,75 @@ class Attachments extends Table {
   Set<Column> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Notes, Categories, Attachments])
+@DriftDatabase(tables: [Notes, Categories, Attachments, Tasks])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) async => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(tasks);
+          }
+        },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+
+  Future<void> saveTask({
+    required String id,
+    required String title,
+    required String details,
+    required int priority,
+    DateTime? dueAt,
+  }) async {
+    final normalizedTitle = title.trim();
+    if (normalizedTitle.isEmpty) {
+      throw ArgumentError.value(title, 'title', 'Task title cannot be empty.');
+    }
+    final existing = await (select(tasks)..where((task) => task.id.equals(id)))
+        .getSingleOrNull();
+    if (existing == null) {
+      await into(tasks).insert(
+        TasksCompanion.insert(
+          id: id,
+          title: normalizedTitle,
+          details: Value(details.trim()),
+          priority: Value(priority.clamp(0, 2)),
+          dueAt: Value(dueAt),
+        ),
+      );
+    } else {
+      await update(tasks).replace(
+        existing.copyWith(
+          title: normalizedTitle,
+          details: details.trim(),
+          priority: priority.clamp(0, 2),
+          dueAt: Value(dueAt),
+          updatedAt: DateTime.now(),
+        ),
+      );
+    }
+  }
+
+  Future<void> setTaskCompleted(String id, bool completed) {
+    return (update(tasks)..where((task) => task.id.equals(id))).write(
+      TasksCompanion(
+        isCompleted: Value(completed),
+        completedAt: Value(completed ? DateTime.now() : null),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> deleteTask(String id) {
+    return (delete(tasks)..where((task) => task.id.equals(id))).go();
+  }
 
   Future<void> setFavorite(String id, bool value) {
     return (update(notes)..where((note) => note.id.equals(id))).write(
