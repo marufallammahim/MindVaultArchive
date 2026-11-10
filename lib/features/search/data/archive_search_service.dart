@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 
 enum ArchiveSearchKind { note, task }
@@ -22,7 +23,8 @@ class ArchiveSearchResult {
   final List<String> tags;
 }
 
-/// Offline search across note text, categories, tags, and task content.
+/// Offline FTS5 search across note text and task content, with category/tag
+/// matching retained as local SQL filters.
 class ArchiveSearchService {
   ArchiveSearchService(this._database);
 
@@ -32,96 +34,156 @@ class ArchiveSearchService {
     String rawQuery, {
     int limit = 100,
   }) async {
-    final query = rawQuery.trim().toLowerCase();
+    final query = rawQuery.trim();
     if (query.isEmpty) return const [];
 
-    final notesQuery = _database.select(_database.notes)
-      ..where((note) => note.isDeleted.equals(false));
-    final notes = await notesQuery.get();
+    final safeLimit = limit.clamp(1, 500).toInt();
+    final ftsQuery = _toFtsQuery(query);
+    final likeQuery = '%${query.toLowerCase()}%';
+
+    final noteConditions = <String>[];
+    final noteVariables = <Variable<Object>>[];
+    if (ftsQuery.isNotEmpty) {
+      noteConditions.add(
+        'notes.id IN (SELECT note_id FROM notes_fts WHERE notes_fts MATCH ?)',
+      );
+      noteVariables.add(Variable.withString(ftsQuery));
+    }
+    noteConditions
+      ..add('LOWER(categories.name) LIKE ?')
+      ..add('LOWER(tags.name) LIKE ?');
+    noteVariables
+      ..add(Variable.withString(likeQuery))
+      ..add(Variable.withString(likeQuery));
+
+    final noteRows = await _database.customSelect(
+      '''
+      SELECT DISTINCT notes.id
+      FROM notes
+      LEFT JOIN categories ON categories.id = notes.category_id
+      LEFT JOIN note_tags ON note_tags.note_id = notes.id
+      LEFT JOIN tags ON tags.id = note_tags.tag_id
+      WHERE notes.is_deleted = 0
+        AND (${noteConditions.join(' OR ')})
+      ORDER BY notes.updated_at DESC
+      LIMIT ?
+      ''',
+      variables: [
+        ...noteVariables,
+        Variable.withInt(safeLimit),
+      ],
+      readsFrom: {
+        _database.notes,
+        _database.categories,
+        _database.noteTags,
+        _database.tags,
+      },
+    ).get();
+
+    final noteIds = noteRows.map((row) => row.read<String>('id')).toList();
+    final noteRecords = noteIds.isEmpty
+        ? <Note>[]
+        : await (_database.select(
+            _database.notes,
+          )..where((note) => note.id.isIn(noteIds))).get();
+
     final categories = await _database.select(_database.categories).get();
     final tags = await _database.select(_database.tags).get();
     final noteTags = await _database.select(_database.noteTags).get();
-    final tasks = await _database.select(_database.tasks).get();
-
     final categoryById = {for (final item in categories) item.id: item};
     final tagById = {for (final item in tags) item.id: item};
     final tagsByNote = <String, List<String>>{};
     for (final relation in noteTags) {
+      if (!noteIds.contains(relation.noteId)) continue;
       final tag = tagById[relation.tagId];
       if (tag != null) {
         (tagsByNote[relation.noteId] ??= []).add(tag.name);
       }
     }
 
-    final matchedCategoryIds = categories
-        .where((item) => _contains(item.name, query))
-        .map((item) => item.id)
-        .toSet();
-    final matchedTagIds = tags
-        .where((item) => _contains(item.name, query))
-        .map((item) => item.id)
-        .toSet();
-    final matchedNoteIdsFromTags = noteTags
-        .where((item) => matchedTagIds.contains(item.tagId))
-        .map((item) => item.noteId)
-        .toSet();
-
     final results = <ArchiveSearchResult>[];
-    for (final note in notes) {
-      final category =
-          note.categoryId == null ? null : categoryById[note.categoryId!];
-      final noteTagNames = tagsByNote[note.id] ?? const <String>[];
-      final matches = _contains(note.title, query) ||
-          _contains(note.documentContent, query) ||
-          (category != null && matchedCategoryIds.contains(category.id)) ||
-          matchedNoteIdsFromTags.contains(note.id);
-      if (!matches) continue;
-
-      final preview = _snippet(note.documentContent, query);
+    for (final note in noteRecords) {
+      final category = note.categoryId == null
+          ? null
+          : categoryById[note.categoryId!];
       results.add(
         ArchiveSearchResult(
           kind: ArchiveSearchKind.note,
           id: note.id,
           title: note.title.trim().isEmpty ? 'Untitled' : note.title,
-          preview: preview,
+          preview: _snippet(note.documentContent, query),
           updatedAt: note.updatedAt,
           category: category?.name,
-          tags: noteTagNames,
+          tags: tagsByNote[note.id] ?? const [],
         ),
       );
     }
 
-    for (final task in tasks) {
-      if (!_contains(task.title, query) && !_contains(task.details, query)) {
-        continue;
+    if (ftsQuery.isNotEmpty) {
+      final taskRows = await _database.customSelect(
+        '''
+        SELECT task_id
+        FROM tasks_fts
+        WHERE tasks_fts MATCH ?
+        ORDER BY rank
+        LIMIT ?
+        ''',
+        variables: [
+          Variable.withString(ftsQuery),
+          Variable.withInt(safeLimit),
+        ],
+        readsFrom: {_database.tasks},
+      ).get();
+      final taskIds = taskRows
+          .map((row) => row.read<String>('task_id'))
+          .toList();
+      if (taskIds.isNotEmpty) {
+        final taskRecords = await (_database.select(
+          _database.tasks,
+        )..where((task) => task.id.isIn(taskIds))).get();
+        for (final task in taskRecords) {
+          results.add(
+            ArchiveSearchResult(
+              kind: ArchiveSearchKind.task,
+              id: task.id,
+              title: task.title,
+              preview: _snippet(task.details, query),
+              updatedAt: task.updatedAt,
+            ),
+          );
+        }
       }
-      results.add(
-        ArchiveSearchResult(
-          kind: ArchiveSearchKind.task,
-          id: task.id,
-          title: task.title,
-          preview: _snippet(task.details, query),
-          updatedAt: task.updatedAt,
-        ),
-      );
     }
 
     results.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-    final safeLimit = limit.clamp(1, 500).toInt();
     return results.length <= safeLimit
         ? results
         : results.sublist(0, safeLimit);
   }
 
-  bool _contains(String value, String query) =>
-      value.toLowerCase().contains(query);
+  String _toFtsQuery(String rawQuery) {
+    final terms = rawQuery
+        .trim()
+        .split(RegExp(r'\s+'))
+        .map((term) => term.replaceAll('"', '').trim())
+        .where((term) => term.isNotEmpty)
+        .map((term) => '"$term"*');
+    return terms.join(' AND ');
+  }
 
   String _snippet(String value, String query) {
     final normalized = value.trim();
     if (normalized.isEmpty) return 'No preview text';
-    final index = normalized.toLowerCase().indexOf(query);
-    final start =
-        index < 0 ? 0 : (index - 55).clamp(0, normalized.length).toInt();
+    final terms = query.toLowerCase().split(RegExp(r'\s+'));
+    final lower = normalized.toLowerCase();
+    var index = -1;
+    for (final term in terms) {
+      final found = lower.indexOf(term);
+      if (found >= 0 && (index < 0 || found < index)) index = found;
+    }
+    final start = index < 0
+        ? 0
+        : (index - 55).clamp(0, normalized.length).toInt();
     final end = (start + 180).clamp(0, normalized.length).toInt();
     final prefix = start > 0 ? '…' : '';
     final suffix = end < normalized.length ? '…' : '';
