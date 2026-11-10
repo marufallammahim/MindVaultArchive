@@ -92,3 +92,15 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - GitHub Actions on the pre-format checkpoint: `flutter pub get` PASS; `build_runner` PASS; format gate FAIL (24 existing files); analyze/tests/APK build SKIPPED. A successful repository-wide formatting commit is now on the branch; CI must be rerun against that latest commit.
 - Flutter/Dart commands executed directly in this session: NONE; the container could not resolve github.com for a local clone, and no local Flutter SDK is available.
 - Android APK generated in this session: NO.
+
+
+## Visual redesign work (2026-11-11)
+- Preserved the existing feature branch and database-backed feature architecture; no new branch was created and main was not modified.
+- Changed the first-run theme preference defaults to Dark + true-black AMOLED; existing saved preferences remain respected.
+- Added a persisted accent-color preference with Burgundy as the default, plus a preset palette and custom HEX color selection in Settings.
+- Added a locally persisted display name and profile image. The profile image is stored as base64 in preferences and limited to 1.5 MB at selection time.
+- Rebuilt the home notes dashboard with a profile header, category/favorite/archive filters, search, high-contrast colorful note cards, create action and bottom navigation.
+- Rebuilt the task list presentation with rounded coral/lime/yellow/blue task cards, clear completion controls and matching bottom navigation while retaining task persistence, editing, due dates, priorities and note links.
+- Renamed the App Lock settings entry to “Protector”; it still uses the existing PIN access gate and is not encryption.
+- GitHub Actions formatter ran successfully and committed the required Dart formatting pass as e6fc07f. Android CI and Code Quality for the pre-format commit 21351f9 stopped at the formatting gate; analyze, tests and APK build were skipped. A fresh verification run is required for the formatted branch head.
+- Local Flutter build could not be run in the container because github.com DNS resolution was unavailable; rely on the fresh GitHub Actions result before reporting a successful build.
