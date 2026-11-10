@@ -163,8 +163,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   String _priorityLabel(int value) => value == 2
       ? 'High'
       : value == 0
-      ? 'Low'
-      : 'Normal';
+          ? 'Low'
+          : 'Normal';
 
   @override
   Widget build(BuildContext context) {
@@ -238,8 +238,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    final overdue =
-                        !item.isCompleted &&
+                    final overdue = !item.isCompleted &&
                         item.dueAt != null &&
                         DateUtils.dateOnly(item.dueAt!)
                             .isBefore(DateUtils.dateOnly(DateTime.now()));
@@ -287,9 +286,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                       color: overdue
                                           ? Theme.of(context).colorScheme.error
                                           : null,
-                                      fontWeight: overdue
-                                          ? FontWeight.bold
-                                          : null,
+                                      fontWeight:
+                                          overdue ? FontWeight.bold : null,
                                     ),
                                   ),
                               ],
