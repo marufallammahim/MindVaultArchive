@@ -86,7 +86,7 @@ if additions:
 print("Gradle plugin repositories verified: Google Maven + Maven Central")
 PY
 
-# Keep root project dependency repositories explicit as well.
+# Keep root project dependency repositories explicit as well; the pluginManagement block above handles plugin classpaths.
 if [[ -f android/build.gradle ]]; then
   grep -q 'google()' android/build.gradle || sed -i '/allprojects[[:space:]]*{/a\\    repositories { google(); mavenCentral() }' android/build.gradle
 fi
