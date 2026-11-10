@@ -1,0 +1,27 @@
+name: Code Quality
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Generate native platform scaffolding
+        run: bash tool/regenerate_platforms.sh
+      - run: flutter pub get
+      - name: Format Dart sources
+        run: dart format lib test integration_test
+      - run: flutter analyze
+      - run: flutter test
