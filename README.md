@@ -16,6 +16,8 @@ and SQLite.
 - Note editing with debounced auto-save, retryable save errors and save-before-exit.
 - Favorites, archive, trash, restore and permanent deletion.
 - Category create, rename, delete, note assignment and category filtering.
+- Per-note color palette and tinted note cards.
+- Quick Capture for ideas and thoughts.
 - Local drawing canvas and drawing attachment metadata.
 - Offline tasks with due dates, priorities and completion state.
 - Starter templates for journals, meetings, projects, study and developer notes.
