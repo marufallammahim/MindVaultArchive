@@ -94,6 +94,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mode = ref.watch(themeModeProvider);
+    final amoledEnabled = ref.watch(amoledThemeProvider);
     final db = ref.watch(databaseProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
@@ -130,6 +131,13 @@ class SettingsScreen extends ConsumerWidget {
                   .read(themeModeProvider.notifier)
                   .setThemeMode(selection.first);
             },
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('AMOLED black theme'),
+            subtitle: const Text('Use a true black background when dark mode is active.'),
+            value: amoledEnabled,
+            onChanged: (value) => ref.read(amoledThemeProvider.notifier).setEnabled(value),
           ),
           const SizedBox(height: 24),
           const Divider(),

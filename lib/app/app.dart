@@ -13,7 +13,9 @@ class MindVaultArchiveApp extends ConsumerWidget {
         title: 'MindVault Archive',
         themeMode: ref.watch(themeModeProvider),
         theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
+        darkTheme: ref.watch(amoledThemeProvider)
+            ? AppTheme.amoledTheme
+            : AppTheme.darkTheme,
         routerConfig: appRouter,
         builder: (context, child) =>
             AppLockGate(child: child ?? const SizedBox.shrink()),

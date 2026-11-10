@@ -16,6 +16,15 @@ class AppTheme {
     return _build(scheme, const Color(0xFFFAF7F8));
   }
 
+  static ThemeData get amoledTheme {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xFFD58A9B),
+      brightness: Brightness.dark,
+      surface: Colors.black,
+    );
+    return _build(scheme, Colors.black);
+  }
+
   static ThemeData get darkTheme {
     final scheme = ColorScheme.fromSeed(
       seedColor: const Color(0xFFD58A9B),

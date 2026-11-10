@@ -44,3 +44,36 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
 final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
   (ref) => ThemeModeNotifier(),
 );
+
+class AmoledThemeNotifier extends StateNotifier<bool> {
+  AmoledThemeNotifier() : super(false) {
+    _load();
+  }
+
+  static const _storageKey = 'amoled_theme_enabled';
+
+  Future<void> _load() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      state = preferences.getBool(_storageKey) ?? false;
+    } catch (_) {
+      // Keep the standard dark surface when preferences are unavailable.
+    }
+  }
+
+  Future<void> setEnabled(bool enabled) async {
+    state = enabled;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool(_storageKey, enabled);
+    } catch (_) {
+      // The current session still reflects the selected preference.
+    }
+  }
+}
+
+final amoledThemeProvider =
+    StateNotifierProvider<AmoledThemeNotifier, bool>(
+  (ref) => AmoledThemeNotifier(),
+);
