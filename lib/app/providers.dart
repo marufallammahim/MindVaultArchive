@@ -95,8 +95,7 @@ class AccentColorNotifier extends StateNotifier<Color> {
   }
 }
 
-final accentColorProvider =
-    StateNotifierProvider<AccentColorNotifier, Color>(
+final accentColorProvider = StateNotifierProvider<AccentColorNotifier, Color>(
   (ref) => AccentColorNotifier(),
 );
 
@@ -118,8 +117,7 @@ class UserProfile {
 }
 
 class UserProfileNotifier extends StateNotifier<UserProfile> {
-  UserProfileNotifier()
-      : super(const UserProfile(name: 'Your name')) {
+  UserProfileNotifier() : super(const UserProfile(name: 'Your name')) {
     _load();
   }
 
