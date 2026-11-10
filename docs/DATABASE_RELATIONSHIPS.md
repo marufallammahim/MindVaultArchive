@@ -4,39 +4,13 @@
 
 ```mermaid
 erDiagram
-  NOTES {
-    text id PK
-    text title
-    text document_content
-    text category_id
-  }
-  CATEGORIES {
-    text id PK
-    text name
-  }
-  TASKS {
-    text id PK
-    text note_id
-    text title
-  }
-  ATTACHMENTS {
-    text id PK
-    text note_id
-    text local_path
-  }
-  TAGS {
-    text id PK
-    text name
-  }
-  NOTE_TAGS {
-    text note_id PK
-    text tag_id PK
-  }
-  NOTE_REVISIONS {
-    text id PK
-    text note_id
-    text title
-  }
+  NOTES { text id PK text title text document_content text category_id }
+  CATEGORIES { text id PK text name }
+  TASKS { text id PK text note_id text title }
+  ATTACHMENTS { text id PK text note_id text local_path }
+  TAGS { text id PK text name }
+  NOTE_TAGS { text note_id PK text tag_id PK }
+  NOTE_REVISIONS { text id PK text note_id text title }
   NOTES ||--o{ TASKS : "logical noteId"
   NOTES ||--o{ ATTACHMENTS : "logical noteId"
   NOTES ||--o{ NOTE_REVISIONS : "logical noteId"
