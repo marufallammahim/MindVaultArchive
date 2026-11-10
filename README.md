@@ -25,11 +25,14 @@ and SQLite.
 - System/light/dark theme preference and Material 3 burgundy branding.
 - Versioned JSON archive v5 for notes, categories, tags, tag links, note-linked
   tasks and note revisions; v1-v4 remain importable.
+- Full ZIP backup/restore with attachment files, SHA-256 integrity checks and
+  safe app-private restore paths.
 - Transactional import validation and duplicate record protection.
 
 ## Important limitations
-JSON transfer does not include drawing/audio/PDF attachment bytes or private
-device paths, so it is not yet a full backup. Search is local substring matching,
+JSON transfer does not include attachment bytes. Use the full ZIP backup for
+drawing/audio/file attachments; it verifies checksums and does not export local
+absolute paths. Search is local substring matching,
 not semantic search. The editor supports Markdown authoring and preview, but is not a full WYSIWYG block editor.
 See [Feature Specification](docs/FEATURE_SPECIFICATION.md).
 
