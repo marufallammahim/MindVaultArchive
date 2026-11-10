@@ -172,9 +172,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     builder: (context, noteSnapshot) {
                       final selectedId = noteSnapshot.data?.categoryId;
                       return DropdownButtonFormField<String?>(
-                        initialValue: categories.any((item) => item.id == selectedId)
-                            ? selectedId
-                            : null,
+                        initialValue:
+                            categories.any((item) => item.id == selectedId)
+                                ? selectedId
+                                : null,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.folder_outlined),

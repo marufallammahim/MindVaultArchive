@@ -217,7 +217,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             Wrap(
                               spacing: 12,
                               children: [
-                                Text('Priority: ${_priorityLabel(item.priority)}'),
+                                Text(
+                                    'Priority: ${_priorityLabel(item.priority)}'),
                                 if (item.dueAt != null)
                                   Text(
                                       'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
