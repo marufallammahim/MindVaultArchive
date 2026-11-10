@@ -11,7 +11,7 @@ A feature may be marked tested only when its criteria pass on a recorded commit.
 | F05 | Attach/reopen supported file; validate type/path; backup bytes; restore integrity; shared attachment reference is safe. |
 | F06 | Note task appears in global list; edits synchronize both views; due date/priority/completion persist; reminders honor timezone. |
 | F07 | Offline search; index updates after edit/delete; filters and exact phrase behavior; locked content not leaked. |
-| F08 | Invalid PIN rejected; protected data encryption verified separately; tampered backup rejected; sensitive content absent from logs/previews. |
+| F08 | Invalid PIN rejected; protected data encryption verified separately; tampered backup rejected; sensitive data absent from logs/previews. |
 | F09 | Offline operations queue; replay is idempotent; conflict visible; explicit resolution preserves both versions. |
 | F10 | Import preview/validation; invalid archive rejected; no overwrite by ID collision; JSON/ZIP round-trip preserves supported metadata and attachments. |
 | F11 | Board positions/zoom/connections persist; linked note/task opens canonical record; large board remains responsive. |
