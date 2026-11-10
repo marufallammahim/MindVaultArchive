@@ -60,16 +60,27 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
 
     return PopScope(
+      canPop: !state.isSaving,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) {
-          await ref.read(editorProvider(widget.noteId).notifier).forceSave();
-        }
+        if (didPop) return;
+        final saved = await ref
+            .read(editorProvider(widget.noteId).notifier)
+            .forceSave();
+        if (saved && mounted) context.pop();
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            state.isSaving ? 'Saving…' : 'Saved',
-            style: Theme.of(context).textTheme.labelLarge,
+            state.saveError != null
+                ? 'Save failed'
+                : state.isSaving
+                ? 'Saving…'
+                : 'Saved',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: state.saveError != null
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+            ),
           ),
           actions: [
             IconButton(
@@ -81,14 +92,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Save',
               icon: const Icon(Icons.check),
               onPressed: () async {
-                await ref
+                final saved = await ref
                     .read(editorProvider(widget.noteId).notifier)
                     .forceSave();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text('Note saved.')));
-                }
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(saved ? 'Note saved.' : 'Could not save note.'),
+                  ),
+                );
               },
             ),
           ],
@@ -97,6 +109,27 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
             children: [
+              if (state.saveError != null)
+                MaterialBanner(
+                  content: Text(state.saveError!),
+                  leading: const Icon(Icons.error_outline),
+                  actions: [
+                    TextButton(
+                      onPressed: () async {
+                        final saved = await ref
+                            .read(editorProvider(widget.noteId).notifier)
+                            .forceSave();
+                        if (!context.mounted) return;
+                        if (saved) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Note saved.')),
+                          );
+                        }
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
               TextField(
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
