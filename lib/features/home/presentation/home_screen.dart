@@ -55,6 +55,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     return [
       PopupMenuItem(
+        value: 'pin',
+        child: Text(note.sortOrder == 1 ? 'Unpin note' : 'Pin note'),
+      ),
+      PopupMenuItem(
         value: 'favorite',
         child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
       ),
@@ -72,6 +76,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     String action,
   ) async {
     switch (action) {
+      case 'pin':
+        await db.setPinned(note.id, note.sortOrder != 1);
+        break;
       case 'favorite':
         await db.setFavorite(note.id, !note.isFavorite);
         break;
@@ -110,7 +117,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return note.isDeleted.equals(false) & note.isArchived.equals(false);
         }
       })
-      ..orderBy([(note) => OrderingTerm.desc(note.updatedAt)]);
+      ..orderBy([
+        (note) => OrderingTerm.desc(note.sortOrder),
+        (note) => OrderingTerm.desc(note.updatedAt),
+      ]);
 
     return Scaffold(
       appBar: AppBar(
@@ -332,6 +342,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            if (note.sortOrder == 1)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 5, top: 2),
+                                child: Icon(Icons.push_pin, size: 16),
+                              ),
                             if (note.isFavorite)
                               const Padding(
                                 padding: EdgeInsets.only(right: 5, top: 2),
