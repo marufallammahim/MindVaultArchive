@@ -61,15 +61,15 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                     'Your timeline will appear here as you create notes and tasks.');
               }
               return ListView.separated(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
                 itemCount: entries.length,
                 separatorBuilder: (_, __) =>
-                    const Divider(height: 1, indent: 52),
+                    const Divider(height: 1, indent: 54),
                 itemBuilder: (context, index) {
                   final entry = entries[index];
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(child: Icon(entry.icon)),
+                    leading: CircleAvatar(backgroundColor: Theme.of(context).colorScheme.primaryContainer, foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer, child: Icon(entry.icon)),
                     title: Text(entry.title,
                         maxLines: 1, overflow: TextOverflow.ellipsis),
                     subtitle: Text(
