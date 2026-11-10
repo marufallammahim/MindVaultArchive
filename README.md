@@ -19,7 +19,7 @@ flutter run
 
 ## Verification
 
-The project has GitHub Actions workflows for Flutter formatting, static analysis, tests, Android debug APK compilation, and a separate signed release pipeline.
+The project has GitHub Actions workflows for Flutter formatting, static analysis, tests, and Android release-mode APK/AAB candidate builds with CI signature verification.
 
 ## Android debug build
 
@@ -28,6 +28,17 @@ flutter build apk --debug
 ```
 
 Debug APKs are for testing and are signed with the Android debug key. They are not production release builds.
+
+## App features and current scope
+
+- Offline SQLite notes with title/content search.
+- Favorites, archive, trash, restore, and permanent deletion.
+- Drawing canvas with local PNG attachments.
+- Category create, rename, and delete controls.
+- Light/dark/system theme with local persistence.
+- Editor autosave with queued writes, retryable errors, and save-before-exit behavior.
+
+Voice recording, audio playback, note-to-category assignment, rich-text editing, backup/restore, and full Bengali localization remain planned work; do not assume these are complete.
 
 ## Android production release
 
