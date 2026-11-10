@@ -39,6 +39,8 @@ class AppLockService {
   static const _enabledKey = 'mindvault.app_lock.enabled';
   static const _saltKey = 'mindvault.app_lock.salt';
   static const _hashKey = 'mindvault.app_lock.pin_hash';
+  static const _attemptsKey = 'mindvault.app_lock.attempts';
+  static const _lockoutKey = 'mindvault.app_lock.lockout_until';
 
   final SecureValueStore _store;
 
@@ -59,10 +61,88 @@ class AppLockService {
     await _store.write(_saltKey, salt);
     await _store.write(_hashKey, hash);
     await _store.write(_enabledKey, 'true');
+    await _store.delete(_attemptsKey);
+    await _store.delete(_lockoutKey);
   }
 
   Future<bool> verifyPin(String pin) async {
-    if (!RegExp(r'^\d{6}$').hasMatch(pin)) return false;
+    if (!RegExp(r'^\d{6}
+    final salt = await _store.read(_saltKey);
+    final expectedHash = await _store.read(_hashKey);
+    if (salt == null || expectedHash == null) return false;
+
+    final actual = sha256.convert(utf8.encode('$salt:$pin')).bytes;
+    final expected = _decodeHex(expectedHash);
+    if (expected == null || expected.length != actual.length) return false;
+
+    var difference = 0;
+    for (var index = 0; index < actual.length; index++) {
+      difference |= actual[index] ^ expected[index];
+    }
+    if (difference == 0) {
+      await _store.delete(_attemptsKey);
+      await _store.delete(_lockoutKey);
+      return true;
+    }
+
+    final attempts =
+        (int.tryParse(await _store.read(_attemptsKey) ?? '') ?? 0) + 1;
+    if (attempts >= 5) {
+      await _store.write(
+        _lockoutKey,
+        (now + const Duration(seconds: 30).inMilliseconds).toString(),
+      );
+      await _store.delete(_attemptsKey);
+    } else {
+      await _store.write(_attemptsKey, attempts.toString());
+    }
+    return false;
+  }
+
+  Future<Duration?> lockoutRemaining() async {
+    final value = int.tryParse(await _store.read(_lockoutKey) ?? '');
+    if (value == null) return null;
+    final remaining = value - DateTime.now().millisecondsSinceEpoch;
+    if (remaining <= 0) {
+      await _store.delete(_lockoutKey);
+      await _store.delete(_attemptsKey);
+      return null;
+    }
+    return Duration(milliseconds: remaining);
+  }
+
+  Future<void> disablePin(String currentPin) async {
+    if (!await verifyPin(currentPin)) {
+      throw StateError('The current PIN is incorrect.');
+    }
+    await _store.delete(_enabledKey);
+    await _store.delete(_saltKey);
+    await _store.delete(_hashKey);
+  }
+
+  List<int>? _decodeHex(String value) {
+    if (value.length != 64) return null;
+    try {
+      return List<int>.generate(
+        32,
+        (index) => int.parse(
+          value.substring(index * 2, index * 2 + 2),
+          radix: 16,
+        ),
+      );
+    } on FormatException {
+      return null;
+    }
+  }
+}
+).hasMatch(pin)) return false;
+    final lockoutUntil = int.tryParse(await _store.read(_lockoutKey) ?? '');
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (lockoutUntil != null && lockoutUntil > now) return false;
+    if (lockoutUntil != null) {
+      await _store.delete(_lockoutKey);
+      await _store.delete(_attemptsKey);
+    }
     final salt = await _store.read(_saltKey);
     final expectedHash = await _store.read(_hashKey);
     if (salt == null || expectedHash == null) return false;
