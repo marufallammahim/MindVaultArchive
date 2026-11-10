@@ -116,7 +116,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** Versioned transfer schema, mapping, duplicate policy, attachment bytes, metadata and relationship preservation.
 - **Offline/backend:** LOCAL for local files; cloud destinations require configured provider.
 - **Acceptance/tests:** Invalid archive rejection; no destructive action before validation; JSON/ZIP round-trip; report partial failures.
-- **Baseline:** PARTIAL — versioned JSON transfer and ZIP backup/restore exist; broad third-party importers and additional export formats remain incomplete.
+- **Baseline:** PARTIAL — versioned JSON transfer, ZIP backup/restore and individual Markdown note share/export exist; broad third-party importers, multi-note Markdown export and additional formats remain incomplete.
 
 ### F11 — Visual Workspace
 - **Purpose/workflow:** Arrange notes/tasks/projects spatially and connect them visually.
@@ -132,7 +132,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** Template records, category, variable definitions and generated editable notes.
 - **Offline/backend:** LOCAL.
 - **Acceptance/tests:** Apply template creates persistent editable note; variables resolve; import/export and duplicate/delete behavior.
-- **Baseline:** PARTIAL — five starter templates exist; custom library, variables and import/export remain incomplete.
+- **Baseline:** PARTIAL — five starter templates and a locally persisted custom Markdown template library with create/apply/delete now exist; variables, template import/export and acceptance tests remain incomplete.
 
 ### F13 — Complete Customization
 - **Purpose/workflow:** Persist accessible appearance, editor, navigation and language preferences.
@@ -140,7 +140,7 @@ Each category below is mandatory in the product vision. Status refers to the ver
 - **Logic/data:** UserPreferences with schema/version and defaults.
 - **Offline/backend:** LOCAL.
 - **Acceptance/tests:** Preferences survive restart; themes apply consistently; text scaling and reduced motion work.
-- **Baseline:** PARTIAL — system/light/dark theme preference and shared Material 3 visual tokens exist; AMOLED, custom palettes, typography/layout controls, adaptive shell and complete Bengali localization remain incomplete.
+- **Baseline:** PARTIAL — system/light/dark theme preference, shared Material 3 visual tokens and an optional true-black AMOLED mode exist; custom palettes, typography/layout controls, adaptive shell and complete Bengali localization remain incomplete.
 
 ### F14 — Collaboration and Sharing
 - **Purpose/workflow:** Share local content safely and optionally collaborate through a real service.

@@ -26,6 +26,9 @@ All 22 feature categories remain in scope. Phase completion does not remove late
 - Added a developer snippet notebook using canonical note records.
 - Added local Quick Capture draft restore and editor word/character/reading-time indicators.
 - Centralized Material 3 visual tokens for light and dark themes.
+- Added locally persisted custom Markdown templates with create/apply/delete workflows.
+- Added an optional true-black AMOLED dark theme preference.
+- Added Markdown export/share from the note editor.
 - These additions improve F01, F03, F15, F16, F17 and F22; they do not close those feature categories. See the master checklist for remaining gates.
 
 ## Remaining high-priority work

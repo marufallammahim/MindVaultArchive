@@ -17,6 +17,9 @@ MindVault Archive uses a deep burgundy brand (#5A0719) and Material 3 color sche
 - A unified note/task activity timeline.
 - A dedicated developer snippet notebook that stores snippets as normal notes.
 - Quick Capture draft persistence using local preferences.
+- User-created Markdown templates stored locally in preferences.
+- Optional true-black AMOLED theme for dark mode.
+- Markdown note export through the Android share sheet.
 - Editor word count, character count and estimated reading time.
 
 ## Remaining UI/UX work

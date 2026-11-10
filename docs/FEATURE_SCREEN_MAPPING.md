@@ -15,12 +15,12 @@ This map is a workflow inventory. Shared screens are allowed; no route should ex
 | Multimedia | Attachment library, image/PDF viewer, scanner, OCR, audio, video, drawing | Attachments / Create | F05 | Partial |
 | Productivity | Task dashboard/list/editor/details, subtasks, Kanban, calendar, planner, habits, goals, focus | Tasks navigation | F06 | Partial |
 | Workspace | Canvas, mind map, flowchart, research/project boards, element properties | Workspace navigation | F11 | Not implemented |
-| Templates | Library, categories, preview, editor, variables, custom templates | Create / Templates | F12 | Partial |
-| Transfer | Import source/preview/validation/progress; export; backup/restore/integrity | Settings / Archive | F10,F17 | Partial |
+| Templates | Five built-in templates plus locally persisted custom Markdown templates | Create / Templates | F12 | Partial (custom templates available; variables/import/export pending) |
+| Transfer | JSON/ZIP archive import/export, Markdown note share/export, validation and backup/restore | Settings / Archive / Editor | F10,F17 | Partial |
 | Sync | Provider setup, sync dashboard/history, conflicts, device management | Settings / Sync | F09 | Not implemented |
 | Collaboration | Shared notes/notebooks, permissions, comments, public links | Share action | F14 | Not implemented |
 | Security | App lock, PIN, biometric, encryption, locked notes, privacy dashboard | Settings / Security | F08 | Partial |
-| Customization | Appearance, editor, notes, search, language, storage, notifications | Settings | F13,F22 | Partial |
+| Customization | System/light/dark themes, optional AMOLED black, editor, notes, search, language, storage, notifications | Settings | F13,F22 | Partial |
 | Developer | Local code-snippet notebook, code blocks, JSON/regex/SQL, Mermaid/LaTeX | Settings / Editor / Templates | F16 | Partial (basic snippet notebook available) |
 | Analytics | Local archive counts, duplicate-title and broken-link checks; advanced writing/productivity trends | Settings / Archive / Projects | F06,F17,F21 | Partial (basic local insights available) |
 

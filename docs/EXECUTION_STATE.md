@@ -42,8 +42,8 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Existing GoRouter is a flat route list; adaptive shell navigation/route guards are not complete.
 
 ## Latest branch head
-- Commit: c8d371ecddcaff44c704f66862c05be012fc9b4d — feat: preserve quick-capture drafts and show editor metrics.
-- Previous source slice: 0f082d00f0aa6b7c52aa0d9a8727e6e62f9ef4bb — local insights, timeline, developer notebook, routing and theme work.
+- Current branch head at checkpoint update: 5a4edd437e5ff7e198406e7b09ce123c5d74b795 — automatic Dart formatting after the custom-template/AMOLED/Markdown export changes.
+- Source commits include c8d371ecddcaff44c704f66862c05be012fc9b4d (Quick Capture drafts/editor metrics), 0f082d00f0aa6b7c52aa0d9a8727e6e62f9ef4bb (insights/timeline/developer notebook/theme/routes), and 396e11bd972726e6b118ce8d0eca5cb368f8d968 (custom templates and AMOLED preference).
 - Both commits were applied to the existing feature/ultimate-all-in-one-mindvault branch using fast-forward ref updates.
 - main was not modified and no new branch was created.
 
@@ -68,11 +68,14 @@ Flutter Android app; Riverpod; GoRouter; Drift/SQLite schema v6; Android applica
 - Added live editor word count, character count and estimated reading time.
 - Expanded the Material 3 theme with shared surface, card, input, button, navigation and snackbar styling.
 - Added routes and Settings entry points for Insights, Timeline and Developer Notebook.
+- Added locally persisted custom Markdown template create/apply/delete workflows.
+- Added an optional true-black AMOLED theme setting for dark mode.
+- Added Markdown share/export from the editor after forcing a save.
 - Updated design, screen map, roadmap, checklist and master feature specification to describe delivered work and remaining gaps.
-- Latest Flutter CI has not yet been verified for commit c8d371ecddcaff44c704f66862c05be012fc9b4d; no build/test success is claimed.
+- Code Quality on b7c56861e1f3e71c9a8fac9a7b927dfb6fd1ce1a passed format, analyze and tests. Android CI on that SHA passed format, analyze and tests; debug APK build was still running at last check. The newer custom-template/AMOLED/Markdown changes still require fresh CI verification.
 
 ## Exact next steps
-1. Run the formatter and Android CI/Code Quality against c8d371ecddcaff44c704f66862c05be012fc9b4d; verify formatting, analysis, tests and APK artifact before reporting success.
+1. Verify formatter, Android CI and Code Quality against the latest commit; confirm APK artifact before reporting a successful build.
 2. Add and run real migration fixtures for schema versions 1–5, including existing task rows and FTS index rebuilds; do not add SQL foreign keys until orphan handling and migration recovery are proven.
 3. Continue the P0 data-safety audit across archive import, full backup restore, attachments and editor autosave/recovery.
 4. Implement one tested P0/P1 source slice at a time; preserve existing user data and update docs/checkpoint with each commit.
