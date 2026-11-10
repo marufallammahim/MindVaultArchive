@@ -42,6 +42,7 @@ class Tasks extends Table {
   TextColumn get id => text()();
   TextColumn get title => text()();
   TextColumn get details => text().withDefault(const Constant(''))();
+  TextColumn get noteId => text().nullable()();
   DateTimeColumn get dueAt => dateTime().nullable()();
   IntColumn get priority => integer().withDefault(const Constant(1))();
   BoolColumn get isCompleted => boolean().withDefault(const Constant(false))();
@@ -115,7 +116,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -131,6 +132,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             await m.createTable(noteRevisions);
           }
+          if (from < 5) {
+            await m.addColumn(tasks, tasks.noteId);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -143,8 +147,16 @@ class AppDatabase extends _$AppDatabase {
     required String details,
     required int priority,
     DateTime? dueAt,
+    String? noteId,
   }) async {
     final normalizedTitle = title.trim();
+    if (noteId != null) {
+      final linkedNote = await (select(notes)..where((note) => note.id.equals(noteId)))
+          .getSingleOrNull();
+      if (linkedNote == null || linkedNote.isDeleted) {
+        throw ArgumentError.value(noteId, 'noteId', 'Linked note not found.');
+      }
+    }
     if (normalizedTitle.isEmpty) {
       throw ArgumentError.value(title, 'title', 'Task title cannot be empty.');
     }
@@ -158,6 +170,7 @@ class AppDatabase extends _$AppDatabase {
           details: Value(details.trim()),
           priority: Value(priority.clamp(0, 2).toInt()),
           dueAt: Value(dueAt),
+          noteId: Value(noteId),
         ),
       );
     } else {
@@ -167,6 +180,7 @@ class AppDatabase extends _$AppDatabase {
           details: details.trim(),
           priority: priority.clamp(0, 2).toInt(),
           dueAt: Value(dueAt),
+          noteId: Value(noteId),
           updatedAt: DateTime.now(),
         ),
       );
@@ -320,6 +334,9 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> permanentlyDeleteNote(String id) {
     return transaction(() async {
+      await (update(tasks)..where((task) => task.noteId.equals(id))).write(
+        const TasksCompanion(noteId: Value(null)),
+      );
       await (delete(attachments)..where((item) => item.noteId.equals(id))).go();
       await (delete(noteTags)..where((item) => item.noteId.equals(id))).go();
       await (delete(noteRevisions)..where((item) => item.noteId.equals(id)))
