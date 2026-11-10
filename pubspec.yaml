@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -20,7 +20,7 @@ dependencies:
   just_audio: ^0.9.36
   flutter_svg: ^2.0.9
   flutter_markdown_plus: ^1.0.12
-  file_picker: ^8.1.7
+  file_picker: ^10.3.8
   share_plus: ^10.1.4
   archive: ^3.6.1
   crypto: ^3.0.6

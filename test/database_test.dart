@@ -121,8 +121,9 @@ void main() {
         'Body $index',
       );
     }
-    final revisions = await (database.select(database.noteRevisions)
-          ..where((revision) => revision.noteId.equals('bounded-history')))
+    final revisions = await (database.select(
+      database.noteRevisions,
+    )..where((revision) => revision.noteId.equals('bounded-history')))
         .get();
     expect(revisions, hasLength(30));
   });

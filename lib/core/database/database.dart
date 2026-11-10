@@ -118,11 +118,14 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) async => m.createAll(),
+        onCreate: (m) async {
+          await m.createAll();
+          await _createSearchIndexes();
+        },
         onUpgrade: (m, from, to) async {
           if (from < 2) {
             await m.createTable(tasks);
@@ -137,11 +140,85 @@ class AppDatabase extends _$AppDatabase {
           if (from >= 2 && from < 5) {
             await m.addColumn(tasks, tasks.noteId);
           }
+          if (from < 6) {
+            await _createSearchIndexes();
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },
       );
+
+  /// Creates local FTS5 indexes and keeps them synchronized with Drift rows.
+  /// Indexes are rebuildable derived data; notes and tasks remain the source of truth.
+  Future<void> _createSearchIndexes() async {
+    await customStatement('''
+      CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts
+      USING fts5(note_id UNINDEXED, title, body,
+        tokenize = 'unicode61 remove_diacritics 2')
+    ''');
+    await customStatement('''
+      CREATE VIRTUAL TABLE IF NOT EXISTS tasks_fts
+      USING fts5(task_id UNINDEXED, title, details,
+        tokenize = 'unicode61 remove_diacritics 2')
+    ''');
+
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS notes_fts_insert
+      AFTER INSERT ON notes BEGIN
+        INSERT INTO notes_fts(note_id, title, body)
+        VALUES (new.id, new.title, new.document_content);
+      END
+    ''');
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS notes_fts_delete
+      AFTER DELETE ON notes BEGIN
+        DELETE FROM notes_fts WHERE note_id = old.id;
+      END
+    ''');
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS notes_fts_update
+      AFTER UPDATE OF title, document_content ON notes BEGIN
+        DELETE FROM notes_fts WHERE note_id = old.id;
+        INSERT INTO notes_fts(note_id, title, body)
+        VALUES (new.id, new.title, new.document_content);
+      END
+    ''');
+
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS tasks_fts_insert
+      AFTER INSERT ON tasks BEGIN
+        INSERT INTO tasks_fts(task_id, title, details)
+        VALUES (new.id, new.title, new.details);
+      END
+    ''');
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS tasks_fts_delete
+      AFTER DELETE ON tasks BEGIN
+        DELETE FROM tasks_fts WHERE task_id = old.id;
+      END
+    ''');
+    await customStatement('''
+      CREATE TRIGGER IF NOT EXISTS tasks_fts_update
+      AFTER UPDATE OF title, details ON tasks BEGIN
+        DELETE FROM tasks_fts WHERE task_id = old.id;
+        INSERT INTO tasks_fts(task_id, title, details)
+        VALUES (new.id, new.title, new.details);
+      END
+    ''');
+
+    // Rebuild indexes during creation or migration to include existing records.
+    await customStatement('DELETE FROM notes_fts');
+    await customStatement('''
+      INSERT INTO notes_fts(note_id, title, body)
+      SELECT id, title, document_content FROM notes
+    ''');
+    await customStatement('DELETE FROM tasks_fts');
+    await customStatement('''
+      INSERT INTO tasks_fts(task_id, title, details)
+      SELECT id, title, details FROM tasks
+    ''');
+  }
 
   Future<void> saveTask({
     required String id,

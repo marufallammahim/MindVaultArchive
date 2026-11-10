@@ -71,4 +71,57 @@ void main() {
     expect(results.single.id, 'visible');
     expect(await search.search('   '), isEmpty);
   });
+  test('FTS indexes stay synchronized when note content changes', () async {
+    await database.saveNoteContent(
+      'indexed-note',
+      'First heading',
+      'alpha searchable phrase',
+    );
+
+    expect(await search.search('searchable'), hasLength(1));
+
+    await database.saveNoteContent(
+      'indexed-note',
+      'Second heading',
+      'beta replacement phrase',
+    );
+
+    expect(await search.search('alpha'), isEmpty);
+    expect(await search.search('replacement'), hasLength(1));
+  });
+
+  test(
+    'FTS indexes task titles and details and remove deleted tasks',
+    () async {
+      await database.saveTask(
+        id: 'indexed-task',
+        title: 'Prepare release',
+        details: 'Inspect generated artifacts',
+        priority: 1,
+      );
+
+      expect(await search.search('generated'), hasLength(1));
+
+      await database.deleteTask('indexed-task');
+      expect(await search.search('generated'), isEmpty);
+    },
+  );
+
+  test('supports token-prefix matching and a global result limit', () async {
+    await database.saveNoteContent(
+      'prefix-note',
+      'Flutter architecture',
+      'A local search index',
+    );
+    await database.saveTask(
+      id: 'prefix-task',
+      title: 'Flutter release',
+      details: 'Prepare package',
+      priority: 1,
+    );
+
+    final results = await search.search('flutt', limit: 1);
+    expect(results, hasLength(1));
+    expect(results.single.title.toLowerCase(), startsWith('flutter'));
+  });
 }

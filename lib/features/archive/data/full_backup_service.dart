@@ -49,10 +49,7 @@ class FullBackupService {
       final source = File(attachment.localPath);
       if (!await source.exists()) {
         throw StateError(
-          'Attachment "' +
-              attachment.filename +
-              '" is missing. Backup stopped '
-                  'to avoid creating an incomplete archive.',
+          'Attachment "${attachment.filename}" is missing. Backup stopped to avoid creating an incomplete archive.',
         );
       }
 
@@ -63,7 +60,7 @@ class FullBackupService {
       }
 
       final safeName = _safeFilename(attachment.filename);
-      final archivePath = 'attachments/' + attachment.id + '/' + safeName;
+      final archivePath = 'attachments/${attachment.id}/$safeName';
       zip.addFile(ArchiveFile(archivePath, bytes.length, bytes));
 
       manifestAttachments.add({
@@ -195,7 +192,7 @@ class FullBackupService {
         throw const FormatException('Backup attachment fields are invalid.');
       }
 
-      final expectedPath = 'attachments/' + id + '/' + _safeFilename(filename);
+      final expectedPath = 'attachments/$id/${_safeFilename(filename)}';
       if (archivePath != expectedPath) {
         throw const FormatException(
           'Backup attachment path does not match its ID.',
@@ -230,11 +227,8 @@ class FullBackupService {
 
     try {
       for (final item in prepared) {
-        final uniqueName = item.id +
-            '_' +
-            const Uuid().v4() +
-            '_' +
-            _safeFilename(item.filename);
+        final uniqueName =
+            '${item.id}_${const Uuid().v4()}_${_safeFilename(item.filename)}';
         final target = File(p.join(attachmentDirectory.path, uniqueName));
         await target.writeAsBytes(item.bytes, flush: true);
         createdFiles[item.id] = target;

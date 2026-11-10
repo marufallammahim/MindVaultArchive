@@ -11,9 +11,7 @@ abstract interface class SecureValueStore {
 }
 
 class FlutterSecureValueStore implements SecureValueStore {
-  const FlutterSecureValueStore([
-    this._storage = const FlutterSecureStorage(),
-  ]);
+  const FlutterSecureValueStore([this._storage = const FlutterSecureStorage()]);
 
   final FlutterSecureStorage _storage;
 
@@ -56,7 +54,7 @@ class AppLockService {
       (_) => Random.secure().nextInt(256),
     );
     final salt = base64UrlEncode(saltBytes);
-    final hash = sha256.convert(utf8.encode(salt + ':' + pin)).toString();
+    final hash = sha256.convert(utf8.encode('$salt:$pin')).toString();
 
     await _store.write(_saltKey, salt);
     await _store.write(_hashKey, hash);
@@ -80,7 +78,7 @@ class AppLockService {
     final expectedHash = await _store.read(_hashKey);
     if (salt == null || expectedHash == null) return false;
 
-    final actual = sha256.convert(utf8.encode(salt + ':' + pin)).bytes;
+    final actual = sha256.convert(utf8.encode('$salt:$pin')).bytes;
     final expected = _decodeHex(expectedHash);
     if (expected == null || expected.length != actual.length) return false;
 
@@ -138,10 +136,8 @@ class AppLockService {
     try {
       return List<int>.generate(
         32,
-        (index) => int.parse(
-          value.substring(index * 2, index * 2 + 2),
-          radix: 16,
-        ),
+        (index) =>
+            int.parse(value.substring(index * 2, index * 2 + 2), radix: 16),
       );
     } on FormatException {
       return null;

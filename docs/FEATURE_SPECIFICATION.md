@@ -24,8 +24,7 @@ only called implemented when the repository contains a usable local workflow.
 ### Editing, search and transfer
 - Markdown authoring toolbar and selectable rendered preview.
 - Home search across title/body in the active note view.
-- Global offline search across note titles/bodies, category names, tag names,
-  and task titles/details.
+- Global offline search using SQLite FTS5 token/prefix indexes for note titles/bodies and task titles/details, plus local category/tag name filters.
 - Versioned JSON archive transfer v5 for notes, categories, tags, tag links,
   note-linked tasks and note revisions.
 - Full ZIP backup/restore for registered attachment bytes, safe relative paths
@@ -43,7 +42,7 @@ only called implemented when the repository contains a usable local workflow.
 ## Partial
 
 - App lock is a screen access gate, not database/file encryption; no PIN recovery.
-- Search is local substring matching, not FTS5, semantic or OCR search.
+- Search uses local FTS5 token/prefix matching for notes/tasks and SQL name filters for categories/tags; it is not semantic search or OCR.
 - Editor is Markdown authoring/preview, not a WYSIWYG block editor.
 - Organization supports categories/tags and title-based links; nested notebooks,
   smart views and graph visualization are absent.
@@ -57,7 +56,7 @@ only called implemented when the repository contains a usable local workflow.
 
 ## Not implemented
 
-- FTS5 and semantic search, OCR/PDF indexing.
+- Semantic search, OCR/PDF indexing.
 - Biometric unlock and encrypted database/attachment storage.
 - Local reminders, recurrence, calendar, habits and project boards.
 - Visual canvas/whiteboard and graph exploration.
