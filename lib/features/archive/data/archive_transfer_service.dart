@@ -98,7 +98,10 @@ class ArchiveTransferService {
   ///
   /// Existing note IDs are skipped to avoid accidental overwrites. Categories
   /// are upserted by stable ID so imported notes can retain their grouping.
-  Future<ArchiveImportResult> importJson(String source) async {
+  Future<ArchiveImportResult> importJson(
+    String source, {
+    List<AttachmentImportRecord> attachments = const [],
+  }) async {
     final decoded = jsonDecode(source);
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != formatName ||
@@ -173,6 +176,16 @@ class ArchiveTransferService {
       }
     }
 
+    final attachmentIds = attachments.map((item) => item.id).toSet();
+    if (attachmentIds.length != attachments.length) {
+      throw const FormatException('Backup contains duplicate attachment IDs.');
+    }
+    for (final attachment in attachments) {
+      if (!noteIds.contains(attachment.noteId)) {
+        throw const FormatException('Backup contains an attachment for a missing note.');
+      }
+    }
+
     final taskIds = parsedTasks.map((item) => item.id).toSet();
     if (taskIds.length != parsedTasks.length) {
       throw const FormatException('Archive contains duplicate task IDs.');
@@ -192,6 +205,9 @@ class ArchiveTransferService {
     var skippedTags = 0;
     var importedRevisions = 0;
     var skippedRevisions = 0;
+    var importedAttachments = 0;
+    var skippedAttachments = 0;
+    final importedAttachmentIds = <String>[];
     final skippedNoteIds = <String>{};
     await _database.transaction(() async {
       for (final category in parsedCategories) {
@@ -329,6 +345,42 @@ class ArchiveTransferService {
         }
       }
 
+      for (final attachment in attachments) {
+        if (skippedNoteIds.contains(attachment.noteId)) {
+          skippedAttachments++;
+          continue;
+        }
+        final noteExists = await (_database.select(_database.notes)
+              ..where((note) => note.id.equals(attachment.noteId)))
+            .getSingleOrNull();
+        if (noteExists == null) {
+          skippedAttachments++;
+          continue;
+        }
+        final existing = await (_database.select(_database.attachments)
+              ..where((row) => row.id.equals(attachment.id)))
+            .getSingleOrNull();
+        if (existing != null) {
+          skippedAttachments++;
+          continue;
+        }
+        await _database.into(_database.attachments).insert(
+              AttachmentsCompanion.insert(
+                id: attachment.id,
+                noteId: attachment.noteId,
+                type: attachment.type,
+                localPath: attachment.localPath,
+                filename: attachment.filename,
+                duration: Value(attachment.duration),
+                documentPosition: Value(attachment.documentPosition),
+                createdAt: Value(attachment.createdAt),
+                metadata: Value(attachment.metadata),
+              ),
+            );
+        importedAttachments++;
+        importedAttachmentIds.add(attachment.id);
+      }
+
       final currentNotes = await _database.select(_database.notes).get();
       final activeNoteIds = currentNotes
           .where((item) => !item.isDeleted)
@@ -374,6 +426,9 @@ class ArchiveTransferService {
       skippedTags: skippedTags,
       importedRevisions: importedRevisions,
       skippedRevisions: skippedRevisions,
+      importedAttachments: importedAttachments,
+      skippedAttachments: skippedAttachments,
+      importedAttachmentIds: importedAttachmentIds,
     );
   }
 
@@ -565,6 +620,9 @@ class ArchiveImportResult {
     this.skippedTags = 0,
     this.importedRevisions = 0,
     this.skippedRevisions = 0,
+    this.importedAttachments = 0,
+    this.skippedAttachments = 0,
+    this.importedAttachmentIds = const [],
   });
 
   final int imported;
@@ -575,6 +633,33 @@ class ArchiveImportResult {
   final int skippedTags;
   final int importedRevisions;
   final int skippedRevisions;
+  final int importedAttachments;
+  final int skippedAttachments;
+  final List<String> importedAttachmentIds;
+}
+
+class AttachmentImportRecord {
+  const AttachmentImportRecord({
+    required this.id,
+    required this.noteId,
+    required this.type,
+    required this.localPath,
+    required this.filename,
+    required this.duration,
+    required this.documentPosition,
+    required this.createdAt,
+    required this.metadata,
+  });
+
+  final String id;
+  final String noteId;
+  final String type;
+  final String localPath;
+  final String filename;
+  final int? duration;
+  final int documentPosition;
+  final DateTime createdAt;
+  final String? metadata;
 }
 
 class _ArchiveCategory {
