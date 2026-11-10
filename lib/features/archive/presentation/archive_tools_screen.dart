@@ -138,7 +138,7 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           ],
           const SizedBox(height: 20),
           const Text(
-            'Format v4 includes notes, categories, tags, note-tag links, tasks and note '
+            'Format v5 includes notes, categories, tags, note-tag links, tasks linked to notes and note '
             'revisions, plus timestamps and archive state. Attachment file bytes '
             'and other binary assets are not included yet. This is not a full '
             'device backup.',
