@@ -1,54 +1,74 @@
-# Feature Specification — implementation status
+# Feature Specification — verified source inventory
 
-This document reports repository functionality, not the aspirational product
-vision. A feature is not marked complete merely because a route or button exists.
+This is an implementation inventory, not a marketing checklist. A feature is
+only called implemented when the repository contains a usable local workflow.
 
-## Implemented in the current source
+## Implemented
 
-- Offline SQLite notes using Drift.
-- Note creation and editing with debounced autosave and save-before-exit.
-- Favorites, pinning, archive, trash, restore and confirmed permanent deletion.
-- Category creation, rename, deletion, note assignment and category-filtered view.
-- Tag creation, rename, deletion and multi-tag note assignment.
+### Notes and organization
+- Offline Drift/SQLite notes with title and body editing.
+- Debounced autosave, serialized writes, retryable save errors and save-before-exit.
+- Favorites, pinning, archive, trash, restore and permanent deletion.
+- Categories with create, rename, delete, note assignment and category filtering.
+- Tags with create, rename, delete and multi-tag assignment.
 - Per-note color selection and tinted archive cards.
-- Quick Capture for fast local idea capture.
+- Lightweight `[[Note title]]` wikilinks and title-based backlinks.
+- Up to 30 previous note revisions, version history and restore.
+
+### Capture and productivity
+- Quick Capture for title/body ideas.
+- Five starter templates: daily journal, meeting, project, study and developer notes.
+- Offline tasks with title/details, due date, priority, completion, edit and delete.
 - Local drawing canvas with PNG attachment metadata.
-- Title/body substring search over the current archive view.
-- Lightweight `[[Note title]]` wikilinks with matching linked-note chips and live backlinks.
-- Version history with up to 30 previous snapshots per note and restore.
-- Light, dark and system theme selection with local persistence.
-- Offline task manager with title/details, due date, priority, completion state,
-  editing and deletion.
-- Reusable starter templates for daily journal, meeting, project plan, study
-  notes and developer notes.
-- Versioned JSON transfer v4 for notes, categories, tags, tag links, tasks and
-  note revisions; v1-v3 remain importable.
-- Import validation, transactional writes and duplicate note/task-ID protection.
-- Existing Flutter CI and Android build workflows.
+
+### Search and transfer
+- Home search across title/body in the active note view.
+- Global offline search across note titles/bodies, category names, tag names,
+  and task titles/details.
+- Versioned JSON archive transfer v4 for notes, categories, tags, tag links,
+  tasks and note revisions.
+- Import supports formats v1-v4, validates input before transaction, and
+  protects existing note/task IDs from overwrite.
+- Import/export deliberately excludes private device paths and binary
+  attachment bytes.
+
+### App foundation
+- Flutter, Riverpod, GoRouter and Drift/SQLite architecture.
+- Persistent system/light/dark theme preference.
+- Material 3 burgundy brand seed.
+- Android CI workflow for dependency resolution, Drift code generation,
+  formatting, static analysis, tests and debug APK build.
 
 ## Partial
 
-- Search: local title/body substring matching; no FTS index, semantic search,
-  advanced filters or OCR index.
-- Editor: plain text fields plus drawing attachments; not a block-based rich editor.
-- Organization: categories, tags, pinning and title-based links exist; nested
-  notebooks, smart views and a persistent graph database are not implemented.
-- Attachments: drawing metadata is stored locally; archive transfer does not
-  package attachment bytes.
-- Security: app-level lock and encrypted database/attachments are not implemented.
-- Sync: no remote sync provider or account is configured.
-- AI: no provider integration or archive RAG is implemented.
-- Localization: full Bengali UI translation is not complete.
+- Search is local substring matching, not FTS5, semantic or OCR search.
+- Editor stores plain text/Markdown-like content; it is not a block-based
+  rich-text editor with inline formatting controls.
+- Organization supports categories/tags and title-based links; nested
+  notebooks, smart views and a graph visualization are absent.
+- Drawing attachment records are local; export does not package attachment
+  files or verify their hashes.
+- Task due dates are stored and displayed, but scheduled notifications,
+  recurrence and calendar views are absent.
+- Theme supports system/light/dark, not user-defined palettes, fonts or
+  layout customization.
+- Bengali localization is not complete.
 
-## Not implemented yet
+## Not implemented
 
-Reminders/notifications, calendar, habits, projects, semantic search, OCR/PDF
-indexing, audio recording/transcription, handwriting, visual canvas boards,
-collaboration, cloud backup, WebDAV/Nextcloud sync, end-to-end encryption,
-and full importers for third-party archive formats.
+- Full attachment-aware ZIP backup and staged restore.
+- Voice recording, audio playback/transcription and OCR/PDF indexing.
+- App lock, biometric vault and encrypted database/attachment storage.
+- Local reminder notifications, recurrence, calendar, habits and project boards.
+- Visual canvas/whiteboard and graph exploration.
+- Cloud sync, WebDAV/Nextcloud provider and multi-device conflict resolution.
+- Collaboration, sharing permissions and multi-user editing.
+- AI provider integration, local semantic index and retrieval-augmented answers.
+- Third-party importers and migration from other note applications.
 
-## External infrastructure required
+## External infrastructure and privacy
 
-Cloud sync, collaboration and cloud AI require a configured backend/provider
-and user credentials. None is represented as active until a real provider is
-connected and tested.
+Cloud sync, collaboration and cloud AI require a real provider/backend,
+authentication and explicit user configuration. No such service is active.
+Any future AI workflow must ask before sending note content off-device and
+must preserve local-only operation when AI is disabled.
