@@ -176,7 +176,8 @@ class ArchiveSearchService {
         .map((term) => term.replaceAll('"', '').trim())
         .where(
           (term) =>
-              term.isNotEmpty && RegExp(r'[A-Za-z0-9\u0080-\uFFFF]').hasMatch(term),
+              term.isNotEmpty &&
+              RegExp(r'[A-Za-z0-9\u0080-\uFFFF]').hasMatch(term),
         )
         .map((term) => '"$term"*');
     return terms.join(' AND ');
