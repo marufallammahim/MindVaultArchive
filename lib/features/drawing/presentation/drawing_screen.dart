@@ -56,16 +56,15 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       final db = ref.read(databaseProvider);
       final existing = await (db.select(
         db.notes,
-      )..where((note) => note.id.equals(widget.noteId))).getSingleOrNull();
+      )..where((note) => note.id.equals(widget.noteId)))
+          .getSingleOrNull();
       if (existing == null) {
         await db
             .into(db.notes)
             .insert(NotesCompanion.insert(id: widget.noteId));
       }
 
-      await db
-          .into(db.attachments)
-          .insert(
+      await db.into(db.attachments).insert(
             AttachmentsCompanion.insert(
               id: id,
               noteId: widget.noteId,
@@ -92,47 +91,48 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('Drawing Canvas'),
-      actions: [
-        IconButton(
-          tooltip: 'Save drawing',
-          icon: _saving
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.check),
-          onPressed: _saving ? null : _saveDrawing,
+        appBar: AppBar(
+          title: const Text('Drawing Canvas'),
+          actions: [
+            IconButton(
+              tooltip: 'Save drawing',
+              icon: _saving
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.check),
+              onPressed: _saving ? null : _saveDrawing,
+            ),
+          ],
         ),
-      ],
-    ),
-    body: Signature(
-      controller: _controller,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-    ),
-    bottomNavigationBar: BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          IconButton(
-            tooltip: 'Undo',
-            icon: const Icon(Icons.undo),
-            onPressed: _controller.undo,
+        body: Signature(
+          controller: _controller,
+          backgroundColor:
+              Theme.of(context).colorScheme.surfaceContainerHighest,
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                tooltip: 'Undo',
+                icon: const Icon(Icons.undo),
+                onPressed: _controller.undo,
+              ),
+              IconButton(
+                tooltip: 'Redo',
+                icon: const Icon(Icons.redo),
+                onPressed: _controller.redo,
+              ),
+              IconButton(
+                tooltip: 'Clear',
+                icon: const Icon(Icons.clear),
+                onPressed: _controller.clear,
+              ),
+            ],
           ),
-          IconButton(
-            tooltip: 'Redo',
-            icon: const Icon(Icons.redo),
-            onPressed: _controller.redo,
-          ),
-          IconButton(
-            tooltip: 'Clear',
-            icon: const Icon(Icons.clear),
-            onPressed: _controller.clear,
-          ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }
