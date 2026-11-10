@@ -63,10 +63,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       canPop: !state.isSaving,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
+        final router = GoRouter.of(context);
         final saved =
             await ref.read(editorProvider(widget.noteId).notifier).forceSave();
         if (!mounted) return;
-        if (saved) context.pop();
+        if (saved) router.pop();
       },
       child: Scaffold(
         appBar: AppBar(
