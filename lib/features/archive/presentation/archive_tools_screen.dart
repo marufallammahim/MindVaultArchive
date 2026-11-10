@@ -1,8 +1,12 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/features/archive/data/archive_transfer_service.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ArchiveToolsScreen extends ConsumerStatefulWidget {
   const ArchiveToolsScreen({super.key});
@@ -35,6 +39,47 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
       _showMessage('Export failed: $error');
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _shareExport() async {
+    final document = _exportDocument;
+    if (document == null) return;
+    try {
+      await Share.shareXFiles(
+        [
+          XFile.fromData(
+            utf8.encode(document),
+            mimeType: 'application/json',
+            name: 'mindvault-archive.json',
+          ),
+        ],
+        text: 'MindVault Archive JSON export',
+      );
+    } catch (error) {
+      if (mounted) _showMessage('Could not share archive: $error');
+    }
+  }
+
+  Future<void> _pickImportFile() async {
+    try {
+      final selection = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: const ['json'],
+        withData: true,
+      );
+      if (selection == null || selection.files.isEmpty) return;
+      final bytes = selection.files.single.bytes;
+      if (bytes == null) {
+        _showMessage('Could not read the selected JSON file.');
+        return;
+      }
+      _importController.text = utf8.decode(bytes);
+      if (mounted) {
+        _showMessage('JSON file loaded. Review it, then validate and import.');
+      }
+    } catch (error) {
+      if (mounted) _showMessage('Could not open JSON file: $error');
     }
   }
 
@@ -98,10 +143,21 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           ),
           if (_exportDocument != null) ...[
             const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _busy ? null : _copyExport,
-              icon: const Icon(Icons.copy),
-              label: const Text('Copy archive JSON'),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _copyExport,
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copy JSON'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _shareExport,
+                  icon: const Icon(Icons.share_outlined),
+                  label: const Text('Share / Save JSON'),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             SelectableText(
@@ -117,6 +173,12 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             'overwritten. Categories and tags are matched by stable ID.',
           ),
           const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: _busy ? null : _pickImportFile,
+            icon: const Icon(Icons.folder_open_outlined),
+            label: const Text('Choose JSON file'),
+          ),
+          const SizedBox(height: 8),
           TextField(
             controller: _importController,
             minLines: 6,
