@@ -40,9 +40,8 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 38,
-                backgroundImage: avatar == null
-                    ? null
-                    : MemoryImage(base64Decode(avatar!)),
+                backgroundImage:
+                    avatar == null ? null : MemoryImage(base64Decode(avatar!)),
                 child: avatar == null
                     ? const Icon(Icons.person_outline, size: 38)
                     : null,
@@ -475,7 +474,8 @@ class _CustomColorDialogState extends State<_CustomColorDialog> {
   void initState() {
     super.initState();
     _controller = TextEditingController(
-      text: '#${widget.initialColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+      text:
+          '#${widget.initialColor.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
     );
   }
 
