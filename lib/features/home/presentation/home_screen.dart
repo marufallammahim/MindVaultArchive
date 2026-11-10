@@ -138,6 +138,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
           IconButton(
+            tooltip: 'Quick capture',
+            icon: const Icon(Icons.bolt_outlined),
+            onPressed: () => context.push('/capture'),
+          ),
+          IconButton(
             tooltip: 'Settings',
             icon: const Icon(Icons.settings_outlined),
             onPressed: () => context.push('/settings'),
@@ -203,6 +208,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                 ],
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.bolt_outlined),
+              title: const Text('Quick capture'),
+              onTap: () {
+                Navigator.pop(context);
+                context.push('/capture');
+              },
             ),
             ListTile(
               leading: const Icon(Icons.auto_awesome_outlined),
