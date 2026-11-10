@@ -41,7 +41,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                     maxLines: 4,
                     decoration: const InputDecoration(labelText: 'Details')),
                 DropdownButtonFormField<int>(
-                  value: priority,
+                  initialValue: priority,
                   decoration: const InputDecoration(labelText: 'Priority'),
                   items: const [
                     DropdownMenuItem(value: 0, child: Text('Low')),
@@ -57,9 +57,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   leading: const Icon(Icons.event_outlined),
                   title: Text(dueAt == null
                       ? 'No due date'
-                      : 'Due ' +
-                          MaterialLocalizations.of(context)
-                              .formatMediumDate(dueAt!)),
+                      : 'Due ${MaterialLocalizations.of(context).formatMediumDate(dueAt!)}'),
                   trailing: IconButton(
                     icon: const Icon(Icons.calendar_month_outlined),
                     onPressed: () async {
@@ -113,7 +111,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not save task: ' + error.toString())),
+        SnackBar(content: Text('Could not save task: $error')),
       );
     }
   }
@@ -161,8 +159,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Center(
-                      child: Text('Could not load tasks: ' +
-                          snapshot.error.toString()));
+                      child: Text('Could not load tasks: ${snapshot.error}'));
                 }
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
@@ -220,13 +217,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             Wrap(
                               spacing: 12,
                               children: [
-                                Text('Priority: ' +
-                                    _priorityLabel(item.priority)),
+                                Text('Priority: ${_priorityLabel(item.priority)}'),
                                 if (item.dueAt != null)
                                   Text(
-                                      'Due ' +
-                                          MaterialLocalizations.of(context)
-                                              .formatShortDate(item.dueAt!),
+                                      'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
                                       style: TextStyle(
                                         color: overdue
                                             ? Theme.of(context)
