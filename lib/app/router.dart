@@ -11,6 +11,7 @@ import 'package:mindvault_archive/features/templates/presentation/templates_scre
 import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 import 'package:mindvault_archive/features/history/presentation/revision_history_screen.dart';
+import 'package:mindvault_archive/features/search/presentation/archive_search_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -50,6 +51,10 @@ final appRouter = GoRouter(
       builder: (context, state) => RevisionHistoryScreen(
         noteId: state.pathParameters['id']!,
       ),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const ArchiveSearchScreen(),
     ),
     GoRoute(
       path: '/archive-tools',
