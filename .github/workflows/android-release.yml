@@ -84,7 +84,8 @@ jobs:
           AAB="build/app/outputs/bundle/release/app-release.aab"
           test -s "$APK"
           test -s "$AAB"
-          APKSIGNER="$(find "$ANDROID_SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:?ANDROID_HOME is not set}}"
+          APKSIGNER="$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -n "$APKSIGNER"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           jarsigner -verify -verbose -certs "$AAB" >/tmp/aab-signature-check.txt
