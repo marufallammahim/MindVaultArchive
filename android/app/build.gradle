@@ -6,7 +6,9 @@ plugins {
 
 android {
     namespace "com.marufallammahim.mindvaultarchive"
-    compileSdkVersion flutter.compileSdkVersion
+    // Keep this independent from Flutter's default compile SDK: AndroidX
+    // dependencies such as share_plus require API 34 or newer.
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
