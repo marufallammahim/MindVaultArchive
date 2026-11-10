@@ -63,10 +63,16 @@ class EditorNotifier extends StateNotifier<EditorState> {
         state = state.copyWith(
           title: note.title,
           content: note.documentContent,
+          isSaving: false,
           isLoaded: true,
+          clearSaveError: true,
         );
       } else {
-        state = state.copyWith(isLoaded: true);
+        state = state.copyWith(
+          isSaving: false,
+          isLoaded: true,
+          clearSaveError: true,
+        );
       }
     } catch (error) {
       if (mounted) {
