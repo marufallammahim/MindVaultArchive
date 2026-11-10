@@ -229,6 +229,9 @@ class AppDatabase extends _$AppDatabase {
           NoteTagsCompanion.insert(noteId: noteId, tagId: tagId),
         );
       }
+      await (update(notes)..where((note) => note.id.equals(noteId))).write(
+        NotesCompanion(updatedAt: Value(DateTime.now())),
+      );
     });
   }
 
