@@ -219,6 +219,53 @@ void main() {
     expect(await database.select(database.noteRevisions).get(), isEmpty);
   });
 
+  test('tasks can be linked to notes and are detached on permanent deletion', () async {
+    await database.saveNoteContent('task-note', 'Project note', 'Details');
+    await database.saveTask(
+      id: 'linked-task',
+      title: 'Review this note',
+      details: 'Check the attached idea',
+      priority: 1,
+      noteId: 'task-note',
+    );
+
+    var task = await (database.select(database.tasks)
+          ..where((item) => item.id.equals('linked-task')))
+        .getSingle();
+    expect(task.noteId, 'task-note');
+
+    await database.permanentlyDeleteNote('task-note');
+    task = await (database.select(database.tasks)
+          ..where((item) => item.id.equals('linked-task')))
+        .getSingle();
+    expect(task.noteId, isNull);
+  });
+
+  test('task cannot be linked to a missing or deleted note', () async {
+    await expectLater(
+      database.saveTask(
+        id: 'bad-task',
+        title: 'Invalid link',
+        details: '',
+        priority: 1,
+        noteId: 'missing-note',
+      ),
+      throwsArgumentError,
+    );
+    await database.saveNoteContent('deleted-note', 'Deleted', 'Body');
+    await database.setDeleted('deleted-note', true);
+    await expectLater(
+      database.saveTask(
+        id: 'deleted-link-task',
+        title: 'Invalid deleted link',
+        details: '',
+        priority: 1,
+        noteId: 'deleted-note',
+      ),
+      throwsArgumentError,
+    );
+  });
+
   test('category names cannot be empty', () async {
     await expectLater(
       database.saveCategory('empty', '   '),
