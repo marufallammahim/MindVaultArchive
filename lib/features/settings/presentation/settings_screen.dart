@@ -197,6 +197,14 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           ListTile(
+            leading: const Icon(Icons.lock_outline),
+            title: const Text('App lock'),
+            subtitle: const Text('Protect app access with a six-digit PIN'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push('/app-lock'),
+          ),
+          const SizedBox(height: 8),
+          ListTile(
             leading: const Icon(Icons.inventory_2_outlined),
             title: const Text('Archive transfer'),
             subtitle: const Text('Export or import a portable JSON archive'),
