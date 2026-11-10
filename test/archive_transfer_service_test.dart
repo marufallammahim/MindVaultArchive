@@ -30,6 +30,7 @@ void main() {
       title: 'Review archive',
       details: 'Check export',
       priority: 2,
+      noteId: 'note-1',
     );
 
     final document = jsonDecode(await transfer.exportJson()) as Map;
@@ -41,6 +42,7 @@ void main() {
         (contents['notes'] as List).single['documentContent'], 'Updated body');
     expect((contents['revisions'] as List).single['title'], 'Research');
     expect((contents['tasks'] as List).single['title'], 'Review archive');
+    expect((contents['tasks'] as List).single['noteId'], 'note-1');
     expect((contents['tags'] as List).single['name'], 'Important');
     expect((contents['noteTags'] as List).single['tagId'], 'important');
   });
@@ -118,6 +120,7 @@ void main() {
             'id': 'task-imported',
             'title': 'Imported task',
             'details': 'Imported details',
+            'noteId': 'new-id',
             'dueAt': null,
             'priority': 2,
             'isCompleted': false,
@@ -149,6 +152,7 @@ void main() {
           ..where((task) => task.id.equals('task-imported')))
         .getSingle();
     expect(importedTask.title, 'Imported task');
+    expect(importedTask.noteId, 'new-id');
     final importedTagLink = await (database.select(database.noteTags)
           ..where((link) => link.noteId.equals('new-id')))
         .getSingle();
@@ -157,6 +161,35 @@ void main() {
           ..where((revision) => revision.id.equals('revision-1')))
         .getSingle();
     expect(importedRevision.title, 'Previous imported title');
+  });
+
+  test('imports version 4 task records without optional note links', () async {
+    final legacy = <String, Object?>{
+      'format': ArchiveTransferService.formatName,
+      'version': 4,
+      'contents': {
+        'categories': <Object?>[],
+        'notes': <Object?>[],
+        'tasks': [
+          {
+            'id': 'legacy-task',
+            'title': 'Legacy task',
+            'details': '',
+            'dueAt': null,
+            'priority': 1,
+            'isCompleted': false,
+            'createdAt': DateTime.utc(2026).toIso8601String(),
+            'updatedAt': DateTime.utc(2026).toIso8601String(),
+            'completedAt': null,
+          }
+        ],
+      },
+    };
+    await transfer.importJson(jsonEncode(legacy));
+    final task = await (database.select(database.tasks)
+          ..where((item) => item.id.equals('legacy-task')))
+        .getSingle();
+    expect(task.noteId, isNull);
   });
 
   test('imports version 3 archives without revision sections', () async {
