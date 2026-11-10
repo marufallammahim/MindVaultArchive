@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -42,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.archive_rounded, size: 100, color: Colors.deepPurple),
+            SvgPicture.asset('assets/branding/mindvault_logo.svg', width: 144, height: 144),
             const SizedBox(height: 20),
             Text('MindVault Archive',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
