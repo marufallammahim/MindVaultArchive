@@ -19,6 +19,12 @@ dependencies:
   path: ^1.8.3
   just_audio: ^0.9.36
   flutter_svg: ^2.0.9
+  flutter_markdown_plus: ^1.0.12
+  file_picker: ^8.1.7
+  share_plus: ^10.1.4
+  archive: ^3.6.1
+  crypto: ^3.0.6
+  flutter_secure_storage: ^9.2.4
   google_fonts: ^6.1.0
   intl: ^0.20.3
   uuid: ^4.2.2
