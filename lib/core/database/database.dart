@@ -132,7 +132,7 @@ class AppDatabase extends _$AppDatabase {
           if (from < 4) {
             await m.createTable(noteRevisions);
           }
-          if (from < 5) {
+          if (from >= 2 && from < 5) {
             await m.addColumn(tasks, tasks.noteId);
           }
         },
