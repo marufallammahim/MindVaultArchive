@@ -140,6 +140,11 @@ class ArchiveTransferService {
     if (relationKeys.length != parsedNoteTags.length) {
       throw const FormatException('Archive contains duplicate note-tag links.');
     }
+    for (final link in parsedNoteTags) {
+      if (!noteIds.contains(link.noteId) || !tagIds.contains(link.tagId)) {
+        throw const FormatException('Archive contains an orphan note-tag link.');
+      }
+    }
 
     final taskIds = parsedTasks.map((item) => item.id).toSet();
     if (taskIds.length != parsedTasks.length) {
