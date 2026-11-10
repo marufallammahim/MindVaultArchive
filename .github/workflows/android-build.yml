@@ -31,6 +31,7 @@ jobs:
       - name: Generate native platform scaffolding
         run: bash tool/regenerate_platforms.sh
       - run: flutter pub get
+      - run: dart run build_runner build --delete-conflicting-outputs
       - name: Build APK
         run: flutter build apk ${{ github.event.inputs.build_type == 'debug' && '--debug' || '--release' }}
       - name: Build App Bundle
