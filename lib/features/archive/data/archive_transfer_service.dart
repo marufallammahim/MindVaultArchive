@@ -13,7 +13,7 @@ class ArchiveTransferService {
   final AppDatabase _database;
 
   static const formatName = 'mindvault-archive';
-  static const formatVersion = 3;
+  static const formatVersion = 4;
 
   Future<String> exportJson() async {
     final categories = await _database.select(_database.categories).get();
@@ -52,6 +52,15 @@ class ArchiveTransferService {
                   'id': item.id,
                   'name': item.name,
                   'color': item.color,
+                  'createdAt': item.createdAt.toUtc().toIso8601String(),
+                })
+            .toList(),
+        'revisions': (await _database.select(_database.noteRevisions).get())
+            .map((item) => <String, Object?>{
+                  'id': item.id,
+                  'noteId': item.noteId,
+                  'title': item.title,
+                  'documentContent': item.documentContent,
                   'createdAt': item.createdAt.toUtc().toIso8601String(),
                 })
             .toList(),
@@ -108,6 +117,7 @@ class ArchiveTransferService {
     final rawTasks = contents['tasks'] ?? <Object?>[];
     final rawTags = contents['tags'] ?? <Object?>[];
     final rawNoteTags = contents['noteTags'] ?? <Object?>[];
+    final rawRevisions = contents['revisions'] ?? <Object?>[];
     if (rawCategories is! List ||
         rawNotes is! List ||
         rawTasks is! List ||
@@ -121,6 +131,7 @@ class ArchiveTransferService {
     final parsedTasks = rawTasks.map(_parseTask).toList();
     final parsedTags = rawTags.map(_parseTag).toList();
     final parsedNoteTags = rawNoteTags.map(_parseNoteTag).toList();
+    final parsedRevisions = rawRevisions.map(_parseRevision).toList();
 
     final categoryIds = parsedCategories.map((item) => item.id).toSet();
     if (categoryIds.length != parsedCategories.length) {
@@ -146,6 +157,16 @@ class ArchiveTransferService {
       }
     }
 
+    final revisionIds = parsedRevisions.map((item) => item.id).toSet();
+    if (revisionIds.length != parsedRevisions.length) {
+      throw const FormatException('Archive contains duplicate revision IDs.');
+    }
+    for (final revision in parsedRevisions) {
+      if (!noteIds.contains(revision.noteId)) {
+        throw const FormatException('Archive contains an orphan note revision.');
+      }
+    }
+
     final taskIds = parsedTasks.map((item) => item.id).toSet();
     if (taskIds.length != parsedTasks.length) {
       throw const FormatException('Archive contains duplicate task IDs.');
@@ -157,6 +178,8 @@ class ArchiveTransferService {
     var skippedTasks = 0;
     var importedTags = 0;
     var skippedTags = 0;
+    var importedRevisions = 0;
+    var skippedRevisions = 0;
     final skippedNoteIds = <String>{};
     await _database.transaction(() async {
       for (final category in parsedCategories) {
@@ -247,6 +270,34 @@ class ArchiveTransferService {
             );
       }
 
+      for (final revision in parsedRevisions) {
+        if (skippedNoteIds.contains(revision.noteId)) {
+          skippedRevisions++;
+          continue;
+        }
+        final exists = await (_database.select(_database.notes)
+              ..where((note) => note.id.equals(revision.noteId)))
+            .getSingleOrNull();
+        if (exists == null) continue;
+        final revisionExists = await (_database.select(_database.noteRevisions)
+              ..where((row) => row.id.equals(revision.id)))
+            .getSingleOrNull();
+        if (revisionExists != null) {
+          skippedRevisions++;
+          continue;
+        }
+        await _database.into(_database.noteRevisions).insert(
+              NoteRevisionsCompanion.insert(
+                id: revision.id,
+                noteId: revision.noteId,
+                title: revision.title,
+                documentContent: revision.documentContent,
+                createdAt: Value(revision.createdAt),
+              ),
+            );
+        importedRevisions++;
+      }
+
       for (final task in parsedTasks) {
         final existing = await (_database.select(_database.tasks)
               ..where((row) => row.id.equals(task.id)))
@@ -279,6 +330,8 @@ class ArchiveTransferService {
       skippedTasks: skippedTasks,
       importedTags: importedTags,
       skippedTags: skippedTags,
+      importedRevisions: importedRevisions,
+      skippedRevisions: skippedRevisions,
     );
   }
 
@@ -385,6 +438,31 @@ class ArchiveTransferService {
     );
   }
 
+  _ArchiveRevision _parseRevision(Object? value) {
+    if (value is! Map<String, dynamic>) {
+      throw const FormatException('Archive contains an invalid revision.');
+    }
+    final id = value['id'];
+    final noteId = value['noteId'];
+    final title = value['title'];
+    final body = value['documentContent'];
+    if (id is! String ||
+        id.trim().isEmpty ||
+        noteId is! String ||
+        noteId.trim().isEmpty ||
+        title is! String ||
+        body is! String) {
+      throw const FormatException('Archive revision fields are invalid.');
+    }
+    return _ArchiveRevision(
+      id: id,
+      noteId: noteId,
+      title: title,
+      documentContent: body,
+      createdAt: _date(value['createdAt']),
+    );
+  }
+
   _ArchiveTask _parseTask(Object? value) {
     if (value is! Map<String, dynamic>) {
       throw const FormatException('Archive contains an invalid task.');
@@ -440,6 +518,8 @@ class ArchiveImportResult {
     this.skippedTasks = 0,
     this.importedTags = 0,
     this.skippedTags = 0,
+    this.importedRevisions = 0,
+    this.skippedRevisions = 0,
   });
 
   final int imported;
@@ -448,6 +528,8 @@ class ArchiveImportResult {
   final int skippedTasks;
   final int importedTags;
   final int skippedTags;
+  final int importedRevisions;
+  final int skippedRevisions;
 }
 
 class _ArchiveCategory {
@@ -539,5 +621,21 @@ class _ArchiveNoteTag {
 
   final String noteId;
   final String tagId;
+  final DateTime createdAt;
+}
+
+class _ArchiveRevision {
+  const _ArchiveRevision({
+    required this.id,
+    required this.noteId,
+    required this.title,
+    required this.documentContent,
+    required this.createdAt,
+  });
+
+  final String id;
+  final String noteId;
+  final String title;
+  final String documentContent;
   final DateTime createdAt;
 }
