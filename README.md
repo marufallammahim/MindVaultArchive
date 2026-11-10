@@ -17,13 +17,24 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-## Android release
+## Verification
+
+The project has GitHub Actions workflows for Flutter formatting, static analysis, tests, Android debug APK compilation, and a separate signed release pipeline.
+
+## Android debug build
 
 ```bash
-flutter build apk --release
+flutter build apk --debug
 ```
 
-Drift's generated `database.g.dart` is produced by build_runner and should be regenerated after dependency installation.
+Debug APKs are for testing and are signed with the Android debug key. They are not production release builds.
+
+## Android production release
+
+Production release builds require your own private Android signing keystore. Follow [Android release signing setup](docs/ANDROID_RELEASE_SIGNING.md) to configure GitHub Actions secrets and run **Actions → Signed Android Release**. The workflow verifies both APK and AAB signatures before uploading release artifacts.
+
+Never commit `android/key.properties`, `*.jks`, or signing passwords.
 
 ## Storage and privacy
+
 Notes are stored locally in an SQLite database in the app documents directory. No account or remote sync is configured.
