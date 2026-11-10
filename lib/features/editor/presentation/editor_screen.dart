@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
+import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 class EditorScreen extends ConsumerStatefulWidget {
   final String noteId;
@@ -20,6 +22,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   bool _initialized = false;
+  bool _previewMode = false;
 
   @override
   void initState() {
@@ -84,6 +87,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
           ),
           actions: [
+            IconButton(
+              tooltip: _previewMode ? 'Edit Markdown' : 'Preview Markdown',
+              icon: Icon(
+                _previewMode ? Icons.edit_outlined : Icons.visibility_outlined,
+              ),
+              onPressed: () => setState(() => _previewMode = !_previewMode),
+            ),
             IconButton(
               tooltip: 'Version history',
               icon: const Icon(Icons.history),
@@ -380,16 +390,43 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 },
               ),
               Expanded(
-                child: TextField(
-                  controller: _contentController,
-                  onChanged: (_) => _onTextChanged(),
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  decoration: const InputDecoration(hintText: 'Start writing…'),
-                  maxLines: null,
-                  expands: true,
-                  textAlignVertical: TextAlignVertical.top,
-                  keyboardType: TextInputType.multiline,
-                ),
+                child: _previewMode
+                    ? SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
+                        child: _contentController.text.trim().isEmpty
+                            ? const Center(
+                                child: Text('Nothing to preview yet.'),
+                              )
+                            : MarkdownBody(
+                                data: _contentController.text,
+                                selectable: true,
+                                styleSheet: MarkdownStyleSheet.fromTheme(
+                                  Theme.of(context),
+                                ),
+                              ),
+                      )
+                    : Column(
+                        children: [
+                          MarkdownToolbar(
+                            controller: _contentController,
+                            onChanged: _onTextChanged,
+                          ),
+                          Expanded(
+                            child: TextField(
+                              controller: _contentController,
+                              onChanged: (_) => _onTextChanged(),
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              decoration: const InputDecoration(
+                                hintText: 'Write with Markdown…',
+                              ),
+                              maxLines: null,
+                              expands: true,
+                              textAlignVertical: TextAlignVertical.top,
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                        ],
+                      ),
               ),
               StreamBuilder<List<Attachment>>(
                 stream: attachmentQuery.watch(),
