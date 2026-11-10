@@ -4,9 +4,18 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// Load private signing data from android/key.properties (never commit this file).
+def signingProperties = new java.util.Properties()
+def signingPropertiesFile = rootProject.file("key.properties")
+if (signingPropertiesFile.exists()) {
+    signingProperties.load(new FileInputStream(signingPropertiesFile))
+}
+
 android {
     namespace "com.marufallammahim.mindvaultarchive"
-    compileSdkVersion flutter.compileSdkVersion
+    // Keep this independent from Flutter's default compile SDK: AndroidX
+    // dependencies such as share_plus require API 34 or newer.
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -26,10 +35,30 @@ android {
         versionName "1.0.0"
     }
 
+    signingConfigs {
+        release {
+            if (signingPropertiesFile.exists()) {
+                def storePath = signingProperties["storeFile"]
+                if (storePath == null || storePath.toString().trim().isEmpty()) {
+                    throw new GradleException("key.properties must define storeFile")
+                }
+                storeFile file(storePath)
+                storePassword signingProperties["storePassword"]
+                keyAlias signingProperties["keyAlias"]
+                keyPassword signingProperties["keyPassword"]
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // Replace with a release keystore before publishing.
-            signingConfig signingConfigs.debug
+            if (!signingPropertiesFile.exists() &&
+                gradle.startParameter.taskNames.any { it.toLowerCase().contains("release") }) {
+                throw new GradleException("Missing android/key.properties. Configure the private release keystore before building a release.")
+            }
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }

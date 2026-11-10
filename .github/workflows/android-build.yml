@@ -1,4 +1,4 @@
-name: Android build
+name: Android Build
 
 on:
   push:
@@ -6,25 +6,88 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-      - name: Generate Android platform scaffold when missing
+
+      - name: Generate native platform scaffolding
+        run: bash tool/regenerate_platforms.sh
+
+      - name: Install dependencies and generate Drift code
         run: |
-          if [ ! -f android/gradlew ]; then
-            flutter create --platforms=android --org com.marufallammahim --project-name mindvault_archive .
-            sed -i 's/com.marufallammahim.mindvault_archive/com.marufallammahim.mindvaultarchive/g' android/app/build.gradle
-          fi
-      - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
-      - run: flutter build apk --release
+          flutter pub get
+          dart run build_runner build --delete-conflicting-outputs
+
+      - name: Verify source
+        run: |
+          dart format --output=none --set-exit-if-changed lib test
+          flutter analyze
+          flutter test
+
+      # This CI-only key creates an installable RELEASE-MODE candidate. It is
+      # deliberately ephemeral and is not a production publishing identity.
+      - name: Create ephemeral CI signing key
+        run: |
+          keytool -genkeypair -noprompt -v \
+            -keystore android/app/ci-release.jks \
+            -storepass ci-only-password \
+            -keypass ci-only-password \
+            -alias ci-release \
+            -keyalg RSA -keysize 2048 -validity 2 \
+            -dname "CN=MindVault CI Candidate, OU=CI, O=MindVault, L=Dhaka, ST=Dhaka, C=BD"
+          cat > android/key.properties <<'EOF'
+          storeFile=ci-release.jks
+          storePassword=ci-only-password
+          keyAlias=ci-release
+          keyPassword=ci-only-password
+          EOF
+          chmod 600 android/app/ci-release.jks android/key.properties
+
+      - name: Build release-mode APK
+        run: flutter build apk --release
+
+      - name: Build release-mode App Bundle
+        run: flutter build appbundle --release
+
+      - name: Verify signatures and collect release candidate
+        run: |
+          set -euo pipefail
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          AAB="build/app/outputs/bundle/release/app-release.aab"
+          test -s "$APK"
+          test -s "$AAB"
+          SDK_ROOT="${ANDROID_SDK_ROOT:-${ANDROID_HOME:?ANDROID_HOME is not set}}"
+          APKSIGNER="$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          jarsigner -verify "$AAB"
+          mkdir -p dist
+          cp "$APK" dist/MindVaultArchive-release-candidate.apk
+          cp "$AAB" dist/MindVaultArchive-release-candidate.aab
+          sha256sum dist/* > dist/SHA256SUMS.txt
+          printf 'branch=%s\ncommit=%s\nversion=%s\nsigning=ephemeral-ci-test-key-not-for-production\n' \
+            "$GITHUB_REF_NAME" "$GITHUB_SHA" "$(grep '^version:' pubspec.yaml | awk '{print $2}')" > dist/build-info.txt
+
       - uses: actions/upload-artifact@v4
         with:
-          name: mindvault-archive-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: mindvault-archive-release-candidate-${{ github.run_number }}-${{ github.sha }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30

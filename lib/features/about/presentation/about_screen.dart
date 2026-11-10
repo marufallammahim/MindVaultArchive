@@ -10,14 +10,16 @@ class AboutScreen extends StatelessWidget {
         body: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const Icon(Icons.archive_rounded, size: 80, color: Colors.deepPurple),
+            const Icon(Icons.archive_rounded,
+                size: 80, color: Colors.deepPurple),
             const SizedBox(height: 16),
             Text(
               'MindVault Archive',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(

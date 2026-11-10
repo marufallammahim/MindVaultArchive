@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -43,8 +44,7 @@ class Attachments extends Table {
   TextColumn get localPath => text()();
   TextColumn get filename => text()();
   IntColumn get duration => integer().nullable()();
-  IntColumn get documentPosition =>
-      integer().withDefault(const Constant(0))();
+  IntColumn get documentPosition => integer().withDefault(const Constant(0))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   TextColumn get metadata => text().nullable()();
 
@@ -54,7 +54,7 @@ class Attachments extends Table {
 
 @DriftDatabase(tables: [Notes, Categories, Attachments])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
   int get schemaVersion => 1;
@@ -67,23 +67,86 @@ class AppDatabase extends _$AppDatabase {
         },
       );
 
+  Future<void> setFavorite(String id, bool value) {
+    return (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(
+        isFavorite: Value(value),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> setArchived(String id, bool value) {
+    return (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(
+        isArchived: Value(value),
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> setDeleted(String id, bool value) {
+    return (update(notes)..where((note) => note.id.equals(id))).write(
+      NotesCompanion(isDeleted: Value(value), updatedAt: Value(DateTime.now())),
+    );
+  }
+
+  Future<void> permanentlyDeleteNote(String id) {
+    return transaction(() async {
+      await (delete(attachments)..where((item) => item.noteId.equals(id))).go();
+      await (delete(notes)..where((note) => note.id.equals(id))).go();
+    });
+  }
+
+  Future<void> saveCategory(String id, String name) async {
+    final normalizedName = name.trim();
+    if (normalizedName.isEmpty) {
+      throw ArgumentError.value(name, 'name', 'Category name cannot be empty.');
+    }
+    await into(categories).insertOnConflictUpdate(
+      CategoriesCompanion.insert(
+        id: id,
+        name: normalizedName,
+        updatedAt: Value(DateTime.now()),
+      ),
+    );
+  }
+
+  Future<void> deleteCategory(String id) {
+    return transaction(() async {
+      await (update(notes)..where((note) => note.categoryId.equals(id))).write(
+        const NotesCompanion(categoryId: Value(null)),
+      );
+      await (delete(
+        categories,
+      )..where((category) => category.id.equals(id)))
+          .go();
+    });
+  }
+
   Future<void> saveNoteContent(String id, String title, String content) {
     return transaction(() async {
-      final existing =
-          await (select(notes)..where((t) => t.id.equals(id))).getSingleOrNull();
+      final existing = await (select(
+        notes,
+      )..where((t) => t.id.equals(id)))
+          .getSingleOrNull();
       if (existing != null) {
-        await update(notes).replace(existing.copyWith(
-          title: title,
-          documentContent: content,
-          updatedAt: DateTime.now(),
-        ));
+        await update(notes).replace(
+          existing.copyWith(
+            title: title,
+            documentContent: content,
+            updatedAt: DateTime.now(),
+          ),
+        );
       } else {
-        await into(notes).insert(NotesCompanion.insert(
-          id: id,
-          title: Value(title),
-          documentContent: Value(content),
-          updatedAt: Value(DateTime.now()),
-        ));
+        await into(notes).insert(
+          NotesCompanion.insert(
+            id: id,
+            title: Value(title),
+            documentContent: Value(content),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
       }
     });
   }
