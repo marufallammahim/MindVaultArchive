@@ -142,6 +142,55 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
               ),
+              StreamBuilder<List<Category>>(
+                stream: (db.select(db.categories)
+                      ..orderBy([(category) => OrderingTerm.asc(category.name)]))
+                    .watch(),
+                builder: (context, categoriesSnapshot) {
+                  final categories = categoriesSnapshot.data ?? [];
+                  return StreamBuilder<Note?>(
+                    stream: (db.select(db.notes)
+                          ..where((note) => note.id.equals(widget.noteId)))
+                        .watchSingleOrNull(),
+                    builder: (context, noteSnapshot) {
+                      final selectedId = noteSnapshot.data?.categoryId;
+                      return DropdownButtonFormField<String?>(
+                        value: categories.any((item) => item.id == selectedId)
+                            ? selectedId
+                            : null,
+                        isExpanded: true,
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.folder_outlined),
+                          hintText: 'No category',
+                        ),
+                        items: [
+                          const DropdownMenuItem<String?>(
+                            value: null,
+                            child: Text('Uncategorized'),
+                          ),
+                          for (final category in categories)
+                            DropdownMenuItem<String?>(
+                              value: category.id,
+                              child: Text(category.name),
+                            ),
+                        ],
+                        onChanged: categoriesSnapshot.hasError
+                            ? null
+                            : (value) async {
+                                try {
+                                  await db.setNoteCategory(widget.noteId, value);
+                                } catch (error) {
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Could not assign category: $error')),
+                                  );
+                                }
+                              },
+                      );
+                    },
+                  );
+                },
+              ),
               Expanded(
                 child: TextField(
                   controller: _contentController,
