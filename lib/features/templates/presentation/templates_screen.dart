@@ -83,7 +83,7 @@ class TemplatesScreen extends ConsumerWidget {
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not create note: ' + error.toString())),
+        SnackBar(content: Text('Could not create note: $error')),
       );
     }
   }
