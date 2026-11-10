@@ -70,7 +70,8 @@ app_id, path = sys.argv[1:]
 text = open(path, encoding="utf-8").read()
 text, n1 = re.subn(r'(?m)^\s*namespace\s+["\'][^"\']+["\']', f'    namespace "{app_id}"', text, count=1)
 text, n2 = re.subn(r'(?m)^\s*applicationId\s+["\'][^"\']+["\']', f'        applicationId "{app_id}"', text, count=1)
-if n1 != 1 or n2 != 1:
+text, n3 = re.subn(r'(?m)^\s*compileSdkVersion\s+[^\n]+', '    compileSdkVersion 36', text, count=1)
+if n1 != 1 or n2 != 1 or n3 != 1:
     raise SystemExit("Could not enforce Android namespace/applicationId in build.gradle")
 open(path, "w", encoding="utf-8").write(text)
 PY
@@ -81,7 +82,8 @@ app_id, path = sys.argv[1:]
 text = open(path, encoding="utf-8").read()
 text, n1 = re.subn(r'(?m)^\s*namespace\s*=\s*["\'][^"\']+["\']', f'    namespace = "{app_id}"', text, count=1)
 text, n2 = re.subn(r'(?m)^\s*applicationId\s*=\s*["\'][^"\']+["\']', f'        applicationId = "{app_id}"', text, count=1)
-if n1 != 1 or n2 != 1:
+text, n3 = re.subn(r'(?m)^\s*compileSdk\s*=\s*[^\n]+', '    compileSdk = 36', text, count=1)
+if n1 != 1 or n2 != 1 or n3 != 1:
     raise SystemExit("Could not enforce Android namespace/applicationId in build.gradle.kts")
 open(path, "w", encoding="utf-8").write(text)
 PY
