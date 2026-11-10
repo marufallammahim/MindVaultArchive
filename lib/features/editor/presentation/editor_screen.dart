@@ -104,13 +104,27 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Version history',
               icon: const Icon(Icons.history),
               onPressed: () async {
+                final notifier = ref.read(
+                  editorProvider(widget.noteId).notifier,
+                );
+                final saved = await notifier.forceSave();
+                if (!context.mounted) return;
+                if (!saved) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Save the current note before restoring a revision.',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+
                 final restored = await context.push<bool>(
                   '/history/${widget.noteId}',
                 );
                 if (restored != true || !mounted) return;
-                await ref
-                    .read(editorProvider(widget.noteId).notifier)
-                    .reloadFromDatabase();
+                await notifier.reloadFromDatabase();
                 if (!mounted) return;
                 final refreshed = ref.read(editorProvider(widget.noteId));
                 _titleController.text = refreshed.title;
