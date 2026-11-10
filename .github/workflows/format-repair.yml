@@ -34,4 +34,6 @@ jobs:
           git add lib test
           git commit -m "style: apply Dart formatter to source and tests"
           TARGET_BRANCH="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          git fetch origin "$TARGET_BRANCH"
+          git rebase "origin/$TARGET_BRANCH"
           git push origin "HEAD:$TARGET_BRANCH"
