@@ -8,7 +8,6 @@ import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
 
-
 class EditorScreen extends ConsumerStatefulWidget {
   final String noteId;
   const EditorScreen({super.key, required this.noteId});
@@ -37,7 +36,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   void _onTextChanged() {
-    ref.read(editorProvider(widget.noteId).notifier)
+    ref
+        .read(editorProvider(widget.noteId).notifier)
         .updateContent(_titleController.text, _contentController.text);
   }
 
@@ -50,9 +50,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       ..orderBy([(attachment) => OrderingTerm.desc(attachment.createdAt)]);
 
     if (!state.isLoaded) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (!_initialized) {
@@ -69,8 +67,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(state.isSaving ? 'Saving…' : 'Saved',
-              style: Theme.of(context).textTheme.labelLarge),
+          title: Text(
+            state.isSaving ? 'Saving…' : 'Saved',
+            style: Theme.of(context).textTheme.labelLarge,
+          ),
           actions: [
             IconButton(
               tooltip: 'Draw',
@@ -81,11 +81,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Save',
               icon: const Icon(Icons.check),
               onPressed: () async {
-                await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+                await ref
+                    .read(editorProvider(widget.noteId).notifier)
+                    .forceSave();
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Note saved.')),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Note saved.')));
                 }
               },
             ),
@@ -98,8 +100,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               TextField(
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
                 decoration: const InputDecoration(hintText: 'Note Title'),
                 maxLines: null,
               ),

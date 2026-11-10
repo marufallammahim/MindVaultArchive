@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -42,16 +43,15 @@ class EditorNotifier extends StateNotifier<EditorState> {
   final AppDatabase _db;
   Timer? _debounce;
 
-  EditorNotifier(this._db, String noteId)
-      : super(EditorState(noteId: noteId)) {
+  EditorNotifier(this._db, String noteId) : super(EditorState(noteId: noteId)) {
     _loadNote();
   }
 
   Future<void> _loadNote() async {
     try {
-      final note = await (_db.select(_db.notes)
-            ..where((t) => t.id.equals(state.noteId)))
-          .getSingleOrNull();
+      final note = await (_db.select(
+        _db.notes,
+      )..where((t) => t.id.equals(state.noteId))).getSingleOrNull();
       if (!mounted) return;
       if (note != null) {
         state = state.copyWith(
@@ -76,7 +76,11 @@ class EditorNotifier extends StateNotifier<EditorState> {
   Future<void> _saveToDb() async {
     if (!mounted || !state.isLoaded) return;
     final snapshot = state;
-    await _db.saveNoteContent(snapshot.noteId, snapshot.title, snapshot.content);
+    await _db.saveNoteContent(
+      snapshot.noteId,
+      snapshot.title,
+      snapshot.content,
+    );
     if (mounted &&
         state.title == snapshot.title &&
         state.content == snapshot.content) {
@@ -98,5 +102,5 @@ class EditorNotifier extends StateNotifier<EditorState> {
 
 final editorProvider =
     StateNotifierProvider.family<EditorNotifier, EditorState, String>(
-  (ref, noteId) => EditorNotifier(ref.watch(databaseProvider), noteId),
-);
+      (ref, noteId) => EditorNotifier(ref.watch(databaseProvider), noteId),
+    );

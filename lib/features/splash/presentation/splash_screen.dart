@@ -43,15 +43,24 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset('assets/branding/mindvault_logo.svg', width: 144, height: 144),
+            SvgPicture.asset(
+              'assets/branding/mindvault_logo.svg',
+              width: 144,
+              height: 144,
+            ),
             const SizedBox(height: 20),
-            Text('MindVault Archive',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold)),
+            Text(
+              'MindVault Archive',
+              style: Theme.of(context).textTheme.headlineMedium
+                  ?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
-            Text('Your Thoughts. Your Archive.',
+            Text(
+              'Your Thoughts. Your Archive.',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ],
         ),
       ),

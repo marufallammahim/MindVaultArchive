@@ -14,18 +14,21 @@ void main() {
     await database.close();
   });
 
-  test('saveNoteContent inserts a note and updates it on subsequent saves', () async {
-    await database.saveNoteContent('note-1', 'First title', 'First body');
-    await database.saveNoteContent('note-1', 'Updated title', 'Updated body');
+  test(
+    'saveNoteContent inserts a note and updates it on subsequent saves',
+    () async {
+      await database.saveNoteContent('note-1', 'First title', 'First body');
+      await database.saveNoteContent('note-1', 'Updated title', 'Updated body');
 
-    final note = await (database.select(database.notes)
-          ..where((row) => row.id.equals('note-1')))
-        .getSingle();
+      final note = await (database.select(
+        database.notes,
+      )..where((row) => row.id.equals('note-1'))).getSingle();
 
-    expect(note.title, 'Updated title');
-    expect(note.documentContent, 'Updated body');
-    expect(note.id, 'note-1');
-  });
+      expect(note.title, 'Updated title');
+      expect(note.documentContent, 'Updated body');
+      expect(note.id, 'note-1');
+    },
+  );
 
   test('favorite, archive and trash state persist in SQLite', () async {
     await database.saveNoteContent('note-2', 'Lifecycle', 'Test');
@@ -33,18 +36,18 @@ void main() {
     await database.setArchived('note-2', true);
     await database.setDeleted('note-2', true);
 
-    final note = await (database.select(database.notes)
-          ..where((row) => row.id.equals('note-2')))
-        .getSingle();
+    final note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-2'))).getSingle();
 
     expect(note.isFavorite, isTrue);
     expect(note.isArchived, isTrue);
     expect(note.isDeleted, isTrue);
 
     await database.setDeleted('note-2', false);
-    final restored = await (database.select(database.notes)
-          ..where((row) => row.id.equals('note-2')))
-        .getSingle();
+    final restored = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-2'))).getSingle();
     expect(restored.isDeleted, isFalse);
   });
 
@@ -56,22 +59,24 @@ void main() {
           ..where((row) => row.id.equals('note-3')))
         .write(const NotesCompanion(categoryId: Value('work')));
 
-    final category = await (database.select(database.categories)
-          ..where((row) => row.id.equals('work')))
-        .getSingle();
+    final category = await (database.select(
+      database.categories,
+    )..where((row) => row.id.equals('work'))).getSingle();
     expect(category.name, 'Projects');
 
     await database.deleteCategory('work');
-    final note = await (database.select(database.notes)
-          ..where((row) => row.id.equals('note-3')))
-        .getSingle();
+    final note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-3'))).getSingle();
     expect(note.categoryId, isNull);
     expect(await database.select(database.categories).get(), isEmpty);
   });
 
   test('permanent deletion removes note and its attachment metadata', () async {
     await database.saveNoteContent('note-4', 'With attachment', 'Body');
-    await database.into(database.attachments).insert(
+    await database
+        .into(database.attachments)
+        .insert(
           AttachmentsCompanion.insert(
             id: 'attachment-1',
             noteId: 'note-4',
@@ -88,9 +93,6 @@ void main() {
   });
 
   test('category names cannot be empty', () async {
-    expect(
-      () => database.saveCategory('empty', '   '),
-      throwsArgumentError,
-    );
+    expect(() => database.saveCategory('empty', '   '), throwsArgumentError);
   });
 }
