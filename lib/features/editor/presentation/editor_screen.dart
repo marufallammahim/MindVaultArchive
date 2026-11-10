@@ -65,7 +65,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         if (didPop) return;
         final saved =
             await ref.read(editorProvider(widget.noteId).notifier).forceSave();
-        if (!context.mounted) return;
+        if (!mounted) return;
         if (saved) context.pop();
       },
       child: Scaffold(
