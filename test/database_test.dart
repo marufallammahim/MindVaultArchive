@@ -34,14 +34,16 @@ void main() {
   test('note category assignment validates and persists', () async {
     await database.saveCategory('ideas', 'Ideas');
     await database.setNoteCategory('note-category', 'ideas');
-    var note = await (database.select(database.notes)
-          ..where((row) => row.id.equals('note-category')))
+    var note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-category')))
         .getSingle();
     expect(note.categoryId, 'ideas');
 
     await database.setNoteCategory('note-category', null);
-    note = await (database.select(database.notes)
-          ..where((row) => row.id.equals('note-category')))
+    note = await (database.select(
+      database.notes,
+    )..where((row) => row.id.equals('note-category')))
         .getSingle();
     expect(note.categoryId, isNull);
     await expectLater(
