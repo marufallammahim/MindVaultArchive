@@ -17,7 +17,6 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.18
   path_provider: ^2.1.1
   path: ^1.8.3
-  record: ^5.0.5
   just_audio: ^0.9.36
   flutter_svg: ^2.0.9
   google_fonts: ^6.1.0
