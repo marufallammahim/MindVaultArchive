@@ -124,7 +124,7 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
         children: [
           TextField(
             controller: _title,
@@ -134,12 +134,12 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
               hintText: 'Give this thought a title…',
               border: InputBorder.none,
             ),
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.7),
           ),
           const Divider(),
           TextField(
             controller: _content,
-            minLines: 8,
+            minLines: 10,
             maxLines: null,
             decoration: const InputDecoration(
               hintText: 'Capture an idea before it disappears…',
