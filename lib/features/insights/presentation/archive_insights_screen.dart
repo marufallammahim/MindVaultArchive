@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -71,6 +72,12 @@ class ArchiveInsightsScreen extends ConsumerWidget {
               return ListView(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
                 children: [
+                  const FeatureHero(
+                    icon: Icons.insights_rounded,
+                    title: 'Archive insights',
+                    subtitle: 'A clear view of the knowledge you are building.',
+                  ),
+                  const SizedBox(height: 18),
                   Text('Your knowledge at a glance',
                       style: Theme.of(context)
                           .textTheme
