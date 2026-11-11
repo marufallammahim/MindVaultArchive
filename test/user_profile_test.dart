@@ -10,7 +10,7 @@ void main() {
         isNull,
       );
       expect(
-        const UserProfile(name: 'Test', avatarBase64: 'not-valid-base64')
+        const UserProfile(name: 'Test', avatarBase64: '%%%not-base64%%%')
             .avatar,
         isNull,
       );
