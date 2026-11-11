@@ -41,8 +41,15 @@ jobs:
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Verify Dart formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Verify handwritten Dart formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          find lib test -name '*.dart' \\
+            ! -name '*.g.dart' \\
+            ! -name '*.freezed.dart' \\
+            ! -name '*.mocks.dart' \\
+            -print0 | xargs -0 -r dart format --output=none --set-exit-if-changed
 
       - name: Static analysis
         run: flutter analyze
