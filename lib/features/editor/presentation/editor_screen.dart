@@ -371,6 +371,23 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 _contentController.text = refreshed.content;
               },
             ),
+            IconButton(
+              tooltip: 'Move note to Trash',
+              icon: const Icon(Icons.delete_outline_rounded),
+              onPressed: () async {
+                final saved = await ref
+                    .read(editorProvider(widget.noteId).notifier)
+                    .forceSave();
+                if (!context.mounted || !saved) return;
+                final confirmed = await context.push<bool>(
+                  '/delete/${widget.noteId}',
+                );
+                if (confirmed == true && context.mounted) {
+                  await db.setDeleted(widget.noteId, true);
+                  if (context.mounted) context.pop();
+                }
+              },
+            ),
             PopupMenuButton<int>(
               tooltip: 'Note color',
               icon: const Icon(Icons.palette_outlined),
