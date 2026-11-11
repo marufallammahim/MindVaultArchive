@@ -210,289 +210,307 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       body: _progressMode
           ? _progressView(db)
           : Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 2, 16, 15),
-            child: Row(
               children: [
-                Expanded(
-                  child: Text(
-                    MaterialLocalizations.of(context).formatMonthYear(_selectedDay),
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                        ),
-                  ),
-                ),
-                IconButton(
-                  tooltip: 'Choose date',
-                  onPressed: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDay,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (picked != null) {
-                      setState(() => _selectedDay = DateUtils.dateOnly(picked));
-                    }
-                  },
-                  icon: const Icon(Icons.calendar_month_rounded),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 68,
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              scrollDirection: Axis.horizontal,
-              itemCount: 7,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
-              itemBuilder: (context, index) {
-                final day = DateUtils.dateOnly(DateTime.now())
-                    .add(Duration(days: index - 3));
-                final selected = DateUtils.isSameDay(day, _selectedDay);
-                return InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: () => setState(() => _selectedDay = day),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 160),
-                    width: 48,
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? const Color(0xFFFFD65A)
-                          : const Color(0xFF1A1A1E),
-                      borderRadius: BorderRadius.circular(17),
-                      border: Border.all(
-                        color: selected
-                            ? const Color(0xFFFFD65A)
-                            : Colors.white.withValues(alpha: .08),
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 2, 16, 15),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
                           MaterialLocalizations.of(context)
-                              .formatShortWeekday(day)
-                              .substring(0, 3),
-                          style: TextStyle(
-                            color: selected ? Colors.black54 : Colors.white60,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
+                              .formatMonthYear(_selectedDay),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${day.day}',
-                          style: TextStyle(
-                            color: selected ? Colors.black : Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    _completed ? 'completed tasks' : 'your next moves',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -0.6,
-                        ),
-                  ),
-                ),
-                SegmentedButton<bool>(
-                  showSelectedIcon: false,
-                  segments: const [
-                    ButtonSegment(value: false, label: Text('To-do')),
-                    ButtonSegment(value: true, label: Text('Done')),
-                  ],
-                  selected: {_completed},
-                  onSelectionChanged: (value) =>
-                      setState(() => _completed = value.first),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: StreamBuilder<List<VaultTask>>(
-              stream: query.watch(),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Could not load tasks: ${snapshot.error}'),
-                  );
-                }
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final items = snapshot.data!;
-                if (items.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.checklist_rounded,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.primary),
-                          const SizedBox(height: 14),
-                          Text(
-                            _completed
-                                ? 'Nothing completed yet'
-                                : 'Nothing on your list',
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text('Add a task and make your next move.'),
-                        ],
                       ),
-                    ),
-                  );
-                }
-                final colors = [
-                  const Color(0xFFE97855),
-                  const Color(0xFFA8D76D),
-                  const Color(0xFFF0C94F),
-                  const Color(0xFF4D91F0),
-                ];
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-                  itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 9),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final overdue = !item.isCompleted &&
-                        item.dueAt != null &&
-                        DateUtils.dateOnly(item.dueAt!)
-                            .isBefore(DateUtils.dateOnly(DateTime.now()));
-                    final color = colors[index % colors.length];
-                    final foreground = color.computeLuminance() > 0.48
-                        ? const Color(0xFF171717)
-                        : Colors.white;
-                    return Material(
-                      color: color,
-                      borderRadius: BorderRadius.circular(19),
-                      clipBehavior: Clip.antiAlias,
-                      child: InkWell(
-                        onTap: () => _editTask(task: item),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
-                          child: Row(
+                      IconButton(
+                        tooltip: 'Choose date',
+                        onPressed: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _selectedDay,
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) {
+                            setState(() =>
+                                _selectedDay = DateUtils.dateOnly(picked));
+                          }
+                        },
+                        icon: const Icon(Icons.calendar_month_rounded),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 68,
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 7,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final day = DateUtils.dateOnly(DateTime.now())
+                          .add(Duration(days: index - 3));
+                      final selected = DateUtils.isSameDay(day, _selectedDay);
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(18),
+                        onTap: () => setState(() => _selectedDay = day),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          width: 48,
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? const Color(0xFFFFD65A)
+                                : const Color(0xFF1A1A1E),
+                            borderRadius: BorderRadius.circular(17),
+                            border: Border.all(
+                              color: selected
+                                  ? const Color(0xFFFFD65A)
+                                  : Colors.white.withValues(alpha: .08),
+                            ),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              Text(
+                                MaterialLocalizations.of(context)
+                                    .formatShortWeekday(day)
+                                    .substring(0, 3),
+                                style: TextStyle(
+                                  color: selected
+                                      ? Colors.black54
+                                      : Colors.white60,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '${day.day}',
+                                style: TextStyle(
+                                  color: selected ? Colors.black : Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _completed ? 'completed tasks' : 'your next moves',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -0.6,
+                                  ),
+                        ),
+                      ),
+                      SegmentedButton<bool>(
+                        showSelectedIcon: false,
+                        segments: const [
+                          ButtonSegment(value: false, label: Text('To-do')),
+                          ButtonSegment(value: true, label: Text('Done')),
+                        ],
+                        selected: {_completed},
+                        onSelectionChanged: (value) =>
+                            setState(() => _completed = value.first),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: StreamBuilder<List<VaultTask>>(
+                    stream: query.watch(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child:
+                              Text('Could not load tasks: ${snapshot.error}'),
+                        );
+                      }
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final items = snapshot.data!;
+                      if (items.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(28),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.checklist_rounded,
+                                    size: 64,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                                const SizedBox(height: 14),
+                                Text(
+                                  _completed
+                                      ? 'Nothing completed yet'
+                                      : 'Nothing on your list',
+                                  style: Theme.of(context).textTheme.titleLarge,
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                    'Add a task and make your next move.'),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                      final colors = [
+                        const Color(0xFFE97855),
+                        const Color(0xFFA8D76D),
+                        const Color(0xFFF0C94F),
+                        const Color(0xFF4D91F0),
+                      ];
+                      return ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 9),
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          final overdue = !item.isCompleted &&
+                              item.dueAt != null &&
+                              DateUtils.dateOnly(item.dueAt!)
+                                  .isBefore(DateUtils.dateOnly(DateTime.now()));
+                          final color = colors[index % colors.length];
+                          final foreground = color.computeLuminance() > 0.48
+                              ? const Color(0xFF171717)
+                              : Colors.white;
+                          return Material(
+                            color: color,
+                            borderRadius: BorderRadius.circular(19),
+                            clipBehavior: Clip.antiAlias,
+                            child: InkWell(
+                              onTap: () => _editTask(task: item),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(14, 11, 10, 11),
+                                child: Row(
                                   children: [
-                                    Text(
-                                      item.title,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: foreground,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w900,
-                                        decoration: item.isCompleted
-                                            ? TextDecoration.lineThrough
-                                            : null,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item.title,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: foreground,
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w900,
+                                              decoration: item.isCompleted
+                                                  ? TextDecoration.lineThrough
+                                                  : null,
+                                            ),
+                                          ),
+                                          if (item.details.isNotEmpty) ...[
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              item.details,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color: foreground.withValues(
+                                                    alpha: 0.82),
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                          const SizedBox(height: 10),
+                                          Wrap(
+                                            spacing: 7,
+                                            runSpacing: 5,
+                                            children: [
+                                              _taskPill(
+                                                  foreground,
+                                                  _priorityLabel(
+                                                      item.priority)),
+                                              if (item.noteId != null)
+                                                _taskPill(
+                                                    foreground, 'Linked note'),
+                                              if (item.dueAt != null)
+                                                _taskPill(
+                                                  overdue
+                                                      ? Colors.white
+                                                      : foreground,
+                                                  'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                                ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    if (item.details.isNotEmpty) ...[
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        item.details,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: foreground.withValues(
-                                              alpha: 0.82),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                    const SizedBox(height: 10),
-                                    Wrap(
-                                      spacing: 7,
-                                      runSpacing: 5,
+                                    const SizedBox(width: 12),
+                                    Column(
                                       children: [
-                                        _taskPill(foreground,
-                                            _priorityLabel(item.priority)),
-                                        if (item.noteId != null)
-                                          _taskPill(foreground, 'Linked note'),
-                                        if (item.dueAt != null)
-                                          _taskPill(
-                                            overdue ? Colors.white : foreground,
-                                            'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                        IconButton.filled(
+                                          style: IconButton.styleFrom(
+                                            backgroundColor:
+                                                const Color(0xFF171717),
+                                            foregroundColor: Colors.white,
                                           ),
+                                          tooltip: item.isCompleted
+                                              ? 'Mark incomplete'
+                                              : 'Mark complete',
+                                          onPressed: () => db.setTaskCompleted(
+                                            item.id,
+                                            !item.isCompleted,
+                                          ),
+                                          icon: Icon(
+                                            item.isCompleted
+                                                ? Icons.check_rounded
+                                                : Icons.circle_outlined,
+                                          ),
+                                        ),
+                                        PopupMenuButton<String>(
+                                          icon: Icon(Icons.more_horiz,
+                                              color: foreground),
+                                          onSelected: (action) async {
+                                            if (action == 'edit') {
+                                              await _editTask(task: item);
+                                            } else if (action == 'delete') {
+                                              await db.deleteTask(item.id);
+                                            }
+                                          },
+                                          itemBuilder: (_) => const [
+                                            PopupMenuItem(
+                                                value: 'edit',
+                                                child: Text('Edit')),
+                                            PopupMenuItem(
+                                                value: 'delete',
+                                                child: Text('Delete')),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Column(
-                                children: [
-                                  IconButton.filled(
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: const Color(0xFF171717),
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    tooltip: item.isCompleted
-                                        ? 'Mark incomplete'
-                                        : 'Mark complete',
-                                    onPressed: () => db.setTaskCompleted(
-                                      item.id,
-                                      !item.isCompleted,
-                                    ),
-                                    icon: Icon(
-                                      item.isCompleted
-                                          ? Icons.check_rounded
-                                          : Icons.circle_outlined,
-                                    ),
-                                  ),
-                                  PopupMenuButton<String>(
-                                    icon: Icon(Icons.more_horiz,
-                                        color: foreground),
-                                    onSelected: (action) async {
-                                      if (action == 'edit') {
-                                        await _editTask(task: item);
-                                      } else if (action == 'delete') {
-                                        await db.deleteTask(item.id);
-                                      }
-                                    },
-                                    itemBuilder: (_) => const [
-                                      PopupMenuItem(
-                                          value: 'edit', child: Text('Edit')),
-                                      PopupMenuItem(
-                                          value: 'delete',
-                                          child: Text('Delete')),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.fromLTRB(18, 0, 18, 10),
         child: Container(
@@ -556,16 +574,19 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       stream: allTasks.watch(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Center(child: Text('Could not load progress: ${snapshot.error}'));
+          return Center(
+              child: Text('Could not load progress: ${snapshot.error}'));
         }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
         final tasks = snapshot.data!;
         final completed = tasks.where((task) => task.isCompleted).length;
-        final dueOnDay = tasks.where((task) =>
-            task.dueAt != null &&
-            DateUtils.isSameDay(task.dueAt, _selectedDay)).length;
+        final dueOnDay = tasks
+            .where((task) =>
+                task.dueAt != null &&
+                DateUtils.isSameDay(task.dueAt, _selectedDay))
+            .length;
         final progress = tasks.isEmpty ? 0.0 : completed / tasks.length;
         return ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
@@ -626,9 +647,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   const SizedBox(height: 14),
                   Row(
                     children: [
-                      Expanded(child: _progressMetric('Completed', '$completed')),
-                      Expanded(child: _progressMetric('Remaining', '${tasks.length - completed}')),
-                      Expanded(child: _progressMetric('Total', '${tasks.length}')),
+                      Expanded(
+                          child: _progressMetric('Completed', '$completed')),
+                      Expanded(
+                          child: _progressMetric(
+                              'Remaining', '${tasks.length - completed}')),
+                      Expanded(
+                          child: _progressMetric('Total', '${tasks.length}')),
                     ],
                   ),
                 ],

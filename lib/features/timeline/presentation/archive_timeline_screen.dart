@@ -73,7 +73,8 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                       child: FeatureHero(
                         icon: Icons.timeline_rounded,
                         title: 'Your memory timeline',
-                        subtitle: 'Follow the notes and tasks that shape your archive.',
+                        subtitle:
+                            'Follow the notes and tasks that shape your archive.',
                         compact: true,
                       ),
                     );

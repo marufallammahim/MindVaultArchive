@@ -115,7 +115,8 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
               child: FeatureHero(
                 icon: Icons.gesture_rounded,
                 title: 'Sketch an idea',
-                subtitle: 'Draw freely. Your sketch is saved as an attachment to this note.',
+                subtitle:
+                    'Draw freely. Your sketch is saved as an attachment to this note.',
                 compact: true,
               ),
             ),
@@ -124,7 +125,8 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
                 borderRadius: BorderRadius.circular(22),
                 child: Signature(
                   controller: _controller,
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.surfaceContainerLow,
                 ),
               ),
             ),

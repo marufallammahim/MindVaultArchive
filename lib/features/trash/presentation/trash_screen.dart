@@ -80,7 +80,8 @@ class TrashScreen extends ConsumerWidget {
         stream: query.watch(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Could not load Trash: ${snapshot.error}'));
+            return Center(
+                child: Text('Could not load Trash: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -109,7 +110,8 @@ class TrashScreen extends ConsumerWidget {
                     const SizedBox(height: 18),
                     const Text(
                       'Trash is empty',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 7),
                     Text(
@@ -153,10 +155,13 @@ class TrashScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              note.title.trim().isEmpty ? 'Untitled note' : note.title,
+                              note.title.trim().isEmpty
+                                  ? 'Untitled note'
+                                  : note.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontWeight: FontWeight.w800),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w800),
                             ),
                             const SizedBox(height: 4),
                             Text(

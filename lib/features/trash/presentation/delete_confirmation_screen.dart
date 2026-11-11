@@ -33,9 +33,8 @@ class DeleteConfirmationScreen extends ConsumerWidget {
             if (note == null) {
               return _missing(context);
             }
-            final title = note.title.trim().isEmpty
-                ? 'Untitled note'
-                : note.title.trim();
+            final title =
+                note.title.trim().isEmpty ? 'Untitled note' : note.title.trim();
             return Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
               child: Column(

@@ -131,7 +131,8 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                   child: FeatureHero(
                     icon: Icons.terminal_rounded,
                     title: 'Developer notebook',
-                    subtitle: 'Keep reusable code, commands and technical notes together.',
+                    subtitle:
+                        'Keep reusable code, commands and technical notes together.',
                     compact: true,
                   ),
                 );

@@ -59,33 +59,34 @@ class MarkdownToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
+        border:
+            Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-          _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
-          _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
-          _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
-          _tool('Heading', Icons.title, () => _prefixLine('## ')),
-          _tool(
-            'Bullet list',
-            Icons.format_list_bulleted,
-            () => _prefixLine('- '),
-          ),
-          _tool(
-            'Checklist',
-            Icons.check_box_outlined,
-            () => _prefixLine('- [ ] '),
-          ),
-          _tool('Quote', Icons.format_quote, () => _prefixLine('> ')),
-          _tool('Link', Icons.link, () => _wrap('[', '](url)')),
-          _tool(
-            'Code block',
-            Icons.data_object,
-            () => _wrap('$tripleTick\n', '\n$tripleTick'),
-          ),
+            _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
+            _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
+            _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
+            _tool('Heading', Icons.title, () => _prefixLine('## ')),
+            _tool(
+              'Bullet list',
+              Icons.format_list_bulleted,
+              () => _prefixLine('- '),
+            ),
+            _tool(
+              'Checklist',
+              Icons.check_box_outlined,
+              () => _prefixLine('- [ ] '),
+            ),
+            _tool('Quote', Icons.format_quote, () => _prefixLine('> ')),
+            _tool('Link', Icons.link, () => _wrap('[', '](url)')),
+            _tool(
+              'Code block',
+              Icons.data_object,
+              () => _wrap('$tripleTick\n', '\n$tripleTick'),
+            ),
           ],
         ),
       ),

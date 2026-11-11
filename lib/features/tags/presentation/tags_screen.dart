@@ -125,7 +125,8 @@ class TagsScreen extends ConsumerWidget {
                   child: FeatureHero(
                     icon: Icons.sell_rounded,
                     title: 'Organize by tag',
-                    subtitle: 'Create lightweight labels to connect related notes.',
+                    subtitle:
+                        'Create lightweight labels to connect related notes.',
                     compact: true,
                   ),
                 );

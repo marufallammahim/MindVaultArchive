@@ -14,7 +14,8 @@ class AboutScreen extends StatelessWidget {
             const FeatureHero(
               icon: Icons.auto_awesome_rounded,
               title: 'Your thoughts. Your archive.',
-              subtitle: 'A private, local-first home for ideas, knowledge and memories.',
+              subtitle:
+                  'A private, local-first home for ideas, knowledge and memories.',
             ),
             const SizedBox(height: 20),
             Icon(Icons.archive_rounded,

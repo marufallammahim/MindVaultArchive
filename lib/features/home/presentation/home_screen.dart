@@ -596,8 +596,7 @@ class _NoteCard extends StatelessWidget {
                         tooltip: 'Edit note',
                         visualDensity: VisualDensity.compact,
                         style: IconButton.styleFrom(
-                          backgroundColor:
-                              foreground.withValues(alpha: 0.10),
+                          backgroundColor: foreground.withValues(alpha: 0.10),
                           foregroundColor: foreground,
                         ),
                         onPressed: onTap,

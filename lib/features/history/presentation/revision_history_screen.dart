@@ -89,7 +89,8 @@ class RevisionHistoryScreen extends ConsumerWidget {
                   child: FeatureHero(
                     icon: Icons.history_rounded,
                     title: 'Every edit remembered',
-                    subtitle: 'Review an earlier version and restore it when needed.',
+                    subtitle:
+                        'Review an earlier version and restore it when needed.',
                     compact: true,
                   ),
                 );
