@@ -74,5 +74,15 @@ Record commit SHA, environment, exact command, exit status and artifact path for
 - [x] Profile display name and profile image can be edited from the home header and Settings.
 - [x] Notes dashboard and task list refreshed with reference-inspired colorful cards and navigation.
 - [x] Existing PIN access gate surfaced as Protector without misrepresenting it as encryption.
-- [ ] Rework and visually audit every remaining route (editor, search, archive, history, drawing, capture, insights, timeline, templates and security).
+- [ ] Rework and visually audit every remaining route (search, archive, history, drawing, capture, insights, timeline, templates and security).
 - [ ] Add profile/theme persistence tests, run full analyzer and test suite, and confirm a successful Android debug APK artifact.
+
+
+## Reference UI implementation progress (2026-11-12)
+- [x] Home note cards restyled with the supplied colorful-card reference, compact metadata, edit affordance and floating arrow.
+- [x] Task dashboard includes a horizontally selectable date strip, date-aware task creation, custom floating navigation dock and a dedicated calendar/progress view with locally computed task metrics.
+- [x] Editor Markdown controls restyled as a compact dark floating toolbar; note deletion is connected to a dedicated full-screen confirmation route.
+- [x] Dedicated delete confirmation screen added with dark composition, brand illustration treatment and explicit Move to Trash / No, keep it actions.
+- [x] Trash destination added with restore and permanent-delete actions.
+- [ ] Continue visual pass across search, archive tools, history, drawing, quick capture, insights, timeline, templates, settings, security, developer notebook and about screens.
+- [ ] User-requested visual-first sequence: finish the remaining screen redesigns before starting analyzer, widget tests, integration tests or APK build.
