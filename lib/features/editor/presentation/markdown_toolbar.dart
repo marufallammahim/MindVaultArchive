@@ -52,10 +52,18 @@ class MarkdownToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final tick = String.fromCharCode(96);
     final tripleTick = List.filled(3, tick).join();
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFF202024),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
           _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
           _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
           _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
@@ -77,7 +85,8 @@ class MarkdownToolbar extends StatelessWidget {
             Icons.data_object,
             () => _wrap('$tripleTick\n', '\n$tripleTick'),
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
