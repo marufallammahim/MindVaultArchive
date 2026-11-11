@@ -43,7 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               CircleAvatar(
                 radius: 38,
                 backgroundImage:
-                    avatar == null ? null : MemoryImage(base64Decode(avatar!)),
+                    UserProfile(name: '', avatarBase64: avatar).avatar,
                 child: avatar == null
                     ? const Icon(Icons.person_outline, size: 38)
                     : null,
@@ -161,7 +161,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           case 'category':
             return note.isDeleted.equals(false) &
                 note.isArchived.equals(false) &
-                note.categoryId.equals(_selectedCategoryId!);
+                note.categoryId.equals(_selectedCategoryId ?? '');
           default:
             return note.isDeleted.equals(false) & note.isArchived.equals(false);
         }
