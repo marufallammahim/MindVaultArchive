@@ -1,9 +1,6 @@
 [workspace]
 resolver = "2"
-members = [
-    "crates/mindvault_core",
-    "crates/mindvault_ffi",
-]
+members = ["crates/mindvault_core", "crates/mindvault_ffi"]
 
 [workspace.package]
 edition = "2021"
