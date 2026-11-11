@@ -138,32 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await db.setArchived(note.id, !note.isArchived);
         break;
       case 'trash':
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (dialogContext) => AlertDialog(
-            icon: const Icon(Icons.delete_outline_rounded, size: 34),
-            title: const Text('Move note to trash?'),
-            content: Text(
-              '"${note.title.trim().isEmpty ? 'Untitled note' : note.title}" '
-              'will be moved to Trash. You can restore it later or delete it permanently.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, false),
-                child: const Text('Cancel'),
-              ),
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(dialogContext).colorScheme.error,
-                  foregroundColor: Theme.of(dialogContext).colorScheme.onError,
-                ),
-                onPressed: () => Navigator.pop(dialogContext, true),
-                icon: const Icon(Icons.delete_outline_rounded),
-                label: const Text('Move to trash'),
-              ),
-            ],
-          ),
-        );
+        final confirmed = await context.push<bool>('/delete/${note.id}');
         if (confirmed == true) {
           await db.setDeleted(note.id, true);
         }
