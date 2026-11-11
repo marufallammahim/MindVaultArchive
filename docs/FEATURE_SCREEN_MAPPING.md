@@ -8,7 +8,7 @@ This map is a workflow inventory. Shared screens are allowed; no route should ex
 | Notes | All notes, list/grid, editor, Markdown preview, block/format toolbar | Home / Notes | F01,F16 | Partial |
 | Note metadata | Details, properties, revisions, compare/restore, lock, share | Note menu | F01,F02,F08,F14 | Partial |
 | Organization | Notebooks, folders, tags, smart folders, saved searches | Notes navigation | F02,F07 | Partial |
-| Lifecycle | Favorites, pinned, recent, archive, trash, bulk actions | Notes navigation | F02 | Partial |
+| Lifecycle | Favorites, pinned, recent, archive, full-screen delete confirmation, trash restore/permanent delete, bulk actions | Notes navigation / Editor | F02 | Partial (dedicated delete confirmation and Trash restore/delete UI available) |
 | Knowledge | Backlinks, linked/unlinked mentions, related/orphan notes, graph, timeline and local archive health | Note details / Archive / Settings | F02,F15,F17 | Partial (timeline and deterministic health checks available) |
 | Capture | Quick capture, thought inbox, voice/camera/share capture | Create action | F03,F17,F18 | Partial |
 | AI | AI home, conversation, Ask Notes, source references, provider and consent settings | AI navigation | F04 | Not implemented |
