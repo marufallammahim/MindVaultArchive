@@ -30,6 +30,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   late final TextEditingController _contentController;
   bool _initialized = false;
   bool _previewMode = false;
+  bool _leaving = false;
 
   @override
   void initState() {
@@ -297,13 +298,29 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     return PopScope(
       canPop: !state.isSaving,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (didPop || _leaving) return;
+        _leaving = true;
         final router = GoRouter.of(context);
-        final saved = await ref
-            .read(editorProvider(widget.noteId).notifier)
-            .forceSave();
+        var saved = false;
+        try {
+          saved = await ref
+              .read(editorProvider(widget.noteId).notifier)
+              .forceSave();
+        } catch (error, stack) {
+          debugPrint('Editor exit save failed: $error');
+          debugPrintStack(stackTrace: stack);
+        }
         if (!mounted) return;
-        if (saved) router.pop();
+        if (saved) {
+          router.pop();
+        } else {
+          _leaving = false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Your note could not be saved. Please try again.'),
+            ),
+          );
+        }
       },
       child: Scaffold(
         appBar: AppBar(
