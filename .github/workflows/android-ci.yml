@@ -38,33 +38,11 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Migrate to standalone Material UI
-        run: dart fix --apply --code=migrate_design_widgets
-
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Verify formatting on pull requests
-        if: github.event_name == 'pull_request'
+      - name: Verify Dart formatting
         run: dart format --output=none --set-exit-if-changed lib test
-
-      - name: Apply Dart formatting on branch runs
-        if: github.event_name != 'pull_request'
-        run: dart format lib test
-
-      - name: Commit formatting corrections when needed
-        if: github.event_name != 'pull_request'
-        run: |
-          set -euo pipefail
-          git add lib test pubspec.yaml pubspec.lock
-          if git diff --cached --quiet; then
-            echo "Dart sources and dependency lockfile are already current."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build: migrate Material UI and lock dependencies"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
 
       - name: Static analysis
         run: flutter analyze
