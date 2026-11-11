@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Small Markdown authoring toolbar for the plain-text note editor.
 class MarkdownToolbar extends StatelessWidget {
@@ -52,32 +52,44 @@ class MarkdownToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final tick = String.fromCharCode(96);
     final tripleTick = List.filled(3, tick).join();
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
-          _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
-          _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
-          _tool('Heading', Icons.title, () => _prefixLine('## ')),
-          _tool(
-            'Bullet list',
-            Icons.format_list_bulleted,
-            () => _prefixLine('- '),
-          ),
-          _tool(
-            'Checklist',
-            Icons.check_box_outlined,
-            () => _prefixLine('- [ ] '),
-          ),
-          _tool('Quote', Icons.format_quote, () => _prefixLine('> ')),
-          _tool('Link', Icons.link, () => _wrap('[', '](url)')),
-          _tool(
-            'Code block',
-            Icons.data_object,
-            () => _wrap('$tripleTick\n', '\n$tripleTick'),
-          ),
-        ],
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: scheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.45),
+        ),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
+            _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
+            _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
+            _tool('Heading', Icons.title, () => _prefixLine('## ')),
+            _tool(
+              'Bullet list',
+              Icons.format_list_bulleted,
+              () => _prefixLine('- '),
+            ),
+            _tool(
+              'Checklist',
+              Icons.check_box_outlined,
+              () => _prefixLine('- [ ] '),
+            ),
+            _tool('Quote', Icons.format_quote, () => _prefixLine('> ')),
+            _tool('Link', Icons.link, () => _wrap('[', '](url)')),
+            _tool(
+              'Code block',
+              Icons.data_object,
+              () => _wrap('$tripleTick\n', '\n$tripleTick'),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Shared AMOLED-first design system for every MindVault Archive route.
 class AppTheme {
   static const defaultBrand = Color(0xFF5A0719);
-  static const brandLight = Color(0xFFB64D69);
+  static const brandLight = Color(0xFF8C3347);
   static const darkSurface = Color(0xFF101014);
   static const darkCard = Color(0xFF171719);
   static const lightSurface = Color(0xFFF4F1F2);
@@ -96,10 +96,13 @@ class AppTheme {
         filled: true,
         fillColor: card,
         isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-        hintStyle:
-            TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.78)),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 15,
+        ),
+        hintStyle: TextStyle(
+          color: scheme.onSurfaceVariant.withValues(alpha: 0.78),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
           borderSide: BorderSide(color: outline),
@@ -149,20 +152,24 @@ class AppTheme {
         indicatorColor: scheme.primary.withValues(alpha: 0.19),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         height: 70,
-        iconTheme: WidgetStateProperty.resolveWith((states) => IconThemeData(
-              color: states.contains(WidgetState.selected)
-                  ? scheme.primary
-                  : scheme.onSurfaceVariant,
-            )),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) => TextStyle(
-              fontSize: 11,
-              fontWeight: states.contains(WidgetState.selected)
-                  ? FontWeight.w800
-                  : FontWeight.w500,
-              color: states.contains(WidgetState.selected)
-                  ? scheme.primary
-                  : scheme.onSurfaceVariant,
-            )),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.onSurfaceVariant,
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            fontSize: 11,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w800
+                : FontWeight.w500,
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.onSurfaceVariant,
+          ),
+        ),
       ),
       dividerTheme: DividerThemeData(color: outline, thickness: 1, space: 1),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -176,8 +183,9 @@ class AppTheme {
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -185,20 +193,22 @@ class AppTheme {
           minimumSize: const Size(48, 48),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           side: BorderSide(color: outline),
         ),
       ),
-      chipTheme: ChipThemeData.fromDefaults(
-        primaryColor: scheme.primary,
-        secondaryColor: card,
-        labelStyle: TextStyle(color: scheme.onSurface),
-      ).copyWith(
-        shape: const StadiumBorder(),
-        side: BorderSide(color: outline),
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      ),
+      chipTheme:
+          ChipThemeData.fromDefaults(
+            primaryColor: scheme.primary,
+            secondaryColor: card,
+            labelStyle: TextStyle(color: scheme.onSurface),
+          ).copyWith(
+            shape: const StadiumBorder(),
+            side: BorderSide(color: outline),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          ),
       switchTheme: SwitchThemeData(
         trackOutlineColor: WidgetStatePropertyAll(outline),
       ),

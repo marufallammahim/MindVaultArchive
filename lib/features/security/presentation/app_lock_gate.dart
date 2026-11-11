@@ -1,17 +1,19 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
 
 class AppLockGate extends StatefulWidget {
-  const AppLockGate({super.key, required this.child});
+  const AppLockGate({super.key, required this.child, AppLockService? service})
+    : _service = service;
 
   final Widget child;
+  final AppLockService? _service;
 
   @override
   State<AppLockGate> createState() => _AppLockGateState();
 }
 
 class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
-  final _service = AppLockService();
+  late final AppLockService _service = widget._service ?? AppLockService();
   bool _loading = true;
   bool _enabled = false;
   bool _locked = false;
@@ -184,7 +186,17 @@ class _UnlockScreenState extends State<_UnlockScreen> {
       setState(() => _busy = false);
       widget.onSuccess();
     } else {
-      final remaining = await widget.lockoutRemaining();
+      Duration? remaining;
+      try {
+        remaining = await widget.lockoutRemaining();
+      } catch (_) {
+        if (!mounted) return;
+        setState(() {
+          _busy = false;
+          _error = 'Secure storage is unavailable. Try again.';
+        });
+        return;
+      }
       if (!mounted) return;
       setState(() {
         _busy = false;

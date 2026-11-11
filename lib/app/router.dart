@@ -16,12 +16,20 @@ import 'package:mindvault_archive/features/security/presentation/app_lock_settin
 import 'package:mindvault_archive/features/insights/presentation/archive_insights_screen.dart';
 import 'package:mindvault_archive/features/timeline/presentation/archive_timeline_screen.dart';
 import 'package:mindvault_archive/features/developer/presentation/developer_notebook_screen.dart';
+import 'package:mindvault_archive/features/trash/presentation/trash_screen.dart';
+import 'package:mindvault_archive/features/trash/presentation/delete_confirmation_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+    GoRoute(path: '/trash', builder: (context, state) => const TrashScreen()),
+    GoRoute(
+      path: '/delete/:id',
+      builder: (context, state) =>
+          DeleteConfirmationScreen(noteId: state.pathParameters['id']!),
+    ),
     GoRoute(
       path: '/editor/:id',
       builder: (context, state) =>
@@ -69,13 +77,16 @@ final appRouter = GoRouter(
       builder: (context, state) => const ArchiveToolsScreen(),
     ),
     GoRoute(
-        path: '/insights',
-        builder: (context, state) => const ArchiveInsightsScreen()),
+      path: '/insights',
+      builder: (context, state) => const ArchiveInsightsScreen(),
+    ),
     GoRoute(
-        path: '/timeline',
-        builder: (context, state) => const ArchiveTimelineScreen()),
+      path: '/timeline',
+      builder: (context, state) => const ArchiveTimelineScreen(),
+    ),
     GoRoute(
-        path: '/developer-notebook',
-        builder: (context, state) => const DeveloperNotebookScreen()),
+      path: '/developer-notebook',
+      builder: (context, state) => const DeveloperNotebookScreen(),
+    ),
   ],
 );

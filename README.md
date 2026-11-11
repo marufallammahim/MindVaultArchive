@@ -49,16 +49,35 @@ dart run build_runner build --delete-conflicting-outputs
 flutter run
 ```
 
-## Verification
+## Feature-branch verification and APK
+
+The `feature/ultimate-all-in-one-mindvault` branch has three independent
+GitHub Actions workflows. A push to that branch starts all three in parallel:
+
+1. **Feature Branch - Code Check** — resolves dependencies, generates Drift and
+   Riverpod sources, formats Dart files, commits formatting corrections when
+   needed, and runs `flutter analyze`.
+2. **Feature Branch - Regression Tests** — runs the complete Flutter test
+   suite after dependency and code generation.
+3. **Feature Branch - Android APK Artifact** — builds a debug APK and uploads
+   `MindVaultArchive-debug.apk`, its SHA-256 checksum, and build metadata as a
+   30-day artifact.
+
+Each workflow also supports manual execution with GitHub Actions
+`workflow_dispatch`. Open the [feature-branch Actions runs](https://github.com/marufallammahim/MindVaultArchive/actions?query=branch%3Afeature%2Fultimate-all-in-one-mindvault)
+and inspect each workflow for the exact commit. The APK can be downloaded from
+the successful build run's **Artifacts** section. A queued or failed run does
+not mean an APK is available.
+
+The equivalent local verification commands are:
 ```bash
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
 dart format --output=none --set-exit-if-changed lib test
 flutter analyze
-flutter test
+flutter test --reporter expanded
 flutter build apk --debug
 ```
-
-The `Android CI` workflow runs these checks on pushes and pull requests. Use
-the Actions result for the exact feature-branch commit to confirm the outcome.
 
 ## Android production release
 Production release builds require a private owner-controlled signing keystore.

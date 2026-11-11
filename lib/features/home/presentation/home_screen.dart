@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' hide Column;
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -42,8 +42,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               CircleAvatar(
                 radius: 38,
-                backgroundImage:
-                    avatar == null ? null : MemoryImage(base64Decode(avatar!)),
+                backgroundImage: UserProfile(
+                  name: '',
+                  avatarBase64: avatar,
+                ).avatar,
                 child: avatar == null
                     ? const Icon(Icons.person_outline, size: 38)
                     : null,
@@ -98,29 +100,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
     if (saved == true) {
-      await ref.read(userProfileProvider.notifier).save(
-            name: name.text,
-            avatarBase64: avatar,
-          );
+      await ref
+          .read(userProfileProvider.notifier)
+          .save(name: name.text, avatarBase64: avatar);
     }
     name.dispose();
   }
 
   List<PopupMenuEntry<String>> _noteActions(Note note) => [
-        PopupMenuItem(
-          value: 'pin',
-          child: Text(note.sortOrder == 1 ? 'Unpin note' : 'Pin note'),
-        ),
-        PopupMenuItem(
-          value: 'favorite',
-          child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
-        ),
-        PopupMenuItem(
-          value: 'archive',
-          child: Text(note.isArchived ? 'Unarchive' : 'Archive'),
-        ),
-        const PopupMenuItem(value: 'trash', child: Text('Move to trash')),
-      ];
+    PopupMenuItem(
+      value: 'pin',
+      child: Text(note.sortOrder == 1 ? 'Unpin note' : 'Pin note'),
+    ),
+    PopupMenuItem(
+      value: 'favorite',
+      child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
+    ),
+    PopupMenuItem(
+      value: 'archive',
+      child: Text(note.isArchived ? 'Unarchive' : 'Archive'),
+    ),
+    const PopupMenuItem(value: 'trash', child: Text('Move to trash')),
+  ];
 
   Future<void> _handleNoteAction(
     AppDatabase db,
@@ -138,7 +139,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         await db.setArchived(note.id, !note.isArchived);
         break;
       case 'trash':
-        await db.setDeleted(note.id, true);
+        final confirmed = await context.push<bool>('/delete/${note.id}');
+        if (confirmed == true) {
+          await db.setDeleted(note.id, true);
+        }
         break;
     }
   }
@@ -158,7 +162,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           case 'category':
             return note.isDeleted.equals(false) &
                 note.isArchived.equals(false) &
-                note.categoryId.equals(_selectedCategoryId!);
+                note.categoryId.equals(_selectedCategoryId ?? '');
           default:
             return note.isDeleted.equals(false) & note.isArchived.equals(false);
         }
@@ -178,10 +182,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             final notes = term.isEmpty
                 ? allNotes
                 : allNotes
-                    .where((note) =>
-                        note.title.toLowerCase().contains(term) ||
-                        note.documentContent.toLowerCase().contains(term))
-                    .toList();
+                      .where(
+                        (note) =>
+                            note.title.toLowerCase().contains(term) ||
+                            note.documentContent.toLowerCase().contains(term),
+                      )
+                      .toList();
 
             return CustomScrollView(
               slivers: [
@@ -249,14 +255,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               'Settings',
                               () => context.push('/settings'),
                             ),
+                            const SizedBox(width: 8),
+                            _roundAction(
+                              context,
+                              Icons.delete_outline_rounded,
+                              'Trash',
+                              () => context.push('/trash'),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 30),
                         Text(
                           'my notes',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
+                          style: Theme.of(context).textTheme.headlineMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -1.1,
@@ -271,21 +282,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               _filterChip(context, '#favorites', 'favorites'),
                               _filterChip(context, '#archive', 'archive'),
                               StreamBuilder<List<Category>>(
-                                stream: (db.select(db.categories)
-                                      ..orderBy([
-                                        (c) => OrderingTerm.asc(c.name),
-                                      ]))
-                                    .watch(),
+                                stream:
+                                    (db.select(db.categories)..orderBy([
+                                          (c) => OrderingTerm.asc(c.name),
+                                        ]))
+                                        .watch(),
                                 builder: (context, categories) => Row(
                                   children: [
                                     for (final category
                                         in categories.data ?? [])
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8),
+                                        padding: const EdgeInsets.only(
+                                          right: 8,
+                                        ),
                                         child: ChoiceChip(
                                           label: Text('#${category.name}'),
-                                          selected: _view == 'category' &&
+                                          selected:
+                                              _view == 'category' &&
                                               _selectedCategoryId ==
                                                   category.id,
                                           onSelected: (_) => setState(() {
@@ -363,8 +376,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.note_add_outlined,
-                                size: 62, color: accent),
+                            Icon(
+                              Icons.note_add_outlined,
+                              size: 62,
+                              color: accent,
+                            ),
                             const SizedBox(height: 14),
                             Text(
                               term.isEmpty
@@ -420,40 +436,92 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: () => context.push('/editor/${const Uuid().v4()}'),
         child: const Icon(Icons.add_rounded, size: 28),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.note_alt_outlined),
-            selectedIcon: Icon(Icons.note_alt_rounded),
-            label: 'Notes',
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+        child: Container(
+          height: 66,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            color: const Color(0xFF171719).withValues(alpha: 0.97),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.32),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.checklist_rounded),
-            label: 'Tasks',
+          child: Row(
+            children: [
+              _dockItem(context, Icons.home_rounded, 'Home', true, () {}),
+              _dockItem(
+                context,
+                Icons.checklist_rounded,
+                'Tasks',
+                false,
+                () => context.push('/tasks'),
+              ),
+              _dockItem(
+                context,
+                Icons.insights_rounded,
+                'Insights',
+                false,
+                () => context.push('/insights'),
+              ),
+              _dockItem(
+                context,
+                Icons.settings_rounded,
+                'Settings',
+                false,
+                () => context.push('/settings'),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            label: 'Insights',
+        ),
+      ),
+    );
+  }
+
+  Widget _dockItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    bool selected,
+    VoidCallback onTap,
+  ) {
+    final foreground = selected
+        ? const Color(0xFF171719)
+        : Colors.white.withValues(alpha: 0.68);
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFFFFD65A) : Colors.transparent,
+            borderRadius: BorderRadius.circular(17),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            label: 'Settings',
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: foreground, size: 21),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: foreground,
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-        ],
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 1:
-              context.push('/tasks');
-              break;
-            case 2:
-              context.push('/insights');
-              break;
-            case 3:
-              context.push('/settings');
-              break;
-          }
-        },
+        ),
       ),
     );
   }
@@ -506,99 +574,150 @@ class _NoteCard extends StatelessWidget {
     final foreground = color.computeLuminance() > 0.48
         ? const Color(0xFF171717)
         : Colors.white;
+    final words = RegExp(r'\S+').allMatches(note.documentContent).length;
     return Material(
       color: color,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(30),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(19, 17, 74, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          MaterialLocalizations.of(context)
+                              .formatShortDate(note.updatedAt),
+                          style: TextStyle(
+                            color: foreground.withValues(alpha: 0.78),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if (note.sortOrder == 1)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(
+                            Icons.push_pin_rounded,
+                            color: foreground,
+                            size: 17,
+                          ),
+                        ),
+                      if (note.isFavorite)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(
+                            Icons.star_rounded,
+                            color: foreground,
+                            size: 18,
+                          ),
+                        ),
+                      IconButton(
+                        tooltip: 'Edit note',
+                        visualDensity: VisualDensity.compact,
+                        style: IconButton.styleFrom(
+                          backgroundColor: foreground.withValues(alpha: 0.10),
+                          foregroundColor: foreground,
+                        ),
+                        onPressed: onTap,
+                        icon: const Icon(Icons.edit_rounded, size: 18),
+                      ),
+                      PopupMenuButton<String>(
+                        tooltip: 'More note actions',
+                        padding: EdgeInsets.zero,
+                        icon: Icon(Icons.more_horiz, color: foreground),
+                        onSelected: onAction,
+                        itemBuilder: (_) => actions,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 23),
                   Text(
-                    MaterialLocalizations.of(context)
-                        .formatShortDate(note.updatedAt),
+                    note.title.trim().isEmpty ? 'Untitled note' : note.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: foreground.withValues(alpha: 0.78),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      color: foreground,
+                      fontSize: 21,
+                      height: 1.16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.45,
                     ),
                   ),
-                  const Spacer(),
-                  if (note.sortOrder == 1)
-                    Icon(Icons.push_pin_rounded, color: foreground, size: 17),
-                  if (note.isFavorite)
-                    Icon(Icons.star_rounded, color: foreground, size: 18),
-                  PopupMenuButton<String>(
-                    tooltip: 'Note actions',
-                    icon: Icon(Icons.more_horiz, color: foreground),
-                    onSelected: onAction,
-                    itemBuilder: (_) => actions,
+                  if (note.documentContent.trim().isNotEmpty) ...[
+                    const SizedBox(height: 9),
+                    Text(
+                      note.documentContent,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: foreground.withValues(alpha: 0.82),
+                        height: 1.35,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 6,
+                    children: [
+                      _metaPill(foreground, '1 note'),
+                      _metaPill(foreground, '$words words'),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                note.title.trim().isEmpty ? 'Untitled note' : note.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: foreground,
-                  fontSize: 19,
-                  height: 1.18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              if (note.documentContent.trim().isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  note.documentContent,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foreground.withValues(alpha: 0.82),
-                    height: 1.35,
+            ),
+            Positioned(
+              right: 13,
+              bottom: 13,
+              child: Material(
+                color: const Color(0xFFFFD65A),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onTap,
+                  child: const SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: Icon(
+                      Icons.arrow_outward_rounded,
+                      color: Color(0xFF171717),
+                      size: 27,
+                    ),
                   ),
                 ),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  _metaPill(foreground, note.isFavorite ? 'Favorite' : 'Note'),
-                  const SizedBox(width: 7),
-                  _metaPill(foreground, note.isArchived ? 'Archived' : 'Saved'),
-                  const Spacer(),
-                  Icon(Icons.arrow_outward_rounded,
-                      color: foreground, size: 20),
-                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _metaPill(Color foreground, String label) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: foreground.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(30),
+    decoration: BoxDecoration(
+      color: foreground.withValues(alpha: 0.13),
+      borderRadius: BorderRadius.circular(30),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: foreground,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: foreground,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      );
+      ),
+    ),
+  );
 }

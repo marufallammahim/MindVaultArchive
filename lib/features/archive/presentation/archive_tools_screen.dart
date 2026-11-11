@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -84,8 +86,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
   Future<void> _exportFullBackup() async {
     setState(() => _busy = true);
     try {
-      final bytes =
-          await FullBackupService(ref.read(databaseProvider)).exportZip();
+      final bytes = await FullBackupService(ref.read(databaseProvider))
+          .exportZip();
       await Share.shareXFiles([
         XFile.fromData(
           bytes,
@@ -138,8 +140,8 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
       if (confirmed != true || !mounted) return;
 
       setState(() => _busy = true);
-      final result =
-          await FullBackupService(ref.read(databaseProvider)).importZip(bytes);
+      final result = await FullBackupService(ref.read(databaseProvider))
+          .importZip(bytes);
       if (!mounted) return;
       _showMessage(
         'Restored ${result.imported} notes, ${result.importedTasks} tasks and '
@@ -197,11 +199,15 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 32),
         children: [
+          const FeatureHero(
+            icon: Icons.inventory_2_rounded,
+            title: 'Your archive, protected',
+            subtitle: 'Export, restore and move your local knowledge safely.',
+          ),
+          const SizedBox(height: 22),
           Text(
             'Full device backup',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
+            style: Theme.of(context).textTheme.titleLarge
                 ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
           ),
           const SizedBox(height: 8),
@@ -225,9 +231,7 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
           const Divider(height: 28),
           Text(
             'Portable JSON transfer',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
+            style: Theme.of(context).textTheme.titleLarge
                 ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
           ),
           const SizedBox(height: 8),

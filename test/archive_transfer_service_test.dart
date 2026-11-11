@@ -147,30 +147,25 @@ void main() {
 
       final existing = await (database.select(
         database.notes,
-      )..where((note) => note.id.equals('same-id')))
-          .getSingle();
+      )..where((note) => note.id.equals('same-id'))).getSingle();
       expect(existing.title, 'Local title');
       final imported = await (database.select(
         database.notes,
-      )..where((note) => note.id.equals('new-id')))
-          .getSingle();
+      )..where((note) => note.id.equals('new-id'))).getSingle();
       expect(imported.categoryId, 'work');
       expect(imported.isFavorite, isTrue);
       final importedTask = await (database.select(
         database.tasks,
-      )..where((task) => task.id.equals('task-imported')))
-          .getSingle();
+      )..where((task) => task.id.equals('task-imported'))).getSingle();
       expect(importedTask.title, 'Imported task');
       expect(importedTask.noteId, 'new-id');
       final importedTagLink = await (database.select(
         database.noteTags,
-      )..where((link) => link.noteId.equals('new-id')))
-          .getSingle();
+      )..where((link) => link.noteId.equals('new-id'))).getSingle();
       expect(importedTagLink.tagId, 'priority');
       final importedRevision = await (database.select(
         database.noteRevisions,
-      )..where((revision) => revision.id.equals('revision-1')))
-          .getSingle();
+      )..where((revision) => revision.id.equals('revision-1'))).getSingle();
       expect(importedRevision.title, 'Previous imported title');
     },
   );
@@ -200,8 +195,7 @@ void main() {
     await transfer.importJson(jsonEncode(legacy));
     final task = await (database.select(
       database.tasks,
-    )..where((item) => item.id.equals('legacy-task')))
-        .getSingle();
+    )..where((item) => item.id.equals('legacy-task'))).getSingle();
     expect(task.noteId, isNull);
   });
 

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -19,40 +20,50 @@ class DeveloperNotebookScreen extends ConsumerWidget {
         content: SizedBox(
           width: 520,
           child: SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              TextField(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
                   controller: title,
                   autofocus: true,
-                  decoration:
-                      const InputDecoration(labelText: 'Snippet title')),
-              TextField(
+                  decoration: const InputDecoration(labelText: 'Snippet title'),
+                ),
+                TextField(
                   controller: language,
                   decoration: const InputDecoration(
-                      labelText: 'Language (dart, python, bash…)')),
-              TextField(
+                    labelText: 'Language (dart, python, bash…)',
+                  ),
+                ),
+                TextField(
                   controller: code,
                   minLines: 6,
                   maxLines: 12,
                   keyboardType: TextInputType.multiline,
                   style: const TextStyle(fontFamily: 'monospace'),
-                  decoration:
-                      const InputDecoration(labelText: 'Code or command')),
-            ]),
+                  decoration: const InputDecoration(
+                    labelText: 'Code or command',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel')),
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Save snippet')),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Save snippet'),
+          ),
         ],
       ),
     );
     final cleanTitle = title.text.trim();
-    final cleanLanguage =
-        language.text.trim().isEmpty ? 'text' : language.text.trim();
+    final cleanLanguage = language.text.trim().isEmpty
+        ? 'text'
+        : language.text.trim();
     final cleanCode = code.text;
     title.dispose();
     language.dispose();
@@ -65,8 +76,13 @@ class DeveloperNotebookScreen extends ConsumerWidget {
     }
     final id = const Uuid().v4();
     try {
-      await ref.read(databaseProvider).saveNoteContent(id, '[Code] $cleanTitle',
-          'Language: $cleanLanguage\n\n\u0060\u0060\u0060$cleanLanguage\n$cleanCode\n\u0060\u0060\u0060');
+      await ref
+          .read(databaseProvider)
+          .saveNoteContent(
+            id,
+            '[Code] $cleanTitle',
+            'Language: $cleanLanguage\n\n\u0060\u0060\u0060$cleanLanguage\n$cleanCode\n\u0060\u0060\u0060',
+          );
       if (context.mounted) {
         context.push('/editor/$id');
       }
@@ -90,8 +106,9 @@ class DeveloperNotebookScreen extends ConsumerWidget {
         label: const Text('New snippet'),
       ),
       body: StreamBuilder<List<Note>>(
-        stream: (db.select(db.notes)..where((n) => n.isDeleted.equals(false)))
-            .watch(),
+        stream: (db.select(
+          db.notes,
+        )..where((n) => n.isDeleted.equals(false))).watch(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -101,48 +118,75 @@ class DeveloperNotebookScreen extends ConsumerWidget {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-          final snippets = snapshot.data!
-              .where((n) => n.title.startsWith('[Code] '))
-              .toList()
-            ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+          final snippets =
+              snapshot.data!
+                  .where((n) => n.title.startsWith('[Code] '))
+                  .toList()
+                ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
           if (snippets.isEmpty) {
             return const Center(
-                child: Padding(
-              padding: EdgeInsets.all(28),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Icon(Icons.code_rounded, size: 56),
-                SizedBox(height: 12),
-                Text('Your technical notebook is empty.'),
-                SizedBox(height: 6),
-                Text('Save commands, code samples and debugging notes here.',
-                    textAlign: TextAlign.center),
-              ]),
-            ));
+              child: Padding(
+                padding: EdgeInsets.all(28),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.code_rounded, size: 56),
+                    SizedBox(height: 12),
+                    Text('Your technical notebook is empty.'),
+                    SizedBox(height: 6),
+                    Text(
+                      'Save commands, code samples and debugging notes here.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
-            itemCount: snippets.length,
+            itemCount: snippets.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
-              final note = snippets[index];
-              final language = RegExp(r'^Language: (.+)$', multiLine: true)
-                      .firstMatch(note.documentContent)
-                      ?.group(1) ??
+              if (index == 0) {
+                return const Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: FeatureHero(
+                    icon: Icons.terminal_rounded,
+                    title: 'Developer notebook',
+                    subtitle: 'Keep reusable code, commands and technical notes together.',
+                    compact: true,
+                  ),
+                );
+              }
+              final note = snippets[index - 1];
+              final language =
+                  RegExp(
+                    r'^Language: (.+)$',
+                    multiLine: true,
+                  ).firstMatch(note.documentContent)?.group(1) ??
                   'text';
               return Card(
-                  child: ListTile(
-                leading: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                    foregroundColor:
-                        Theme.of(context).colorScheme.onPrimaryContainer,
-                    child: const Icon(Icons.code)),
-                title: Text(note.title.substring(7),
-                    maxLines: 1, overflow: TextOverflow.ellipsis),
-                subtitle: Text(language),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () => context.push('/editor/${note.id}'),
-              ));
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer,
+                    foregroundColor: Theme.of(context)
+                        .colorScheme
+                        .onPrimaryContainer,
+                    child: const Icon(Icons.code),
+                  ),
+                  title: Text(
+                    note.title.substring(7),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: Text(language),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => context.push('/editor/${note.id}'),
+                ),
+              );
             },
           );
         },

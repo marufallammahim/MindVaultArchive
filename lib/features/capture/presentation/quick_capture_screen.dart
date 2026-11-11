@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -86,7 +87,9 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     setState(() => _saving = true);
     final id = const Uuid().v4();
     try {
-      await ref.read(databaseProvider).saveNoteContent(
+      await ref
+          .read(databaseProvider)
+          .saveNoteContent(
             id,
             title.isEmpty ? 'Quick capture' : title,
             content,
@@ -126,6 +129,13 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
         children: [
+          const FeatureHero(
+            icon: Icons.bolt_rounded,
+            title: 'Catch the thought',
+            subtitle: 'A quick local capture. Keep moving, organize it later.',
+            compact: true,
+          ),
+          const SizedBox(height: 18),
           TextField(
             controller: _title,
             autofocus: true,
@@ -134,9 +144,7 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
               hintText: 'Give this thought a title…',
               border: InputBorder.none,
             ),
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall
+            style: Theme.of(context).textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.7),
           ),
           const Divider(),

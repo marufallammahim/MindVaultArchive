@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show OrderingTerm;
-import 'package:flutter/material.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -115,10 +116,22 @@ class TagsScreen extends ConsumerWidget {
           }
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
-            itemCount: tags.length,
+            itemCount: tags.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              final tag = tags[index];
+              if (index == 0) {
+                return const Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: FeatureHero(
+                    icon: Icons.sell_rounded,
+                    title: 'Organize by tag',
+                    subtitle:
+                        'Create lightweight labels to connect related notes.',
+                    compact: true,
+                  ),
+                );
+              }
+              final tag = tags[index - 1];
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.sell_outlined),
