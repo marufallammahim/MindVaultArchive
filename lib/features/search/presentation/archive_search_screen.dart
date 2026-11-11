@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,6 +84,15 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
       appBar: AppBar(title: const Text('Search')),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: FeatureHero(
+              icon: Icons.manage_search_rounded,
+              title: 'Find anything',
+              subtitle: 'Search across notes, tags, categories and tasks.',
+              compact: true,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
             child: TextField(
