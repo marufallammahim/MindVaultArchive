@@ -542,79 +542,125 @@ class _NoteCard extends StatelessWidget {
     final foreground = color.computeLuminance() > 0.48
         ? const Color(0xFF171717)
         : Colors.white;
+    final words = RegExp(r'\\S+').allMatches(note.documentContent).length;
     return Material(
       color: color,
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(30),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(19, 17, 74, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          MaterialLocalizations.of(context)
+                              .formatShortDate(note.updatedAt),
+                          style: TextStyle(
+                            color: foreground.withValues(alpha: 0.78),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      if (note.sortOrder == 1)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(Icons.push_pin_rounded,
+                              color: foreground, size: 17),
+                        ),
+                      if (note.isFavorite)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Icon(Icons.star_rounded,
+                              color: foreground, size: 18),
+                        ),
+                      IconButton(
+                        tooltip: 'Edit note',
+                        visualDensity: VisualDensity.compact,
+                        style: IconButton.styleFrom(
+                          backgroundColor:
+                              foreground.withValues(alpha: 0.10),
+                          foregroundColor: foreground,
+                        ),
+                        onPressed: onTap,
+                        icon: const Icon(Icons.edit_rounded, size: 18),
+                      ),
+                      PopupMenuButton<String>(
+                        tooltip: 'More note actions',
+                        padding: EdgeInsets.zero,
+                        icon: Icon(Icons.more_horiz, color: foreground),
+                        onSelected: onAction,
+                        itemBuilder: (_) => actions,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 23),
                   Text(
-                    MaterialLocalizations.of(context)
-                        .formatShortDate(note.updatedAt),
+                    note.title.trim().isEmpty ? 'Untitled note' : note.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: foreground.withValues(alpha: 0.78),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      color: foreground,
+                      fontSize: 21,
+                      height: 1.16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.45,
                     ),
                   ),
-                  const Spacer(),
-                  if (note.sortOrder == 1)
-                    Icon(Icons.push_pin_rounded, color: foreground, size: 17),
-                  if (note.isFavorite)
-                    Icon(Icons.star_rounded, color: foreground, size: 18),
-                  PopupMenuButton<String>(
-                    tooltip: 'Note actions',
-                    icon: Icon(Icons.more_horiz, color: foreground),
-                    onSelected: onAction,
-                    itemBuilder: (_) => actions,
+                  if (note.documentContent.trim().isNotEmpty) ...[
+                    const SizedBox(height: 9),
+                    Text(
+                      note.documentContent,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: foreground.withValues(alpha: 0.82),
+                        height: 1.35,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 20),
+                  Wrap(
+                    spacing: 7,
+                    runSpacing: 6,
+                    children: [
+                      _metaPill(foreground, '1 note'),
+                      _metaPill(foreground, '$words words'),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                note.title.trim().isEmpty ? 'Untitled note' : note.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: foreground,
-                  fontSize: 19,
-                  height: 1.18,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              if (note.documentContent.trim().isNotEmpty) ...[
-                const SizedBox(height: 8),
-                Text(
-                  note.documentContent,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: foreground.withValues(alpha: 0.82),
-                    height: 1.35,
+            ),
+            Positioned(
+              right: 13,
+              bottom: 13,
+              child: Material(
+                color: const Color(0xFFFFD65A),
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: onTap,
+                  child: const SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: Icon(
+                      Icons.arrow_outward_rounded,
+                      color: Color(0xFF171717),
+                      size: 27,
+                    ),
                   ),
                 ),
-              ],
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  _metaPill(foreground, note.isFavorite ? 'Favorite' : 'Note'),
-                  const SizedBox(width: 7),
-                  _metaPill(foreground, note.isArchived ? 'Archived' : 'Saved'),
-                  const Spacer(),
-                  Icon(Icons.arrow_outward_rounded,
-                      color: foreground, size: 20),
-                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -622,16 +668,16 @@ class _NoteCard extends StatelessWidget {
 
   Widget _metaPill(Color foreground, String label) => DecoratedBox(
         decoration: BoxDecoration(
-          color: foreground.withValues(alpha: 0.14),
+          color: foreground.withValues(alpha: 0.13),
           borderRadius: BorderRadius.circular(30),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
           child: Text(
             label,
             style: TextStyle(
               color: foreground,
-              fontSize: 10,
+              fontSize: 11,
               fontWeight: FontWeight.w700,
             ),
           ),
