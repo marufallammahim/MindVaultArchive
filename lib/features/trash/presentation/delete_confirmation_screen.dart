@@ -25,7 +25,7 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                 child: Text('Could not load note: ${snapshot.error}'),
               );
             }
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             }
             final note = snapshot.data;
