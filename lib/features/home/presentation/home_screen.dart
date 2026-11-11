@@ -420,40 +420,76 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: () => context.push('/editor/${const Uuid().v4()}'),
         child: const Icon(Icons.add_rounded, size: 28),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.note_alt_outlined),
-            selectedIcon: Icon(Icons.note_alt_rounded),
-            label: 'Notes',
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+        child: Container(
+          height: 66,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            color: const Color(0xFF171719).withValues(alpha: 0.97),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.32),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.checklist_rounded),
-            label: 'Tasks',
+          child: Row(
+            children: [
+              _dockItem(context, Icons.home_rounded, 'Home', true, () {}),
+              _dockItem(context, Icons.checklist_rounded, 'Tasks', false,
+                  () => context.push('/tasks')),
+              _dockItem(context, Icons.insights_rounded, 'Insights', false,
+                  () => context.push('/insights')),
+              _dockItem(context, Icons.settings_rounded, 'Settings', false,
+                  () => context.push('/settings')),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.insights_outlined),
-            label: 'Insights',
+        ),
+      ),
+  }
+
+  Widget _dockItem(
+    BuildContext context,
+    IconData icon,
+    String label,
+    bool selected,
+    VoidCallback onTap,
+  ) {
+    final foreground = selected
+        ? const Color(0xFF171719)
+        : Colors.white.withValues(alpha: 0.68);
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFFFFD65A) : Colors.transparent,
+            borderRadius: BorderRadius.circular(17),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            label: 'Settings',
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: foreground, size: 21),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: foreground,
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-        ],
-        onDestinationSelected: (index) {
-          switch (index) {
-            case 1:
-              context.push('/tasks');
-              break;
-            case 2:
-              context.push('/insights');
-              break;
-            case 3:
-              context.push('/settings');
-              break;
-          }
-        },
+        ),
       ),
     );
   }
