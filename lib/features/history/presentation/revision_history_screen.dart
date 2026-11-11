@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart' show OrderingTerm;
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';

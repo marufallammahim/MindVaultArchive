@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
 
 class AppLockGate extends StatefulWidget {
   const AppLockGate({super.key, required this.child, AppLockService? service})
-      : _service = service;
+    : _service = service;
 
   final Widget child;
   final AppLockService? _service;

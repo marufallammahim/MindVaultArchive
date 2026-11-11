@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Consistent introductory panel for secondary MindVault feature screens.
 class FeatureHero extends StatelessWidget {
@@ -23,10 +23,7 @@ class FeatureHero extends StatelessWidget {
       padding: EdgeInsets.all(compact ? 15 : 19),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            accent.withValues(alpha: .19),
-            const Color(0xFF1A1A1E),
-          ],
+          colors: [accent.withValues(alpha: .19), const Color(0xFF1A1A1E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -52,17 +49,17 @@ class FeatureHero extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -.45,
-                      ),
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -.45,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        height: 1.35,
-                      ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    height: 1.35,
+                  ),
                 ),
               ],
             ),

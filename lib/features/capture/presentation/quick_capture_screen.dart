@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -87,7 +87,9 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     setState(() => _saving = true);
     final id = const Uuid().v4();
     try {
-      await ref.read(databaseProvider).saveNoteContent(
+      await ref
+          .read(databaseProvider)
+          .saveNoteContent(
             id,
             title.isEmpty ? 'Quick capture' : title,
             content,
@@ -142,9 +144,7 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
               hintText: 'Give this thought a title…',
               border: InputBorder.none,
             ),
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall
+            style: Theme.of(context).textTheme.headlineSmall
                 ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.7),
           ),
           const Divider(),

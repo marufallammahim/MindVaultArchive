@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart' hide Column;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -167,8 +167,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   String _priorityLabel(int value) => value == 2
       ? 'High'
       : value == 0
-          ? 'Low'
-          : 'Normal';
+      ? 'Low'
+      : 'Normal';
 
   @override
   Widget build(BuildContext context) {
@@ -220,10 +220,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         child: Text(
                           MaterialLocalizations.of(context)
                               .formatMonthYear(_selectedDay),
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                  ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w900),
                         ),
                       ),
                       IconButton(
@@ -236,8 +234,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             lastDate: DateTime(2100),
                           );
                           if (picked != null) {
-                            setState(() =>
-                                _selectedDay = DateUtils.dateOnly(picked));
+                            setState(
+                              () => _selectedDay = DateUtils.dateOnly(picked),
+                            );
                           }
                         },
                         icon: const Icon(Icons.calendar_month_rounded),
@@ -277,9 +276,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                DateFormat.E(Localizations.localeOf(context)
-                                        .toString())
-                                    .format(day),
+                                DateFormat.E(
+                                  Localizations.localeOf(context).toString(),
+                                ).format(day),
                                 style: TextStyle(
                                   color: selected
                                       ? Colors.black54
@@ -311,11 +310,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                       Expanded(
                         child: Text(
                           _completed ? 'completed tasks' : 'your next moves',
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    letterSpacing: -0.6,
-                                  ),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.6,
+                              ),
                         ),
                       ),
                       SegmentedButton<bool>(
@@ -337,8 +336,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(
-                          child:
-                              Text('Could not load tasks: ${snapshot.error}'),
+                          child: Text(
+                            'Could not load tasks: ${snapshot.error}',
+                          ),
                         );
                       }
                       if (!snapshot.hasData) {
@@ -352,10 +352,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.checklist_rounded,
-                                    size: 64,
-                                    color:
-                                        Theme.of(context).colorScheme.primary),
+                                Icon(
+                                  Icons.checklist_rounded,
+                                  size: 64,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                                 const SizedBox(height: 14),
                                 Text(
                                   _completed
@@ -365,7 +366,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                 ),
                                 const SizedBox(height: 6),
                                 const Text(
-                                    'Add a task and make your next move.'),
+                                  'Add a task and make your next move.',
+                                ),
                               ],
                             ),
                           ),
@@ -383,7 +385,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         separatorBuilder: (_, __) => const SizedBox(height: 9),
                         itemBuilder: (context, index) {
                           final item = items[index];
-                          final overdue = !item.isCompleted &&
+                          final overdue =
+                              !item.isCompleted &&
                               item.dueAt != null &&
                               DateUtils.dateOnly(item.dueAt!)
                                   .isBefore(DateUtils.dateOnly(DateTime.now()));
@@ -398,8 +401,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             child: InkWell(
                               onTap: () => _editTask(task: item),
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(14, 11, 10, 11),
+                                padding: const EdgeInsets.fromLTRB(
+                                  14,
+                                  11,
+                                  10,
+                                  11,
+                                ),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -428,7 +435,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
                                                 color: foreground.withValues(
-                                                    alpha: 0.82),
+                                                  alpha: 0.82,
+                                                ),
                                                 fontSize: 12,
                                               ),
                                             ),
@@ -439,12 +447,14 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                             runSpacing: 5,
                                             children: [
                                               _taskPill(
-                                                  foreground,
-                                                  _priorityLabel(
-                                                      item.priority)),
+                                                foreground,
+                                                _priorityLabel(item.priority),
+                                              ),
                                               if (item.noteId != null)
                                                 _taskPill(
-                                                    foreground, 'Linked note'),
+                                                  foreground,
+                                                  'Linked note',
+                                                ),
                                               if (item.dueAt != null)
                                                 _taskPill(
                                                   overdue
@@ -462,8 +472,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                       children: [
                                         IconButton.filled(
                                           style: IconButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xFF171717),
+                                            backgroundColor: const Color(
+                                              0xFF171717,
+                                            ),
                                             foregroundColor: Colors.white,
                                           ),
                                           tooltip: item.isCompleted
@@ -480,8 +491,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                           ),
                                         ),
                                         PopupMenuButton<String>(
-                                          icon: Icon(Icons.more_horiz,
-                                              color: foreground),
+                                          icon: Icon(
+                                            Icons.more_horiz,
+                                            color: foreground,
+                                          ),
                                           onSelected: (action) async {
                                             if (action == 'edit') {
                                               await _editTask(task: item);
@@ -491,11 +504,13 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                           },
                                           itemBuilder: (_) => const [
                                             PopupMenuItem(
-                                                value: 'edit',
-                                                child: Text('Edit')),
+                                              value: 'edit',
+                                              child: Text('Edit'),
+                                            ),
                                             PopupMenuItem(
-                                                value: 'delete',
-                                                child: Text('Delete')),
+                                              value: 'delete',
+                                              child: Text('Delete'),
+                                            ),
                                           ],
                                         ),
                                       ],
@@ -576,7 +591,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return Center(
-              child: Text('Could not load progress: ${snapshot.error}'));
+            child: Text('Could not load progress: ${snapshot.error}'),
+          );
         }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
@@ -584,9 +600,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         final tasks = snapshot.data!;
         final completed = tasks.where((task) => task.isCompleted).length;
         final dueOnDay = tasks
-            .where((task) =>
-                task.dueAt != null &&
-                DateUtils.isSameDay(task.dueAt, _selectedDay))
+            .where(
+              (task) =>
+                  task.dueAt != null &&
+                  DateUtils.isSameDay(task.dueAt, _selectedDay),
+            )
             .length;
         final progress = tasks.isEmpty ? 0.0 : completed / tasks.length;
         return ListView(
@@ -594,10 +612,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           children: [
             Text(
               'Progress',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.8,
-                  ),
+              style: Theme.of(context).textTheme.headlineMedium
+                  ?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.8),
             ),
             const SizedBox(height: 5),
             Text(
@@ -649,12 +665,17 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                   Row(
                     children: [
                       Expanded(
-                          child: _progressMetric('Completed', '$completed')),
+                        child: _progressMetric('Completed', '$completed'),
+                      ),
                       Expanded(
-                          child: _progressMetric(
-                              'Remaining', '${tasks.length - completed}')),
+                        child: _progressMetric(
+                          'Remaining',
+                          '${tasks.length - completed}',
+                        ),
+                      ),
                       Expanded(
-                          child: _progressMetric('Total', '${tasks.length}')),
+                        child: _progressMetric('Total', '${tasks.length}'),
+                      ),
                     ],
                   ),
                 ],
@@ -663,9 +684,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             const SizedBox(height: 18),
             Text(
               MaterialLocalizations.of(context).formatMonthYear(_selectedDay),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 8),
             Container(
@@ -678,9 +698,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 initialDate: _selectedDay,
                 firstDate: DateTime(2000),
                 lastDate: DateTime(2100),
-                onDateChanged: (day) => setState(
-                  () => _selectedDay = DateUtils.dateOnly(day),
-                ),
+                onDateChanged: (day) =>
+                    setState(() => _selectedDay = DateUtils.dateOnly(day)),
               ),
             ),
             const SizedBox(height: 14),
@@ -692,8 +711,11 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.event_available_rounded,
-                      color: Color(0xFF171719), size: 30),
+                  const Icon(
+                    Icons.event_available_rounded,
+                    color: Color(0xFF171719),
+                    size: 30,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -727,21 +749,21 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   }
 
   Widget _progressMetric(String label, String value) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: .58),
-              fontSize: 11,
-            ),
-          ),
-        ],
-      );
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        value,
+        style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
+      ),
+      Text(
+        label,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: .58),
+          fontSize: 11,
+        ),
+      ),
+    ],
+  );
 
   Widget _taskDockItem(
     IconData icon,
@@ -784,20 +806,20 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
   }
 
   Widget _taskPill(Color foreground, String label) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: foreground.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(30),
+    decoration: BoxDecoration(
+      color: foreground.withValues(alpha: 0.14),
+      borderRadius: BorderRadius.circular(30),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: foreground,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: foreground,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      );
+      ),
+    ),
+  );
 }

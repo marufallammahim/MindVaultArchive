@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' hide Column;
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -42,8 +42,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               CircleAvatar(
                 radius: 38,
-                backgroundImage:
-                    UserProfile(name: '', avatarBase64: avatar).avatar,
+                backgroundImage: UserProfile(
+                  name: '',
+                  avatarBase64: avatar,
+                ).avatar,
                 child: avatar == null
                     ? const Icon(Icons.person_outline, size: 38)
                     : null,
@@ -98,29 +100,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
     if (saved == true) {
-      await ref.read(userProfileProvider.notifier).save(
-            name: name.text,
-            avatarBase64: avatar,
-          );
+      await ref
+          .read(userProfileProvider.notifier)
+          .save(name: name.text, avatarBase64: avatar);
     }
     name.dispose();
   }
 
   List<PopupMenuEntry<String>> _noteActions(Note note) => [
-        PopupMenuItem(
-          value: 'pin',
-          child: Text(note.sortOrder == 1 ? 'Unpin note' : 'Pin note'),
-        ),
-        PopupMenuItem(
-          value: 'favorite',
-          child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
-        ),
-        PopupMenuItem(
-          value: 'archive',
-          child: Text(note.isArchived ? 'Unarchive' : 'Archive'),
-        ),
-        const PopupMenuItem(value: 'trash', child: Text('Move to trash')),
-      ];
+    PopupMenuItem(
+      value: 'pin',
+      child: Text(note.sortOrder == 1 ? 'Unpin note' : 'Pin note'),
+    ),
+    PopupMenuItem(
+      value: 'favorite',
+      child: Text(note.isFavorite ? 'Remove favorite' : 'Add to favorites'),
+    ),
+    PopupMenuItem(
+      value: 'archive',
+      child: Text(note.isArchived ? 'Unarchive' : 'Archive'),
+    ),
+    const PopupMenuItem(value: 'trash', child: Text('Move to trash')),
+  ];
 
   Future<void> _handleNoteAction(
     AppDatabase db,
@@ -181,10 +182,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             final notes = term.isEmpty
                 ? allNotes
                 : allNotes
-                    .where((note) =>
-                        note.title.toLowerCase().contains(term) ||
-                        note.documentContent.toLowerCase().contains(term))
-                    .toList();
+                      .where(
+                        (note) =>
+                            note.title.toLowerCase().contains(term) ||
+                            note.documentContent.toLowerCase().contains(term),
+                      )
+                      .toList();
 
             return CustomScrollView(
               slivers: [
@@ -264,9 +267,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         const SizedBox(height: 30),
                         Text(
                           'my notes',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineMedium
+                          style: Theme.of(context).textTheme.headlineMedium
                               ?.copyWith(
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: -1.1,
@@ -281,21 +282,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               _filterChip(context, '#favorites', 'favorites'),
                               _filterChip(context, '#archive', 'archive'),
                               StreamBuilder<List<Category>>(
-                                stream: (db.select(db.categories)
-                                      ..orderBy([
-                                        (c) => OrderingTerm.asc(c.name),
-                                      ]))
-                                    .watch(),
+                                stream:
+                                    (db.select(db.categories)..orderBy([
+                                          (c) => OrderingTerm.asc(c.name),
+                                        ]))
+                                        .watch(),
                                 builder: (context, categories) => Row(
                                   children: [
                                     for (final category
                                         in categories.data ?? [])
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 8),
+                                        padding: const EdgeInsets.only(
+                                          right: 8,
+                                        ),
                                         child: ChoiceChip(
                                           label: Text('#${category.name}'),
-                                          selected: _view == 'category' &&
+                                          selected:
+                                              _view == 'category' &&
                                               _selectedCategoryId ==
                                                   category.id,
                                           onSelected: (_) => setState(() {
@@ -373,8 +376,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.note_add_outlined,
-                                size: 62, color: accent),
+                            Icon(
+                              Icons.note_add_outlined,
+                              size: 62,
+                              color: accent,
+                            ),
                             const SizedBox(height: 14),
                             Text(
                               term.isEmpty
@@ -451,12 +457,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Row(
             children: [
               _dockItem(context, Icons.home_rounded, 'Home', true, () {}),
-              _dockItem(context, Icons.checklist_rounded, 'Tasks', false,
-                  () => context.push('/tasks')),
-              _dockItem(context, Icons.insights_rounded, 'Insights', false,
-                  () => context.push('/insights')),
-              _dockItem(context, Icons.settings_rounded, 'Settings', false,
-                  () => context.push('/settings')),
+              _dockItem(
+                context,
+                Icons.checklist_rounded,
+                'Tasks',
+                false,
+                () => context.push('/tasks'),
+              ),
+              _dockItem(
+                context,
+                Icons.insights_rounded,
+                'Insights',
+                false,
+                () => context.push('/insights'),
+              ),
+              _dockItem(
+                context,
+                Icons.settings_rounded,
+                'Settings',
+                false,
+                () => context.push('/settings'),
+              ),
             ],
           ),
         ),
@@ -583,14 +604,20 @@ class _NoteCard extends StatelessWidget {
                       if (note.sortOrder == 1)
                         Padding(
                           padding: const EdgeInsets.only(right: 5),
-                          child: Icon(Icons.push_pin_rounded,
-                              color: foreground, size: 17),
+                          child: Icon(
+                            Icons.push_pin_rounded,
+                            color: foreground,
+                            size: 17,
+                          ),
                         ),
                       if (note.isFavorite)
                         Padding(
                           padding: const EdgeInsets.only(right: 5),
-                          child: Icon(Icons.star_rounded,
-                              color: foreground, size: 18),
+                          child: Icon(
+                            Icons.star_rounded,
+                            color: foreground,
+                            size: 18,
+                          ),
                         ),
                       IconButton(
                         tooltip: 'Edit note',
@@ -677,20 +704,20 @@ class _NoteCard extends StatelessWidget {
   }
 
   Widget _metaPill(Color foreground, String label) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: foreground.withValues(alpha: 0.13),
-          borderRadius: BorderRadius.circular(30),
+    decoration: BoxDecoration(
+      color: foreground.withValues(alpha: 0.13),
+      borderRadius: BorderRadius.circular(30),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: foreground,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: foreground,
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      );
+      ),
+    ),
+  );
 }

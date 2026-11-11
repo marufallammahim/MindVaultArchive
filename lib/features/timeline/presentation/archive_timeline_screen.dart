@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,8 +14,9 @@ class ArchiveTimelineScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Memory timeline')),
       body: StreamBuilder<List<Note>>(
-        stream: (db.select(db.notes)..where((n) => n.isDeleted.equals(false)))
-            .watch(),
+        stream: (db.select(
+          db.notes,
+        )..where((n) => n.isDeleted.equals(false))).watch(),
         builder: (context, noteSnapshot) {
           if (noteSnapshot.hasError) {
             return _TimelineMessage(
@@ -39,27 +40,30 @@ class ArchiveTimelineScreen extends ConsumerWidget {
               final entries = <_TimelineEntry>[
                 for (final note in noteSnapshot.data!)
                   _TimelineEntry(
-                      date: note.updatedAt,
-                      title: note.title.trim().isEmpty
-                          ? 'Untitled note'
-                          : note.title,
-                      detail:
-                          note.isArchived ? 'Archived note' : 'Note updated',
-                      icon: Icons.note_alt_outlined,
-                      noteId: note.id),
+                    date: note.updatedAt,
+                    title: note.title.trim().isEmpty
+                        ? 'Untitled note'
+                        : note.title,
+                    detail: note.isArchived ? 'Archived note' : 'Note updated',
+                    icon: Icons.note_alt_outlined,
+                    noteId: note.id,
+                  ),
                 for (final task in taskSnapshot.data!)
                   _TimelineEntry(
-                      date: task.updatedAt,
-                      title: task.title,
-                      detail:
-                          task.isCompleted ? 'Task completed' : 'Task updated',
-                      icon: task.isCompleted
-                          ? Icons.task_alt
-                          : Icons.pending_actions_outlined),
+                    date: task.updatedAt,
+                    title: task.title,
+                    detail: task.isCompleted
+                        ? 'Task completed'
+                        : 'Task updated',
+                    icon: task.isCompleted
+                        ? Icons.task_alt
+                        : Icons.pending_actions_outlined,
+                  ),
               ]..sort((a, b) => b.date.compareTo(a.date));
               if (entries.isEmpty) {
                 return const _TimelineMessage(
-                    'Your timeline will appear here as you create notes and tasks.');
+                  'Your timeline will appear here as you create notes and tasks.',
+                );
               }
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
@@ -73,8 +77,7 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                       child: FeatureHero(
                         icon: Icons.timeline_rounded,
                         title: 'Your memory timeline',
-                        subtitle:
-                            'Follow the notes and tasks that shape your archive.',
+                        subtitle: 'Follow the notes and tasks that shape your archive.',
                         compact: true,
                       ),
                     );
@@ -83,15 +86,22 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).colorScheme.primaryContainer,
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimaryContainer,
-                        child: Icon(entry.icon)),
-                    title: Text(entry.title,
-                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .primaryContainer,
+                      foregroundColor: Theme.of(context)
+                          .colorScheme
+                          .onPrimaryContainer,
+                      child: Icon(entry.icon),
+                    ),
+                    title: Text(
+                      entry.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     subtitle: Text(
-                        '${entry.detail} • ${MaterialLocalizations.of(context).formatMediumDate(entry.date)}'),
+                      '${entry.detail} • ${MaterialLocalizations.of(context).formatMediumDate(entry.date)}',
+                    ),
                     trailing: entry.noteId == null
                         ? null
                         : const Icon(Icons.chevron_right),
@@ -110,12 +120,13 @@ class ArchiveTimelineScreen extends ConsumerWidget {
 }
 
 class _TimelineEntry {
-  const _TimelineEntry(
-      {required this.date,
-      required this.title,
-      required this.detail,
-      required this.icon,
-      this.noteId});
+  const _TimelineEntry({
+    required this.date,
+    required this.title,
+    required this.detail,
+    required this.icon,
+    this.noteId,
+  });
   final DateTime date;
   final String title;
   final String detail;
@@ -128,7 +139,9 @@ class _TimelineMessage extends StatelessWidget {
   final String message;
   @override
   Widget build(BuildContext context) => Center(
-      child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(message, textAlign: TextAlign.center)));
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Text(message, textAlign: TextAlign.center),
+    ),
+  );
 }

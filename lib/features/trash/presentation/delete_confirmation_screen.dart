@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -33,8 +33,9 @@ class DeleteConfirmationScreen extends ConsumerWidget {
             if (note == null) {
               return _missing(context);
             }
-            final title =
-                note.title.trim().isEmpty ? 'Untitled note' : note.title.trim();
+            final title = note.title.trim().isEmpty
+                ? 'Untitled note'
+                : note.title.trim();
             return Padding(
               padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
               child: Column(
@@ -174,17 +175,17 @@ class DeleteConfirmationScreen extends ConsumerWidget {
   }
 
   Widget _missing(BuildContext context) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.note_alt_outlined, size: 48),
-            const SizedBox(height: 12),
-            const Text('This note is no longer available.'),
-            TextButton(
-              onPressed: () => context.pop(false),
-              child: const Text('Go back'),
-            ),
-          ],
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.note_alt_outlined, size: 48),
+        const SizedBox(height: 12),
+        const Text('This note is no longer available.'),
+        TextButton(
+          onPressed: () => context.pop(false),
+          child: const Text('Go back'),
         ),
-      );
+      ],
+    ),
+  );
 }

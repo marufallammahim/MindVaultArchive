@@ -8,7 +8,7 @@ import 'package:mindvault_archive/features/security/presentation/app_lock_gate.d
 
 class MindVaultArchiveApp extends ConsumerWidget {
   const MindVaultArchiveApp({super.key, AppLockService? appLockService})
-      : _appLockService = appLockService;
+    : _appLockService = appLockService;
 
   final AppLockService? _appLockService;
 

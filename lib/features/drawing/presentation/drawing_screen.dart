@@ -1,8 +1,9 @@
 import 'dart:io';
+
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 
 import 'package:mindvault_archive/core/database/database.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path/path.dart' as p;
@@ -57,15 +58,16 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       final db = ref.read(databaseProvider);
       final existing = await (db.select(
         db.notes,
-      )..where((note) => note.id.equals(widget.noteId)))
-          .getSingleOrNull();
+      )..where((note) => note.id.equals(widget.noteId))).getSingleOrNull();
       if (existing == null) {
         await db
             .into(db.notes)
             .insert(NotesCompanion.insert(id: widget.noteId));
       }
 
-      await db.into(db.attachments).insert(
+      await db
+          .into(db.attachments)
+          .insert(
             AttachmentsCompanion.insert(
               id: id,
               noteId: widget.noteId,
@@ -92,67 +94,67 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Sketch pad'),
-          actions: [
-            IconButton(
-              tooltip: 'Save drawing',
-              icon: _saving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.check),
-              onPressed: _saving ? null : _saveDrawing,
-            ),
-          ],
+    appBar: AppBar(
+      title: const Text('Sketch pad'),
+      actions: [
+        IconButton(
+          tooltip: 'Save drawing',
+          icon: _saving
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.check),
+          onPressed: _saving ? null : _saveDrawing,
         ),
-        body: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 12),
-              child: FeatureHero(
-                icon: Icons.gesture_rounded,
-                title: 'Sketch an idea',
-                subtitle:
-                    'Draw freely. Your sketch is saved as an attachment to this note.',
-                compact: true,
-              ),
-            ),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
-                child: Signature(
-                  controller: _controller,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainerLow,
-                ),
-              ),
-            ),
-          ],
-        ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                tooltip: 'Undo',
-                icon: const Icon(Icons.undo),
-                onPressed: _controller.undo,
-              ),
-              IconButton(
-                tooltip: 'Redo',
-                icon: const Icon(Icons.redo),
-                onPressed: _controller.redo,
-              ),
-              IconButton(
-                tooltip: 'Clear',
-                icon: const Icon(Icons.clear),
-                onPressed: _controller.clear,
-              ),
-            ],
+      ],
+    ),
+    body: Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, 12),
+          child: FeatureHero(
+            icon: Icons.gesture_rounded,
+            title: 'Sketch an idea',
+            subtitle: 'Draw freely. Your sketch is saved as an attachment to this note.',
+            compact: true,
           ),
         ),
-      );
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: Signature(
+              controller: _controller,
+              backgroundColor: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerLow,
+            ),
+          ),
+        ),
+      ],
+    ),
+    bottomNavigationBar: BottomAppBar(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          IconButton(
+            tooltip: 'Undo',
+            icon: const Icon(Icons.undo),
+            onPressed: _controller.undo,
+          ),
+          IconButton(
+            tooltip: 'Redo',
+            icon: const Icon(Icons.redo),
+            onPressed: _controller.redo,
+          ),
+          IconButton(
+            tooltip: 'Clear',
+            icon: const Icon(Icons.clear),
+            onPressed: _controller.clear,
+          ),
+        ],
+      ),
+    ),
+  );
 }

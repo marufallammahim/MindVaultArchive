@@ -27,25 +27,27 @@ class _MemorySecureStore implements SecureValueStore {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('application root starts without uncaught initialization errors',
-      (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final database = AppDatabase(NativeDatabase.memory());
-    addTearDown(database.close);
+  testWidgets(
+    'application root starts without uncaught initialization errors',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final database = AppDatabase(NativeDatabase.memory());
+      addTearDown(database.close);
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [databaseProvider.overrideWithValue(database)],
-        child: MindVaultArchiveApp(
-          appLockService: AppLockService(store: _MemorySecureStore()),
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [databaseProvider.overrideWithValue(database)],
+          child: MindVaultArchiveApp(
+            appLockService: AppLockService(store: _MemorySecureStore()),
+          ),
         ),
-      ),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 100));
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.text('MindVault Archive'), findsOneWidget);
-    expect(find.text('Your Thoughts. Your Archive.'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+      expect(find.text('MindVault Archive'), findsOneWidget);
+      expect(find.text('Your Thoughts. Your Archive.'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

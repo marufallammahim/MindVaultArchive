@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart' hide Column;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -16,9 +16,9 @@ class TrashScreen extends ConsumerWidget {
       );
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not restore note: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not restore note: $error')));
     }
   }
 
@@ -81,7 +81,8 @@ class TrashScreen extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-                child: Text('Could not load Trash: ${snapshot.error}'));
+              child: Text('Could not load Trash: ${snapshot.error}'),
+            );
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -110,8 +111,10 @@ class TrashScreen extends ConsumerWidget {
                     const SizedBox(height: 18),
                     const Text(
                       'Trash is empty',
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     const SizedBox(height: 7),
                     Text(
@@ -160,8 +163,9 @@ class TrashScreen extends ConsumerWidget {
                                   : note.title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w800),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(

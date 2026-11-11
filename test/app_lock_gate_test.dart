@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
 import 'package:mindvault_archive/features/security/presentation/app_lock_gate.dart';
@@ -25,8 +25,9 @@ class _MemorySecureStore implements SecureValueStore {
 }
 
 void main() {
-  testWidgets('app lock gate displays the app after a valid PIN',
-      (tester) async {
+  testWidgets('app lock gate displays the app after a valid PIN', (
+    tester,
+  ) async {
     final store = _MemorySecureStore();
     final service = AppLockService(store: store);
     await service.setPin('482915');
@@ -50,8 +51,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('app lock gate fails closed when secure storage is unavailable',
-      (tester) async {
+  testWidgets('app lock gate fails closed when secure storage is unavailable', (
+    tester,
+  ) async {
     final store = _MemorySecureStore()..failReads = true;
     final service = AppLockService(store: store);
 

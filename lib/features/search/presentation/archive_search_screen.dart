@@ -1,7 +1,8 @@
 import 'dart:async';
+
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -115,8 +116,9 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                   },
                   icon: const Icon(Icons.close),
                 ),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
               ),
             ),
           ),
@@ -133,68 +135,67 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
             child: _controller.text.trim().isEmpty
                 ? const _SearchHint()
                 : _results.isEmpty && !_loading && _error == null
-                    ? const _NoResults()
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(14, 4, 14, 28),
-                        itemCount: _results.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                        itemBuilder: (context, index) {
-                          final item = _results[index];
-                          final isNote = item.kind == ArchiveSearchKind.note;
-                          final labels = <String>[
-                            if (item.category != null) item.category!,
-                            ...item.tags,
-                          ];
-                          return Card(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                child: Icon(
-                                  isNote
-                                      ? Icons.description_outlined
-                                      : Icons.check_circle_outline,
-                                ),
-                              ),
-                              title: Text(
-                                item.title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (item.preview.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4),
-                                      child: Text(
-                                        item.preview,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  if (labels.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 6),
-                                      child: Wrap(
-                                        spacing: 6,
-                                        runSpacing: 4,
-                                        children: [
-                                          for (final label in labels.take(5))
-                                            Chip(
-                                              visualDensity:
-                                                  VisualDensity.compact,
-                                              label: Text(label),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              trailing: const Icon(Icons.chevron_right),
-                              onTap: () => _openResult(item),
+                ? const _NoResults()
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(14, 4, 14, 28),
+                    itemCount: _results.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final item = _results[index];
+                      final isNote = item.kind == ArchiveSearchKind.note;
+                      final labels = <String>[
+                        if (item.category != null) item.category!,
+                        ...item.tags,
+                      ];
+                      return Card(
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            child: Icon(
+                              isNote
+                                  ? Icons.description_outlined
+                                  : Icons.check_circle_outline,
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                          title: Text(
+                            item.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (item.preview.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    item.preview,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              if (labels.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Wrap(
+                                    spacing: 6,
+                                    runSpacing: 4,
+                                    children: [
+                                      for (final label in labels.take(5))
+                                        Chip(
+                                          visualDensity: VisualDensity.compact,
+                                          label: Text(label),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                            ],
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => _openResult(item),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

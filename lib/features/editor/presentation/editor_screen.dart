@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart' hide Column;
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -51,8 +51,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Future<void> _shareMarkdown() async {
-    final saved =
-        await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+    final saved = await ref
+        .read(editorProvider(widget.noteId).notifier)
+        .forceSave();
     if (!mounted) {
       return;
     }
@@ -63,21 +64,20 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       return;
     }
     final title = _titleController.text.trim();
-    final safeName = (title.isEmpty ? 'mindvault-note' : title)
-        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '-');
+    final safeName = (title.isEmpty ? 'mindvault-note' : title).replaceAll(
+      RegExp(r'[\\/:*?"<>|]'),
+      '-',
+    );
     final markdown =
         '# ${title.isEmpty ? 'Untitled' : title}\n\n${_contentController.text}';
     try {
-      await Share.shareXFiles(
-        [
-          XFile.fromData(
-            utf8.encode(markdown),
-            mimeType: 'text/markdown',
-            name: '$safeName.md',
-          ),
-        ],
-        text: 'Exported from MindVault Archive',
-      );
+      await Share.shareXFiles([
+        XFile.fromData(
+          utf8.encode(markdown),
+          mimeType: 'text/markdown',
+          name: '$safeName.md',
+        ),
+      ], text: 'Exported from MindVault Archive');
     } catch (error) {
       if (!mounted) {
         return;
@@ -89,8 +89,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Future<void> _attachFile() async {
-    final saved =
-        await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+    final saved = await ref
+        .read(editorProvider(widget.noteId).notifier)
+        .forceSave();
     if (!mounted) {
       return;
     }
@@ -123,27 +124,26 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       );
       await directory.create(recursive: true);
       final id = const Uuid().v4();
-      final safeName =
-          p.basename(picked.name).replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+      final safeName = p
+          .basename(picked.name)
+          .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
       final filename = '${id}_${safeName.isEmpty ? 'attachment' : safeName}';
       target = File(p.join(directory.path, filename));
       await target.writeAsBytes(bytes, flush: true);
       final extension = p.extension(picked.name).toLowerCase();
       final type =
           {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'}.contains(extension)
-              ? 'image'
-              : {'.mp3', '.m4a', '.wav', '.ogg', '.aac'}.contains(extension)
-                  ? 'audio'
-                  : {'.mp4', '.mov', '.mkv', '.webm'}.contains(extension)
-                      ? 'video'
-                      : extension == '.pdf'
-                          ? 'pdf'
-                          : 'file';
+          ? 'image'
+          : {'.mp3', '.m4a', '.wav', '.ogg', '.aac'}.contains(extension)
+          ? 'audio'
+          : {'.mp4', '.mov', '.mkv', '.webm'}.contains(extension)
+          ? 'video'
+          : extension == '.pdf'
+          ? 'pdf'
+          : 'file';
       await ref
           .read(databaseProvider)
-          .into(
-            ref.read(databaseProvider).attachments,
-          )
+          .into(ref.read(databaseProvider).attachments)
           .insert(
             AttachmentsCompanion.insert(
               id: id,
@@ -166,9 +166,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       if (!mounted) {
         return;
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not attach file: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not attach file: $error')));
     }
   }
 
@@ -204,13 +204,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       return;
     }
     try {
-      await Share.shareXFiles(
-        [
-          XFile(file.path,
-              mimeType: attachment.type == 'pdf' ? 'application/pdf' : null)
-        ],
-        text: 'Open this MindVault Archive attachment with a compatible app.',
-      );
+      await Share.shareXFiles([
+        XFile(
+          file.path,
+          mimeType: attachment.type == 'pdf' ? 'application/pdf' : null,
+        ),
+      ], text: 'Open this MindVault Archive attachment with a compatible app.');
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -242,9 +241,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       return;
     }
     try {
-      await (ref.read(databaseProvider).delete(
-                ref.read(databaseProvider).attachments,
-              )..where((item) => item.id.equals(attachment.id)))
+      await (ref
+              .read(databaseProvider)
+              .delete(ref.read(databaseProvider).attachments)
+            ..where((item) => item.id.equals(attachment.id)))
           .go();
       final file = File(attachment.localPath);
       if (await file.exists()) {
@@ -298,8 +298,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final router = GoRouter.of(context);
-        final saved =
-            await ref.read(editorProvider(widget.noteId).notifier).forceSave();
+        final saved = await ref
+            .read(editorProvider(widget.noteId).notifier)
+            .forceSave();
         if (!mounted) return;
         if (saved) router.pop();
       },
@@ -309,13 +310,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             state.saveError != null
                 ? 'Save failed'
                 : state.isSaving
-                    ? 'Saving…'
-                    : 'Saved',
+                ? 'Saving…'
+                : 'Saved',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: state.saveError != null
-                      ? Theme.of(context).colorScheme.error
-                      : null,
-                ),
+              color: state.saveError != null
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+            ),
           ),
           actions: [
             IconButton(
@@ -459,34 +460,37 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 controller: _titleController,
                 onChanged: (_) => _onTextChanged(),
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.8,
-                    height: 1.12),
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.8,
+                  height: 1.12,
+                ),
                 decoration: const InputDecoration(
-                    hintText: 'Give this note a title',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 12)),
+                  hintText: 'Give this note a title',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 12),
+                ),
                 maxLines: null,
               ),
               StreamBuilder<List<Category>>(
-                stream: (db.select(db.categories)
-                      ..orderBy([
-                        (category) => OrderingTerm.asc(category.name),
-                      ]))
-                    .watch(),
+                stream:
+                    (db.select(db.categories)..orderBy([
+                          (category) => OrderingTerm.asc(category.name),
+                        ]))
+                        .watch(),
                 builder: (context, categoriesSnapshot) {
                   final categories = categoriesSnapshot.data ?? [];
                   return StreamBuilder<Note?>(
-                    stream: (db.select(db.notes)
-                          ..where((note) => note.id.equals(widget.noteId)))
-                        .watchSingleOrNull(),
+                    stream:
+                        (db.select(db.notes)
+                              ..where((note) => note.id.equals(widget.noteId)))
+                            .watchSingleOrNull(),
                     builder: (context, noteSnapshot) {
                       final selectedId = noteSnapshot.data?.categoryId;
                       return DropdownButtonFormField<String?>(
                         initialValue:
                             categories.any((item) => item.id == selectedId)
-                                ? selectedId
-                                : null,
+                            ? selectedId
+                            : null,
                         isExpanded: true,
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.folder_outlined),
@@ -530,16 +534,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               StreamBuilder<List<Tag>>(
                 stream: (db.select(
                   db.tags,
-                )..orderBy([(tag) => OrderingTerm.asc(tag.name)]))
-                    .watch(),
+                )..orderBy([(tag) => OrderingTerm.asc(tag.name)])).watch(),
                 builder: (context, tagsSnapshot) {
                   final tags = tagsSnapshot.data ?? [];
                   return StreamBuilder<List<NoteTag>>(
-                    stream: (db.select(db.noteTags)
-                          ..where(
-                            (item) => item.noteId.equals(widget.noteId),
-                          ))
-                        .watch(),
+                    stream:
+                        (db.select(db.noteTags)..where(
+                              (item) => item.noteId.equals(widget.noteId),
+                            ))
+                            .watch(),
                     builder: (context, selectedSnapshot) {
                       final selectedIds = (selectedSnapshot.data ?? [])
                           .map((item) => item.tagId)
@@ -604,13 +607,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 },
               ),
               StreamBuilder<List<VaultTask>>(
-                stream: (db.select(db.tasks)
-                      ..where((task) => task.noteId.equals(widget.noteId))
-                      ..orderBy([
-                        (task) => OrderingTerm.asc(task.dueAt),
-                        (task) => OrderingTerm.desc(task.updatedAt),
-                      ]))
-                    .watch(),
+                stream:
+                    (db.select(db.tasks)
+                          ..where((task) => task.noteId.equals(widget.noteId))
+                          ..orderBy([
+                            (task) => OrderingTerm.asc(task.dueAt),
+                            (task) => OrderingTerm.desc(task.updatedAt),
+                          ]))
+                        .watch(),
                 builder: (context, taskSnapshot) {
                   final tasks = taskSnapshot.data ?? [];
                   if (tasks.isEmpty) return const SizedBox.shrink();
@@ -669,14 +673,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   final backlinks = currentTitle.isEmpty
                       ? <Note>[]
                       : allNotes
-                          .where(
-                            (note) =>
-                                note.id != widget.noteId &&
-                                note.documentContent.toLowerCase().contains(
-                                      '[[${currentTitle.toLowerCase()}]]',
-                                    ),
-                          )
-                          .toList();
+                            .where(
+                              (note) =>
+                                  note.id != widget.noteId &&
+                                  note.documentContent.toLowerCase().contains(
+                                    '[[${currentTitle.toLowerCase()}]]',
+                                  ),
+                            )
+                            .toList();
                   if (linkedNotes.isEmpty && backlinks.isEmpty) {
                     return const SizedBox.shrink();
                   }
@@ -786,9 +790,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         const SizedBox(width: 12),
                         Text('${text.length} characters'),
                         const Spacer(),
-                        Text(readingMinutes == 0
-                            ? 'Less than 1 min'
-                            : '$readingMinutes min read'),
+                        Text(
+                          readingMinutes == 0
+                              ? 'Less than 1 min'
+                              : '$readingMinutes min read',
+                        ),
                       ],
                     ),
                   );
@@ -800,8 +806,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   if (snapshot.hasError) {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
-                      child:
-                          Text('Could not load attachments: ${snapshot.error}'),
+                      child: Text(
+                        'Could not load attachments: ${snapshot.error}',
+                      ),
                     );
                   }
                   final attachments = snapshot.data ?? [];
@@ -823,8 +830,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             child: ListTile(
                               dense: true,
                               leading: Icon(_attachmentIcon(item)),
-                              title: Text(item.filename,
-                                  maxLines: 1, overflow: TextOverflow.ellipsis),
+                              title: Text(
+                                item.filename,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                               subtitle: Text(item.type.toUpperCase()),
                               onTap: () => _openAttachment(item),
                               trailing: IconButton(

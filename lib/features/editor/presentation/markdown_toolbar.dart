@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Small Markdown authoring toolbar for the plain-text note editor.
 class MarkdownToolbar extends StatelessWidget {
@@ -59,8 +59,9 @@ class MarkdownToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(22),
-        border:
-            Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
+        border: Border.all(
+          color: scheme.outlineVariant.withValues(alpha: 0.45),
+        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,

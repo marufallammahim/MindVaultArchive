@@ -5,22 +5,18 @@ void main() {
   group('UserProfile', () {
     test('returns no avatar for empty or malformed stored image data', () {
       expect(const UserProfile(name: 'Test').avatar, isNull);
+      expect(const UserProfile(name: 'Test', avatarBase64: '').avatar, isNull);
       expect(
-        const UserProfile(name: 'Test', avatarBase64: '').avatar,
-        isNull,
-      );
-      expect(
-        const UserProfile(name: 'Test', avatarBase64: '%%%not-base64%%%')
-            .avatar,
+        const UserProfile(
+          name: 'Test',
+          avatarBase64: '%%%not-base64%%%',
+        ).avatar,
         isNull,
       );
     });
 
     test('decodes valid base64 avatar data', () {
-      final profile = const UserProfile(
-        name: 'Test',
-        avatarBase64: 'AQIDBA==',
-      );
+      final profile = const UserProfile(name: 'Test', avatarBase64: 'AQIDBA==');
 
       expect(profile.avatar, isNotNull);
     });
