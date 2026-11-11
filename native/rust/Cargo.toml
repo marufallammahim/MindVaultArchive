@@ -1,0 +1,17 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/mindvault_core",
+    "crates/mindvault_ffi",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT"
+rust-version = "1.75"
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+
+[workspace.lints.clippy]
+all = "warn"
