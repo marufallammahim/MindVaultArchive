@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:uuid/uuid.dart';
@@ -276,9 +277,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                MaterialLocalizations.of(context)
-                                    .formatShortWeekday(day)
-                                    .substring(0, 3),
+                                DateFormat.E(Localizations.localeOf(context).toString())
+                                    .format(day),
                                 style: TextStyle(
                                   color: selected
                                       ? Colors.black54
