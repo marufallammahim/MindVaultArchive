@@ -60,7 +60,8 @@ class TrashScreen extends ConsumerWidget {
               context: context,
               applicationName: 'MindVault Archive',
               children: const [
-                Text('Restore notes whenever you need them. Permanently deleted notes cannot be recovered.'),
+                Text(
+                    'Restore notes whenever you need them. Permanently deleted notes cannot be recovered.'),
               ],
             ),
             icon: const Icon(Icons.info_outline_rounded),
@@ -71,7 +72,8 @@ class TrashScreen extends ConsumerWidget {
         stream: query.watch(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Could not load Trash: ${snapshot.error}'));
+            return Center(
+                child: Text('Could not load Trash: ${snapshot.error}'));
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -92,7 +94,8 @@ class TrashScreen extends ConsumerWidget {
                               fontWeight: FontWeight.w800,
                             )),
                     const SizedBox(height: 6),
-                    Text('Notes you move here can be restored or deleted forever.',
+                    Text(
+                        'Notes you move here can be restored or deleted forever.',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium),
                   ],
@@ -111,8 +114,10 @@ class TrashScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Theme.of(context).colorScheme.errorContainer,
-                      foregroundColor: Theme.of(context).colorScheme.onErrorContainer,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.errorContainer,
+                      foregroundColor:
+                          Theme.of(context).colorScheme.onErrorContainer,
                       child: const Icon(Icons.delete_outline_rounded),
                     ),
                     title: Text(
