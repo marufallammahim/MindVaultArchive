@@ -1,3 +1,4 @@
+import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/features/splash/presentation/splash_screen.dart';
 import 'package:mindvault_archive/features/home/presentation/home_screen.dart';
