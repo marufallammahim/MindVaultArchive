@@ -265,7 +265,7 @@ class FullBackupService {
 
   Future<Directory> _attachmentsDirectory() async {
     final root =
-        _restoreDirectory ??
+        restoreDirectory ??
         Directory(
           p.join(
             (await getApplicationDocumentsDirectory()).path,
