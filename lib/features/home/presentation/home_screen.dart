@@ -460,14 +460,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _dockItem(
                 context,
                 Icons.checklist_rounded,
-                'Tasks',
+                'List',
                 false,
                 () => context.push('/tasks'),
               ),
               _dockItem(
                 context,
                 Icons.insights_rounded,
-                'Insights',
+                'Stats',
                 false,
                 () => context.push('/insights'),
               ),
