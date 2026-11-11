@@ -22,7 +22,7 @@ mod tests {
 
     #[test]
     fn api_version_is_nonzero() {
-        assert!(CORE_API_VERSION > 0);
+        assert_eq!(CORE_API_VERSION, 1);
     }
 
     #[test]
