@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:flutter/material.dart';
@@ -107,9 +108,27 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
             ),
           ],
         ),
-        body: Signature(
-          controller: _controller,
-          backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+        body: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: FeatureHero(
+                icon: Icons.gesture_rounded,
+                title: 'Sketch an idea',
+                subtitle: 'Draw freely. Your sketch is saved as an attachment to this note.',
+                compact: true,
+              ),
+            ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(22),
+                child: Signature(
+                  controller: _controller,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                ),
+              ),
+            ),
+          ],
         ),
         bottomNavigationBar: BottomAppBar(
           child: Row(
