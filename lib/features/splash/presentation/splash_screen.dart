@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/branding_assets.dart';
@@ -40,6 +42,15 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
+  Uint8List _logoBytes() {
+    try {
+      return BrandingAssets.splashLogo;
+    } on FormatException catch (error) {
+      debugPrint('Splash logo data is invalid; using the main app logo: $error');
+      return BrandingAssets.appLogo;
+    }
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFF06152F),
@@ -66,7 +77,7 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Image.memory(
-                  BrandingAssets.splashLogo,
+                  _logoBytes(),
                   fit: BoxFit.cover,
                   filterQuality: FilterQuality.high,
                 ),
