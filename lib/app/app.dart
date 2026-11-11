@@ -1,4 +1,5 @@
-import 'package:flutter_localizations/flutter_localizations.dart' as flutter_localizations;
+import 'package:flutter_localizations/flutter_localizations.dart'
+    as flutter_localizations;
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -26,8 +27,10 @@ class MindVaultArchiveApp extends ConsumerWidget {
           ? AppTheme.amoledThemeFor(accent)
           : AppTheme.darkThemeFor(accent),
       routerConfig: appRouter,
-      localizationsDelegates: flutter_localizations.GlobalMaterialLocalizations.delegates,
-      supportedLocales: flutter_localizations.GlobalMaterialLocalizations.supportedLocales,
+      localizationsDelegates:
+          flutter_localizations.GlobalMaterialLocalizations.delegates,
+      supportedLocales:
+          flutter_localizations.GlobalMaterialLocalizations.supportedLocales,
       builder: (context, child) => MaterialUiCompatibilityBridge(
         child: AppLockGate(
           service: _appLockService,

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' as flutter_material;
+import 'package:material_ui/material_ui.dart' as flutter_material;
 import 'package:drift/drift.dart' hide Column;
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
