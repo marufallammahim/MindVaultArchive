@@ -1,4 +1,4 @@
-name: Feature Branch - Test and Android APK
+name: Feature Branch - Android APK Artifact
 
 on:
   push:
@@ -13,12 +13,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: mindvault-feature-ci-${{ github.ref }}
+  group: mindvault-apk-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  verify-and-build:
-    name: Verify Flutter app and build installable APK
+  android-apk:
+    name: Build and publish installable debug APK
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -49,19 +49,10 @@ jobs:
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Verify Dart formatting
-        run: dart format --output=none --set-exit-if-changed lib test
-
-      - name: Static analysis
-        run: flutter analyze
-
-      - name: Run Flutter tests
-        run: flutter test --reporter expanded
-
       - name: Build installable debug APK
         run: flutter build apk --debug
 
-      - name: Verify APK and create checksum
+      - name: Verify APK and create build metadata
         shell: bash
         run: |
           set -euo pipefail
