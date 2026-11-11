@@ -17,6 +17,7 @@ import 'package:mindvault_archive/features/insights/presentation/archive_insight
 import 'package:mindvault_archive/features/timeline/presentation/archive_timeline_screen.dart';
 import 'package:mindvault_archive/features/developer/presentation/developer_notebook_screen.dart';
 import 'package:mindvault_archive/features/trash/presentation/trash_screen.dart';
+import 'package:mindvault_archive/features/trash/presentation/delete_confirmation_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
@@ -24,6 +25,11 @@ final appRouter = GoRouter(
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
     GoRoute(path: '/trash', builder: (context, state) => const TrashScreen()),
+    GoRoute(
+      path: '/delete/:id',
+      builder: (context, state) =>
+          DeleteConfirmationScreen(noteId: state.pathParameters['id']!),
+    ),
     GoRoute(
       path: '/editor/:id',
       builder: (context, state) =>
