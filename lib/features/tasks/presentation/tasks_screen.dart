@@ -393,23 +393,92 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: 1,
-        destinations: const [
-          NavigationDestination(
-              icon: Icon(Icons.note_alt_outlined), label: 'Notes'),
-          NavigationDestination(
-              icon: Icon(Icons.checklist_rounded), label: 'Tasks'),
-          NavigationDestination(
-              icon: Icon(Icons.insights_outlined), label: 'Insights'),
-          NavigationDestination(
-              icon: Icon(Icons.settings_outlined), label: 'Settings'),
-        ],
-        onDestinationSelected: (index) {
-          if (index == 0) Navigator.of(context).pop();
-          if (index == 2) context.push('/insights');
-          if (index == 3) context.push('/settings');
-        },
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(18, 0, 18, 10),
+        child: Container(
+          height: 66,
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          decoration: BoxDecoration(
+            color: const Color(0xFF171719).withValues(alpha: 0.97),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.32),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              _taskDockItem(
+                Icons.home_rounded,
+                'Home',
+                false,
+                () => Navigator.of(context).pop(),
+              ),
+              _taskDockItem(
+                Icons.checklist_rounded,
+                'List',
+                true,
+                () {},
+              ),
+              _taskDockItem(
+                Icons.insights_rounded,
+                'Stats',
+                false,
+                () => context.push('/insights'),
+              ),
+              _taskDockItem(
+                Icons.settings_rounded,
+                'Settings',
+                false,
+                () => context.push('/settings'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _taskDockItem(
+    IconData icon,
+    String label,
+    bool selected,
+    VoidCallback onTap,
+  ) {
+    final foreground = selected
+        ? const Color(0xFF171719)
+        : Colors.white.withValues(alpha: 0.68);
+    return Expanded(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFFFFD65A) : Colors.transparent,
+            borderRadius: BorderRadius.circular(17),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: foreground, size: 21),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: TextStyle(
+                  color: foreground,
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
