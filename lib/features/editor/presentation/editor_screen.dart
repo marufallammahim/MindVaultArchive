@@ -309,7 +309,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           debugPrint('Editor exit save failed: $error');
           debugPrintStack(stackTrace: stack);
         }
-        if (!mounted) return;
+        if (!context.mounted) return;
         if (saved) {
           router.pop();
         } else {
