@@ -3,7 +3,7 @@
 ## Completed foundation
 
 - Existing Flutter/Riverpod/Drift application retained.
-- Dedicated feature branch created from current `main`.
+- Dedicated hybrid branch `feature/hybrid-native-architecture` created from `feature/ultimate-all-in-one-mindvault`; the source branch remains untouched.
 - Offline notes, favorites, pinning, archive/trash lifecycle and autosave.
 - Category management, note assignment and category filtering.
 - Tag management and multi-tag note assignment.
@@ -33,6 +33,18 @@
 10. Visual boards and persistent knowledge graph.
 11. Third-party importers/exporters and collaboration providers.
 12. Complete Bengali localization and accessibility review.
+
+## Hybrid engineering status
+
+- Rust core/FFI workspace and stable API/health probes exist; Dart bridge
+  generation and platform packaging are still pending.
+- C++ shared-library C ABI probes now have a Linux CTest contract check.
+- Flutter analysis, regression tests and Android debug APK have passed on the
+  verified baseline commit. See `docs/HYBRID_IMPLEMENTATION_PLAN.md` for the
+  commit-specific evidence and remaining acceptance gates.
+- The native scaffold is not yet a production hybrid runtime: encryption,
+  database ownership migration, synchronization and cross-platform FFI
+  packaging remain unimplemented.
 
 ## External dependencies
 
