@@ -40,10 +40,16 @@ jobs:
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Apply Dart formatting
+      - name: Verify formatting on pull requests
+        if: github.event_name == 'pull_request'
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Apply Dart formatting on branch runs
+        if: github.event_name != 'pull_request'
         run: dart format lib test
 
       - name: Commit formatting corrections when needed
+        if: github.event_name != 'pull_request'
         run: |
           set -euo pipefail
           if git diff --quiet -- lib test; then
