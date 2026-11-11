@@ -92,7 +92,7 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'If you move “$title” to Trash, you can still find it there and restore it later.',
+                    'If you delete this note, fret not, you can still find it in the bin.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: .64),
@@ -146,7 +146,7 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                       onPressed: () => context.pop(true),
                       icon: const Icon(Icons.delete_outline_rounded),
                       label: const Text(
-                        'Move to Trash',
+                        'Delete this note',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
