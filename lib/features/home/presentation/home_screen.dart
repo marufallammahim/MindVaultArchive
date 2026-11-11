@@ -407,11 +407,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       itemBuilder: (context, index) {
                         final note = notes[index];
                         final colors = [
-                          const Color(0xFFE97855),
-                          const Color(0xFFA8D76D),
-                          const Color(0xFF4D91F0),
-                          const Color(0xFFE5C45B),
-                          const Color(0xFFB28ADD),
+                          const Color(0xFFFF795F),
+                          const Color(0xFFC5EFB5),
+                          const Color(0xFFFFD65A),
+                          const Color(0xFFB88AF2),
+                          const Color(0xFF8BCBFA),
                         ];
                         final color = note.color == null
                             ? colors[index % colors.length]
@@ -432,9 +432,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.small(
+        backgroundColor: const Color(0xFFB88AF2),
+        foregroundColor: const Color(0xFF171719),
         onPressed: () => context.push('/editor/${const Uuid().v4()}'),
-        child: const Icon(Icons.add_rounded, size: 28),
+        child: const Icon(Icons.add_rounded, size: 25),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: SafeArea(
@@ -502,7 +504,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFFD65A) : Colors.transparent,
+            color: selected ? const Color(0xFFF3F0E9) : Colors.transparent,
             borderRadius: BorderRadius.circular(17),
           ),
           padding: const EdgeInsets.symmetric(vertical: 6),
