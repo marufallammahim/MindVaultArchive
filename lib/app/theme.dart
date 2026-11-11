@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 /// Shared AMOLED-first design system for every MindVault Archive route.
 class AppTheme {
-  static const defaultBrand = Color(0xFF5A0719);
-  static const brandLight = Color(0xFFB64D69);
+  static const defaultBrand = Color(0xFFFFD65A);
+  static const brandLight = Color(0xFFFFE59A);
   static const darkSurface = Color(0xFF101014);
   static const darkCard = Color(0xFF171719);
   static const lightSurface = Color(0xFFF4F1F2);
