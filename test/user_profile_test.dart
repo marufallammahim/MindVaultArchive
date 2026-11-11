@@ -17,7 +17,7 @@ void main() {
     });
 
     test('decodes valid base64 avatar data', () {
-      final profile = UserProfile(
+      final profile = const UserProfile(
         name: 'Test',
         avatarBase64: 'AQIDBA==',
       );
