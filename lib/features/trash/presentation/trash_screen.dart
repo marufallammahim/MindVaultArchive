@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart' hide Column;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -15,8 +15,11 @@ class TrashScreen extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        icon: Icon(Icons.delete_forever_rounded,
-            color: Theme.of(dialogContext).colorScheme.error, size: 36),
+        icon: Icon(
+          Icons.delete_forever_rounded,
+          color: Theme.of(dialogContext).colorScheme.error,
+          size: 36,
+        ),
         title: const Text('Delete permanently?'),
         content: Text(
           '"${note.title.trim().isEmpty ? 'Untitled note' : note.title}" '
@@ -61,7 +64,8 @@ class TrashScreen extends ConsumerWidget {
               applicationName: 'MindVault Archive',
               children: const [
                 Text(
-                    'Restore notes whenever you need them. Permanently deleted notes cannot be recovered.'),
+                  'Restore notes whenever you need them. Permanently deleted notes cannot be recovered.',
+                ),
               ],
             ),
             icon: const Icon(Icons.info_outline_rounded),
@@ -73,7 +77,8 @@ class TrashScreen extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-                child: Text('Could not load Trash: ${snapshot.error}'));
+              child: Text('Could not load Trash: ${snapshot.error}'),
+            );
           }
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -86,18 +91,23 @@ class TrashScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.delete_outline_rounded,
-                        size: 64, color: Theme.of(context).colorScheme.primary),
+                    Icon(
+                      Icons.delete_outline_rounded,
+                      size: 64,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                     const SizedBox(height: 14),
-                    Text('Trash is empty',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w800,
-                            )),
+                    Text(
+                      'Trash is empty',
+                      style: Theme.of(context).textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                    ),
                     const SizedBox(height: 6),
                     Text(
-                        'Notes you move here can be restored or deleted forever.',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodyMedium),
+                      'Notes you move here can be restored or deleted forever.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ],
                 ),
               ),
@@ -114,10 +124,12 @@ class TrashScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor:
-                          Theme.of(context).colorScheme.errorContainer,
-                      foregroundColor:
-                          Theme.of(context).colorScheme.onErrorContainer,
+                      backgroundColor: Theme.of(context)
+                          .colorScheme
+                          .errorContainer,
+                      foregroundColor: Theme.of(context)
+                          .colorScheme
+                          .onErrorContainer,
                       child: const Icon(Icons.delete_outline_rounded),
                     ),
                     title: Text(
