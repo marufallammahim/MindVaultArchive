@@ -75,7 +75,7 @@ jobs:
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MindVaultArchive-debug-${{ github.ref_name }}-${{ github.run_number }}
+          name: MindVaultArchive-debug-${{ github.run_number }}
           path: dist/*
           if-no-files-found: error
           retention-days: 30
