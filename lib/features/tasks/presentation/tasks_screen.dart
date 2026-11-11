@@ -374,10 +374,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         );
                       }
                       final colors = [
-                        const Color(0xFFE97855),
-                        const Color(0xFFA8D76D),
-                        const Color(0xFFF0C94F),
+                        const Color(0xFFFF7A5E),
+                        const Color(0xFF8BCBFA),
+                        const Color(0xFFF18CB4),
+                        const Color(0xFFFFA36F),
                         const Color(0xFF4D91F0),
+                        const Color(0xFFFFD65A),
                       ];
                       return ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
