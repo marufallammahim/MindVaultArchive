@@ -1,0 +1,87 @@
+name: Feature Branch - Test and Android APK
+
+on:
+  push:
+    branches:
+      - feature/ultimate-all-in-one-mindvault
+  pull_request:
+    branches:
+      - feature/ultimate-all-in-one-mindvault
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mindvault-feature-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-and-build:
+    name: Verify Flutter app and build installable APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout exact branch commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate missing native platform scaffolding
+        run: bash tool/regenerate_platforms.sh
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Generate Drift and Riverpod sources
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Verify Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Static analysis
+        run: flutter analyze
+
+      - name: Run Flutter tests
+        run: flutter test --reporter expanded
+
+      - name: Build installable debug APK
+        run: flutter build apk --debug
+
+      - name: Verify APK and create checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="build/app/outputs/flutter-apk/app-debug.apk"
+          test -s "$APK"
+          mkdir -p dist
+          cp "$APK" dist/MindVaultArchive-debug.apk
+          sha256sum dist/MindVaultArchive-debug.apk > dist/SHA256SUMS.txt
+          {
+            echo "branch=${GITHUB_REF_NAME}"
+            echo "commit=${GITHUB_SHA}"
+            echo "version=$(grep '^version:' pubspec.yaml | awk '{print $2}')"
+            echo "build_type=debug"
+            echo "installable=true"
+          } > dist/build-info.txt
+
+      - name: Upload installable APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MindVaultArchive-debug-${{ github.ref_name }}-${{ github.run_number }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
