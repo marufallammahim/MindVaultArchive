@@ -84,5 +84,7 @@ Record commit SHA, environment, exact command, exit status and artifact path for
 - [x] Editor Markdown controls restyled as a compact dark floating toolbar; note deletion is connected to a dedicated full-screen confirmation route.
 - [x] Dedicated delete confirmation screen added with dark composition, brand illustration treatment and explicit Move to Trash / No, keep it actions.
 - [x] Trash destination added with restore and permanent-delete actions.
-- [ ] Continue visual pass across search, archive tools, history, drawing, quick capture, insights, timeline, templates, settings, security, developer notebook and about screens.
+- [x] Shared AMOLED feature panels applied across search, archive tools, history, drawing, quick capture, insights, timeline, tags, developer notebook and about; settings, templates and security retain their existing custom visual sections.
+- [x] Added full-screen delete confirmation and completed Trash restore/permanent-delete presentation.
+- [ ] Perform final screenshot-by-screenshot visual audit and responsive polish after the visual implementation pass.
 - [ ] User-requested visual-first sequence: finish the remaining screen redesigns before starting analyzer, widget tests, integration tests or APK build.
