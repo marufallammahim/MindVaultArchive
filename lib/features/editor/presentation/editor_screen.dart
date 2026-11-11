@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:drift/drift.dart' hide Column;
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:material_ui/material_ui.dart' as flutter;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -766,9 +765,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             : MarkdownBody(
                                 data: _contentController.text,
                                 selectable: true,
-                                styleSheet: MarkdownStyleSheet.fromTheme(
-                                  flutter.ThemeData(),
-                                ),
+                                styleSheet: MarkdownStyleSheet(),
                               ),
                       )
                     : Column(
