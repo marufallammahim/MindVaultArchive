@@ -750,7 +750,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                 data: _contentController.text,
                                 selectable: true,
                                 styleSheet: MarkdownStyleSheet.fromTheme(
-                                  flutter.Theme.of(context),
+                                  flutter.ThemeData(),
                                 ),
                               ),
                       )
