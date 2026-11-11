@@ -277,7 +277,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                DateFormat.E(Localizations.localeOf(context).toString())
+                                DateFormat.E(Localizations.localeOf(context)
+                                        .toString())
                                     .format(day),
                                 style: TextStyle(
                                   color: selected
