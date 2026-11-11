@@ -15,8 +15,7 @@ import 'package:uuid/uuid.dart';
 /// Local absolute paths are never exported. Each attachment is restored to a
 /// new app-private path and its SHA-256 checksum is verified before import.
 class FullBackupService {
-  FullBackupService(this._database, {Directory? restoreDirectory})
-    : _restoreDirectory = restoreDirectory;
+  FullBackupService(this._database, {this.restoreDirectory});
 
   static const backupFormat = 'mindvault-full-backup';
   static const backupVersion = 1;
@@ -24,7 +23,7 @@ class FullBackupService {
   static const maxAttachments = 1000;
 
   final AppDatabase _database;
-  final Directory? _restoreDirectory;
+  final Directory? restoreDirectory;
 
   Future<Uint8List> exportZip() async {
     final zip = Archive();
