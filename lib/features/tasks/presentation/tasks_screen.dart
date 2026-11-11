@@ -17,6 +17,7 @@ class TasksScreen extends ConsumerStatefulWidget {
 
 class _TasksScreenState extends ConsumerState<TasksScreen> {
   bool _completed = false;
+  DateTime _selectedDay = DateUtils.dateOnly(DateTime.now());
 
   Future<void> _editTask({VaultTask? task}) async {
     final db = ref.read(databaseProvider);
@@ -29,7 +30,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     final title = TextEditingController(text: task?.title ?? '');
     final details = TextEditingController(text: task?.details ?? '');
     var priority = task?.priority ?? 1;
-    DateTime? dueAt = task?.dueAt;
+    DateTime? dueAt = task?.dueAt ?? _selectedDay;
     var linkedNoteId = task?.noteId ?? widget.noteId;
     if (linkedNoteId != null &&
         !availableNotes.any((note) => note.id == linkedNoteId)) {
@@ -199,7 +200,94 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 2, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 15),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    MaterialLocalizations.of(context).formatMonthYear(_selectedDay),
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                ),
+                IconButton(
+                  tooltip: 'Choose date',
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _selectedDay,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (picked != null) {
+                      setState(() => _selectedDay = DateUtils.dateOnly(picked));
+                    }
+                  },
+                  icon: const Icon(Icons.calendar_month_rounded),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 68,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              scrollDirection: Axis.horizontal,
+              itemCount: 7,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final day = DateUtils.dateOnly(DateTime.now())
+                    .add(Duration(days: index - 3));
+                final selected = DateUtils.isSameDay(day, _selectedDay);
+                return InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: () => setState(() => _selectedDay = day),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    width: 48,
+                    decoration: BoxDecoration(
+                      color: selected
+                          ? const Color(0xFFFFD65A)
+                          : const Color(0xFF1A1A1E),
+                      borderRadius: BorderRadius.circular(17),
+                      border: Border.all(
+                        color: selected
+                            ? const Color(0xFFFFD65A)
+                            : Colors.white.withValues(alpha: .08),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          MaterialLocalizations.of(context)
+                              .formatShortWeekday(day)
+                              .substring(0, 3),
+                          style: TextStyle(
+                            color: selected ? Colors.black54 : Colors.white60,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${day.day}',
+                          style: TextStyle(
+                            color: selected ? Colors.black : Colors.white,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
             child: Row(
               children: [
                 Expanded(
