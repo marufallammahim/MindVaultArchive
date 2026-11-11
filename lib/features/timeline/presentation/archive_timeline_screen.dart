@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -62,11 +63,22 @@ class ArchiveTimelineScreen extends ConsumerWidget {
               }
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-                itemCount: entries.length,
+                itemCount: entries.length + 1,
                 separatorBuilder: (_, __) =>
                     const Divider(height: 1, indent: 54),
                 itemBuilder: (context, index) {
-                  final entry = entries[index];
+                  if (index == 0) {
+                    return const Padding(
+                      padding: EdgeInsets.only(bottom: 6),
+                      child: FeatureHero(
+                        icon: Icons.timeline_rounded,
+                        title: 'Your memory timeline',
+                        subtitle: 'Follow the notes and tasks that shape your archive.',
+                        compact: true,
+                      ),
+                    );
+                  }
+                  final entry = entries[index - 1];
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: CircleAvatar(
