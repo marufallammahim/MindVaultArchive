@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/ultimate-all-in-one-mindvault
+      - feature/hybrid-native-architecture
   pull_request:
     branches:
       - feature/ultimate-all-in-one-mindvault
