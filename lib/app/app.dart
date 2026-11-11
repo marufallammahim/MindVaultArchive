@@ -26,7 +26,7 @@ class MindVaultArchiveApp extends ConsumerWidget {
           : AppTheme.darkThemeFor(accent),
       routerConfig: appRouter,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      supportedLocales: GlobalMaterialLocalizations.supportedLocales,
+      supportedLocales: const [Locale('en', 'US')],
       builder: (context, child) => MaterialUiCompatibilityBridge(
         child: AppLockGate(
           service: _appLockService,
