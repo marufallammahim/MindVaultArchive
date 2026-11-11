@@ -80,11 +80,11 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Search your archive')),
+      appBar: AppBar(title: const Text('Search')),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
             child: TextField(
               controller: _controller,
               autofocus: true,
@@ -105,7 +105,8 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                   },
                   icon: const Icon(Icons.close),
                 ),
-                border: const OutlineInputBorder(),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
               ),
             ),
           ),
@@ -124,9 +125,9 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                 : _results.isEmpty && !_loading && _error == null
                     ? const _NoResults()
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(12, 4, 12, 24),
+                        padding: const EdgeInsets.fromLTRB(14, 4, 14, 28),
                         itemCount: _results.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 6),
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final item = _results[index];
                           final isNote = item.kind == ArchiveSearchKind.note;

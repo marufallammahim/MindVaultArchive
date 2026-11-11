@@ -114,9 +114,9 @@ class TagsScreen extends ConsumerWidget {
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
             itemCount: tags.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final tag = tags[index];
               return Card(
@@ -145,7 +145,7 @@ class TagsScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _addTag(context, ref),
         icon: const Icon(Icons.add),
-        label: const Text('Create tag'),
+        label: const Text('New tag'),
       ),
     );
   }

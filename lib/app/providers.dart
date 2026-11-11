@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -10,7 +12,7 @@ final databaseProvider = Provider<AppDatabase>((ref) {
 });
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.system) {
+  ThemeModeNotifier() : super(ThemeMode.dark) {
     _load();
   }
 
@@ -23,11 +25,9 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       if (!mounted || stored == null) return;
       state = ThemeMode.values.firstWhere(
         (mode) => mode.name == stored,
-        orElse: () => ThemeMode.system,
+        orElse: () => ThemeMode.dark,
       );
-    } catch (_) {
-      // Keep the system default if preferences are unavailable.
-    }
+    } catch (_) {}
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
@@ -35,9 +35,7 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     try {
       final preferences = await SharedPreferences.getInstance();
       await preferences.setString(_storageKey, mode.name);
-    } catch (_) {
-      // The current session still uses the selected mode.
-    }
+    } catch (_) {}
   }
 }
 
@@ -46,7 +44,7 @@ final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
 );
 
 class AmoledThemeNotifier extends StateNotifier<bool> {
-  AmoledThemeNotifier() : super(false) {
+  AmoledThemeNotifier() : super(true) {
     _load();
   }
 
@@ -56,10 +54,8 @@ class AmoledThemeNotifier extends StateNotifier<bool> {
     try {
       final preferences = await SharedPreferences.getInstance();
       if (!mounted) return;
-      state = preferences.getBool(_storageKey) ?? false;
-    } catch (_) {
-      // Keep the standard dark surface when preferences are unavailable.
-    }
+      state = preferences.getBool(_storageKey) ?? true;
+    } catch (_) {}
   }
 
   Future<void> setEnabled(bool enabled) async {
@@ -67,12 +63,94 @@ class AmoledThemeNotifier extends StateNotifier<bool> {
     try {
       final preferences = await SharedPreferences.getInstance();
       await preferences.setBool(_storageKey, enabled);
-    } catch (_) {
-      // The current session still reflects the selected preference.
-    }
+    } catch (_) {}
   }
 }
 
 final amoledThemeProvider = StateNotifierProvider<AmoledThemeNotifier, bool>(
   (ref) => AmoledThemeNotifier(),
+);
+
+class AccentColorNotifier extends StateNotifier<Color> {
+  AccentColorNotifier() : super(const Color(0xFF5A0719)) {
+    _load();
+  }
+
+  static const _storageKey = 'primary_accent_color';
+
+  Future<void> _load() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      final value = preferences.getInt(_storageKey);
+      if (mounted && value != null) state = Color(value);
+    } catch (_) {}
+  }
+
+  Future<void> setColor(Color color) async {
+    state = color;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setInt(_storageKey, color.toARGB32());
+    } catch (_) {}
+  }
+}
+
+final accentColorProvider = StateNotifierProvider<AccentColorNotifier, Color>(
+  (ref) => AccentColorNotifier(),
+);
+
+class UserProfile {
+  const UserProfile({required this.name, this.avatarBase64});
+
+  final String name;
+  final String? avatarBase64;
+
+  ImageProvider<Object>? get avatar {
+    final value = avatarBase64;
+    if (value == null || value.isEmpty) return null;
+    try {
+      return MemoryImage(base64Decode(value));
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class UserProfileNotifier extends StateNotifier<UserProfile> {
+  UserProfileNotifier() : super(const UserProfile(name: 'Your name')) {
+    _load();
+  }
+
+  static const _nameKey = 'profile_display_name';
+  static const _avatarKey = 'profile_avatar_base64';
+
+  Future<void> _load() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      state = UserProfile(
+        name: preferences.getString(_nameKey) ?? 'Your name',
+        avatarBase64: preferences.getString(_avatarKey),
+      );
+    } catch (_) {}
+  }
+
+  Future<void> save({required String name, String? avatarBase64}) async {
+    final cleanName = name.trim().isEmpty ? 'Your name' : name.trim();
+    state = UserProfile(name: cleanName, avatarBase64: avatarBase64);
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString(_nameKey, cleanName);
+      if (avatarBase64 == null || avatarBase64.isEmpty) {
+        await preferences.remove(_avatarKey);
+      } else {
+        await preferences.setString(_avatarKey, avatarBase64);
+      }
+    } catch (_) {}
+  }
+}
+
+final userProfileProvider =
+    StateNotifierProvider<UserProfileNotifier, UserProfile>(
+  (ref) => UserProfileNotifier(),
 );

@@ -69,10 +69,15 @@ class ArchiveInsightsScreen extends ConsumerWidget {
               final recent =
                   notes.where((n) => !n.createdAt.isBefore(weekStart)).length;
               return ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 30),
                 children: [
                   Text('Your knowledge at a glance',
-                      style: Theme.of(context).textTheme.headlineSmall),
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.7)),
                   const SizedBox(height: 6),
                   const Text(
                       'These insights are calculated on this device from your local archive.'),

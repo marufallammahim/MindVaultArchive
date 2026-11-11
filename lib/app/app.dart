@@ -9,16 +9,21 @@ class MindVaultArchiveApp extends ConsumerWidget {
   const MindVaultArchiveApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
-        title: 'MindVault Archive',
-        themeMode: ref.watch(themeModeProvider),
-        theme: AppTheme.lightTheme,
-        darkTheme: ref.watch(amoledThemeProvider)
-            ? AppTheme.amoledTheme
-            : AppTheme.darkTheme,
-        routerConfig: appRouter,
-        builder: (context, child) =>
-            AppLockGate(child: child ?? const SizedBox.shrink()),
-        debugShowCheckedModeBanner: false,
-      );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(themeModeProvider);
+    final amoled = ref.watch(amoledThemeProvider);
+    final accent = ref.watch(accentColorProvider);
+    return MaterialApp.router(
+      title: 'MindVault Archive',
+      themeMode: mode,
+      theme: AppTheme.lightThemeFor(accent),
+      darkTheme: amoled
+          ? AppTheme.amoledThemeFor(accent)
+          : AppTheme.darkThemeFor(accent),
+      routerConfig: appRouter,
+      builder: (context, child) =>
+          AppLockGate(child: child ?? const SizedBox.shrink()),
+      debugShowCheckedModeBanner: false,
+    );
+  }
 }

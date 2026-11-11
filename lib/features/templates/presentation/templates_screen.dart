@@ -29,38 +29,38 @@ const noteTemplates = <NoteTemplate>[
   NoteTemplate(
       id: 'daily-journal',
       title: 'Daily journal',
-      description: 'Reflect on the day and capture what matters.',
-      icon: Icons.book_outlined,
+      description: 'Reflect, notice patterns, and plan tomorrow.',
+      icon: Icons.auto_stories_rounded,
       content:
           '## Today\n\nDate: \n\n### Highlights\n- \n\n### What I learned\n- \n\n### Challenges\n- \n\n### Tomorrow\n- '),
   NoteTemplate(
       id: 'meeting',
       title: 'Meeting notes',
       description: 'Agenda, decisions, and action items.',
-      icon: Icons.groups_outlined,
+      icon: Icons.groups_2_rounded,
       content:
-          '## Meeting\n\nDate: \nAttendees: \n\n### Agenda\n- \n\n### Discussion\n\n\n### Decisions\n- \n\n### Action items\n- [ ] '),
+          '## Meeting\n\nDate: \nAttendees: \n\n### Agenda\n- \n\n### Discussion\n\n### Decisions\n- \n\n### Action items\n- [ ] '),
   NoteTemplate(
       id: 'project-plan',
       title: 'Project plan',
-      description: 'Define goals, milestones, risks, and next steps.',
-      icon: Icons.rocket_launch_outlined,
+      description: 'Goals, milestones, risks, and next steps.',
+      icon: Icons.rocket_launch_rounded,
       content:
           '## Project overview\n\nGoal: \n\n### Scope\n- \n\n### Milestones\n1. \n2. \n\n### Risks\n- \n\n### Next actions\n- [ ] '),
   NoteTemplate(
       id: 'study',
       title: 'Study notes',
-      description: 'Organize concepts, examples, and questions.',
-      icon: Icons.school_outlined,
+      description: 'Capture concepts, examples, and questions.',
+      icon: Icons.school_rounded,
       content:
-          '## Topic\n\nSubject: \nSource: \n\n### Key concepts\n- \n\n### Explanation\n\n\n### Examples\n- \n\n### Questions to revisit\n- '),
+          '## Topic\n\nSubject: \nSource: \n\n### Key concepts\n- \n\n### Explanation\n\n### Examples\n- \n\n### Questions to revisit\n- '),
   NoteTemplate(
       id: 'developer',
-      title: 'Developer notebook',
-      description: 'Record code ideas, commands, and debugging notes.',
-      icon: Icons.terminal_outlined,
+      title: 'Developer log',
+      description: 'Track code ideas, commands, and debugging.',
+      icon: Icons.terminal_rounded,
       content:
-          '## Technical note\n\nProject: \nLanguage / tool: \n\n### Problem or idea\n\n\n### Approach\n\n\n### Commands / snippets\n\n\n### Result\n\n\n### Follow-up\n- [ ] '),
+          '## Technical note\n\nProject: \nLanguage / tool: \n\n### Problem or idea\n\n### Approach\n\n### Commands / snippets\n\n### Result\n\n### Follow-up\n- [ ] '),
 ];
 
 class TemplatesScreen extends ConsumerStatefulWidget {
@@ -72,7 +72,9 @@ class TemplatesScreen extends ConsumerStatefulWidget {
 
 class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
   static const _storageKey = 'mindvault_custom_templates_v1';
-  List<NoteTemplate> _customTemplates = [];
+  final _search = TextEditingController();
+  List<NoteTemplate> _custom = [];
+  String _query = '';
 
   @override
   void initState() {
@@ -80,105 +82,124 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     _loadCustomTemplates();
   }
 
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadCustomTemplates() async {
     try {
-      final preferences = await SharedPreferences.getInstance();
-      final raw = preferences.getString(_storageKey);
-      if (raw == null) {
-        return;
-      }
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_storageKey);
+      if (raw == null) return;
       final decoded = jsonDecode(raw);
-      if (decoded is! List) {
-        return;
-      }
-      final templates = <NoteTemplate>[];
+      if (decoded is! List) return;
+      final loaded = <NoteTemplate>[];
       for (final item in decoded) {
-        if (item is! Map) {
-          continue;
-        }
+        if (item is! Map) continue;
         final value = Map<String, dynamic>.from(item);
         if (value['id'] is! String ||
             value['title'] is! String ||
             value['content'] is! String) {
           continue;
         }
-        templates.add(NoteTemplate(
+        loaded.add(NoteTemplate(
           id: value['id'] as String,
           title: value['title'] as String,
-          description: value['description'] as String? ?? 'Custom template',
-          icon: Icons.bookmark_outline,
+          description: value['description'] as String? ?? 'Personal template',
+          icon: Icons.bookmark_rounded,
           content: value['content'] as String,
           isCustom: true,
         ));
       }
-      if (mounted) {
-        setState(() => _customTemplates = templates);
-      }
+      if (mounted) setState(() => _custom = loaded);
     } catch (_) {
-      // Invalid or unavailable preferences do not affect built-in templates.
+      if (mounted) _message('Could not load saved templates.');
     }
   }
 
-  Future<void> _persistCustomTemplates() async {
+  Future<void> _persist() async {
     try {
-      final preferences = await SharedPreferences.getInstance();
-      await preferences.setString(
-        _storageKey,
-        jsonEncode(_customTemplates
-            .map((template) => {
-                  'id': template.id,
-                  'title': template.title,
-                  'description': template.description,
-                  'content': template.content,
-                })
-            .toList()),
-      );
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not save custom templates: $error')),
-        );
-      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(
+          _storageKey,
+          jsonEncode(_custom
+              .map((item) => {
+                    'id': item.id,
+                    'title': item.title,
+                    'description': item.description,
+                    'content': item.content,
+                  })
+              .toList()));
+    } catch (_) {
+      _message('Template could not be saved. Check device storage.');
     }
+  }
+
+  void _message(String value) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
   }
 
   Future<void> _createCustomTemplate() async {
     final title = TextEditingController();
     final description = TextEditingController();
     final content = TextEditingController();
-    final saved = await showDialog<bool>(
+    final saved = await showModalBottomSheet<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Create a template'),
-        content: SizedBox(
-          width: 560,
-          child: SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              TextField(
-                  controller: title,
-                  autofocus: true,
-                  decoration:
-                      const InputDecoration(labelText: 'Template name')),
-              TextField(
-                  controller: description,
-                  decoration: const InputDecoration(labelText: 'Description')),
-              TextField(
-                  controller: content,
-                  minLines: 6,
-                  maxLines: 12,
-                  decoration:
-                      const InputDecoration(labelText: 'Markdown content')),
-            ]),
-          ),
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) => Padding(
+        padding: EdgeInsets.fromLTRB(
+            20, 8, 20, MediaQuery.of(sheetContext).viewInsets.bottom + 24),
+        child: SingleChildScrollView(
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('New template',
+                    style: Theme.of(sheetContext)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.w800)),
+                const SizedBox(height: 16),
+                TextField(
+                    controller: title,
+                    autofocus: true,
+                    maxLength: 60,
+                    decoration:
+                        const InputDecoration(labelText: 'Template name')),
+                const SizedBox(height: 8),
+                TextField(
+                    controller: description,
+                    maxLength: 120,
+                    decoration:
+                        const InputDecoration(labelText: 'Short description')),
+                const SizedBox(height: 8),
+                TextField(
+                    controller: content,
+                    minLines: 6,
+                    maxLines: 12,
+                    decoration: const InputDecoration(
+                        labelText: 'Markdown starter content',
+                        alignLabelWithHint: true)),
+                const SizedBox(height: 16),
+                SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        if (title.text.trim().isEmpty ||
+                            content.text.trim().isEmpty) {
+                          return;
+                        }
+                        Navigator.pop(sheetContext, true);
+                      },
+                      icon: const Icon(Icons.bookmark_add_outlined),
+                      label: const Text('Save template'),
+                    )),
+              ]),
         ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Save template')),
-        ],
       ),
     );
     final cleanTitle = title.text.trim();
@@ -190,46 +211,20 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
     if (saved != true || cleanTitle.isEmpty || cleanContent.trim().isEmpty) {
       return;
     }
-    setState(() {
-      _customTemplates = [
-        ..._customTemplates,
-        NoteTemplate(
-          id: const Uuid().v4(),
-          title: cleanTitle,
-          description:
-              cleanDescription.isEmpty ? 'Custom template' : cleanDescription,
-          icon: Icons.bookmark_outline,
-          content: cleanContent,
-          isCustom: true,
-        ),
-      ];
-    });
-    await _persistCustomTemplates();
-  }
-
-  Future<void> _deleteCustomTemplate(NoteTemplate template) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete template?'),
-        content: Text(
-            'Remove "${template.title}" from your custom library? Existing notes will not be affected.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel')),
-          FilledButton(
-              onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Delete')),
-        ],
-      ),
-    );
-    if (confirmed != true) {
-      return;
-    }
-    setState(
-        () => _customTemplates.removeWhere((item) => item.id == template.id));
-    await _persistCustomTemplates();
+    setState(() => _custom = [
+          ..._custom,
+          NoteTemplate(
+            id: const Uuid().v4(),
+            title: cleanTitle,
+            description: cleanDescription.isEmpty
+                ? 'Personal template'
+                : cleanDescription,
+            icon: Icons.bookmark_rounded,
+            content: cleanContent,
+            isCustom: true,
+          )
+        ]);
+    await _persist();
   }
 
   Future<void> _createFromTemplate(NoteTemplate template) async {
@@ -238,80 +233,215 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
       await ref
           .read(databaseProvider)
           .saveNoteContent(id, template.title, template.content);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
       context.push('/editor/$id');
     } catch (error) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not create note: $error')),
-      );
+      _message('Could not create note: $error');
     }
   }
 
-  Widget _templateTile(NoteTemplate template) => Card(
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(16),
-          leading: CircleAvatar(child: Icon(template.icon)),
-          title: Text(template.title),
-          subtitle: Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Text(template.description),
-          ),
-          trailing: template.isCustom
-              ? IconButton(
-                  tooltip: 'Delete custom template',
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => _deleteCustomTemplate(template),
-                )
-              : const Icon(Icons.arrow_forward_ios, size: 16),
-          onTap: () => _createFromTemplate(template),
-        ),
-      );
+  Future<void> _deleteCustom(NoteTemplate template) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete this template?'),
+        content: Text(
+            '“${template.title}” will be removed from your template library. Existing notes will stay unchanged.'),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Keep')),
+          FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    setState(() => _custom.removeWhere((item) => item.id == template.id));
+    await _persist();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+    final all = [...noteTemplates, ..._custom];
+    final filtered = all
+        .where((item) => ('${item.title} ${item.description}')
+            .toLowerCase()
+            .contains(_query))
+        .toList();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Note templates'),
+        title: const Text('Templates'),
         actions: [
           IconButton(
-            tooltip: 'Create custom template',
-            onPressed: _createCustomTemplate,
-            icon: const Icon(Icons.add),
-          ),
+              tooltip: 'Create template',
+              onPressed: _createCustomTemplate,
+              icon: const Icon(Icons.add_rounded))
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text('Start with a useful structure',
-              style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 6),
-          const Text('Choose a template or build your own reusable structure.'),
-          const SizedBox(height: 18),
-          Text('Built-in templates',
-              style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 10),
-          for (final template in noteTemplates) _templateTile(template),
-          if (_customTemplates.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            Text('Your templates',
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 10),
-            for (final template in _customTemplates) _templateTile(template),
-          ],
-          const SizedBox(height: 72),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 18),
+              sliver: SliverToBoxAdapter(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    Text('A good start, every time.',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.7)),
+                    const SizedBox(height: 5),
+                    Text(
+                        'Choose a structure and turn it into an editable note.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant)),
+                    const SizedBox(height: 18),
+                    TextField(
+                        controller: _search,
+                        onChanged: (value) =>
+                            setState(() => _query = value.trim().toLowerCase()),
+                        decoration: InputDecoration(
+                            hintText: 'Find a template',
+                            prefixIcon: const Icon(Icons.search_rounded),
+                            suffixIcon: _query.isEmpty
+                                ? null
+                                : IconButton(
+                                    onPressed: () {
+                                      _search.clear();
+                                      setState(() => _query = '');
+                                    },
+                                    icon: const Icon(Icons.close_rounded)))),
+                    const SizedBox(height: 18),
+                    Row(children: [
+                      Text('TEMPLATE LIBRARY',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelMedium
+                              ?.copyWith(
+                                  letterSpacing: 1.3,
+                                  fontWeight: FontWeight.w800,
+                                  color: accent)),
+                      const Spacer(),
+                      Text('${filtered.length} available',
+                          style: Theme.of(context).textTheme.labelSmall),
+                    ]),
+                  ]))),
+          if (filtered.isEmpty)
+            const SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(child: Text('No templates match your search.')))
+          else
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 112),
+              sliver: SliverLayoutBuilder(builder: (context, constraints) {
+                final columns = constraints.crossAxisExtent > 650 ? 3 : 2;
+                return SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: columns,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      childAspectRatio: 0.94),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final item = filtered[index];
+                    final colors = [
+                      const Color(0xFFE97855),
+                      const Color(0xFFA8D76D),
+                      const Color(0xFF4D91F0),
+                      const Color(0xFFE5C45B),
+                      const Color(0xFFB28ADD)
+                    ];
+                    final color = colors[index % colors.length];
+                    return Material(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? const Color(0xFF171719)
+                          : Theme.of(context).colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(24),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () => _createFromTemplate(item),
+                        child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(children: [
+                                    Container(
+                                        width: 42,
+                                        height: 42,
+                                        decoration: BoxDecoration(
+                                            color:
+                                                color.withValues(alpha: 0.17),
+                                            borderRadius:
+                                                BorderRadius.circular(14)),
+                                        child: Icon(item.icon, color: color)),
+                                    const Spacer(),
+                                    if (item.isCustom)
+                                      PopupMenuButton<String>(
+                                          tooltip: 'Template actions',
+                                          onSelected: (value) {
+                                            if (value == 'delete') {
+                                              _deleteCustom(item);
+                                            }
+                                          },
+                                          itemBuilder: (_) => const [
+                                                PopupMenuItem(
+                                                    value: 'delete',
+                                                    child: Text('Delete'))
+                                              ]),
+                                  ]),
+                                  const Spacer(),
+                                  Text(item.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(
+                                              fontWeight: FontWeight.w900,
+                                              height: 1.1)),
+                                  const SizedBox(height: 6),
+                                  Text(item.description,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurfaceVariant)),
+                                  const SizedBox(height: 12),
+                                  Row(children: [
+                                    Text('Use template',
+                                        style: TextStyle(
+                                            color: accent,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 12)),
+                                    const Spacer(),
+                                    Icon(Icons.arrow_outward_rounded,
+                                        size: 17, color: accent)
+                                  ]),
+                                ])),
+                      ),
+                    );
+                  }, childCount: filtered.length),
+                );
+              }),
+            ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _createCustomTemplate,
-        icon: const Icon(Icons.add),
-        label: const Text('Custom template'),
-      ),
+          onPressed: _createCustomTemplate,
+          icon: const Icon(Icons.add_rounded),
+          label: const Text('New template')),
     );
   }
 }

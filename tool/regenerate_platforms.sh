@@ -56,6 +56,41 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
   fi
 fi
 
+# Ensure Gradle plugin transitive dependencies can be resolved from the
+# official Google Maven and Maven Central repositories. Flutter's generated
+# settings file may otherwise leave Kotlin DSL/plugin artifacts restricted to
+# the Gradle Plugin Portal on some SDK/Gradle combinations.
+python3 - <<'PY'
+from pathlib import Path
+
+candidates = [Path("android/settings.gradle"), Path("android/settings.gradle.kts")]
+settings = next((p for p in candidates if p.is_file()), None)
+if settings is None:
+    raise SystemExit("Android settings.gradle(.kts) is missing after scaffolding")
+
+lines = settings.read_text(encoding="utf-8").splitlines()
+pm = next((i for i, line in enumerate(lines) if line.strip() == "pluginManagement {"), None)
+if pm is None:
+    raise SystemExit("Could not find pluginManagement block in Android settings")
+repo = next((i for i in range(pm + 1, len(lines)) if lines[i].strip() == "repositories {"), None)
+if repo is None:
+    raise SystemExit("Could not find pluginManagement.repositories block")
+close = next((i for i in range(repo + 1, len(lines)) if lines[i].strip() == "}"), None)
+if close is None:
+    raise SystemExit("Could not find end of pluginManagement.repositories block")
+existing = {line.strip() for line in lines[repo + 1:close]}
+additions = [f"        {name}" for name in ("google()", "mavenCentral()") if name not in existing]
+if additions:
+    lines[close:close] = additions
+    settings.write_text("\n".join(lines) + "\n", encoding="utf-8")
+print("Gradle plugin repositories verified: Google Maven + Maven Central")
+PY
+
+# Keep root project dependency repositories explicit as well; the pluginManagement block above handles plugin classpaths.
+if [[ -f android/build.gradle ]]; then
+  grep -q 'google()' android/build.gradle || sed -i '/allprojects[[:space:]]*{/a\\    repositories { google(); mavenCentral() }' android/build.gradle
+fi
+
 # The app module's compileSdk is pinned to API 36 in
 # android/app/build.gradle. Do not mutate third-party plugin build files here:
 # Flutter resolves plugin packages only after "flutter pub get".

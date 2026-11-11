@@ -120,7 +120,7 @@ class DeveloperNotebookScreen extends ConsumerWidget {
             ));
           }
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
             itemCount: snippets.length,
             separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
@@ -131,7 +131,12 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                   'text';
               return Card(
                   child: ListTile(
-                leading: const CircleAvatar(child: Icon(Icons.code)),
+                leading: CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                    foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
+                    child: const Icon(Icons.code)),
                 title: Text(note.title.substring(7),
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 subtitle: Text(language),

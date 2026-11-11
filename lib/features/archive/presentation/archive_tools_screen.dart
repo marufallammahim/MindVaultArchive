@@ -195,11 +195,14 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Archive transfer')),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 32),
         children: [
           Text(
             'Full device backup',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -219,10 +222,13 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             icon: const Icon(Icons.settings_backup_restore_outlined),
             label: const Text('Restore full ZIP backup'),
           ),
-          const Divider(height: 32),
+          const Divider(height: 28),
           Text(
             'Portable JSON transfer',
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
           ),
           const SizedBox(height: 8),
           const Text(

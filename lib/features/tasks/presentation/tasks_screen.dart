@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:uuid/uuid.dart';
@@ -182,25 +183,45 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.noteId == null ? 'Tasks' : 'Note tasks'),
+        title: Text(widget.noteId == null ? 'To-do list' : 'Note tasks'),
+        actions: [
+          IconButton(
+            tooltip: 'Settings',
+            onPressed: () => context.push('/settings'),
+            icon: const Icon(Icons.tune_rounded),
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => _editTask(),
-        icon: const Icon(Icons.add),
-        label: const Text('New task'),
+        child: const Icon(Icons.add_rounded, size: 28),
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: SegmentedButton<bool>(
-              segments: const [
-                ButtonSegment(value: false, label: Text('To do')),
-                ButtonSegment(value: true, label: Text('Completed')),
+            padding: const EdgeInsets.fromLTRB(16, 2, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _completed ? 'completed tasks' : 'your next moves',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.6,
+                        ),
+                  ),
+                ),
+                SegmentedButton<bool>(
+                  showSelectedIcon: false,
+                  segments: const [
+                    ButtonSegment(value: false, label: Text('To-do')),
+                    ButtonSegment(value: true, label: Text('Done')),
+                  ],
+                  selected: {_completed},
+                  onSelectionChanged: (value) =>
+                      setState(() => _completed = value.first),
+                ),
               ],
-              selected: {_completed},
-              onSelectionChanged: (value) =>
-                  setState(() => _completed = value.first),
             ),
           ),
           Expanded(
@@ -218,97 +239,150 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 final items = snapshot.data!;
                 if (items.isEmpty) {
                   return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.checklist_rounded, size: 64),
-                        const SizedBox(height: 12),
-                        Text(
-                          _completed ? 'No completed tasks' : 'No tasks yet',
-                        ),
-                        const SizedBox(height: 6),
-                        const Text('Capture your next step here.'),
-                      ],
+                    child: Padding(
+                      padding: const EdgeInsets.all(28),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.checklist_rounded,
+                              size: 64,
+                              color: Theme.of(context).colorScheme.primary),
+                          const SizedBox(height: 14),
+                          Text(
+                            _completed
+                                ? 'Nothing completed yet'
+                                : 'Nothing on your list',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 6),
+                          const Text('Add a task and make your next move.'),
+                        ],
+                      ),
                     ),
                   );
                 }
+                final colors = [
+                  const Color(0xFFE97855),
+                  const Color(0xFFA8D76D),
+                  const Color(0xFFF0C94F),
+                  const Color(0xFF4D91F0),
+                ];
                 return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 100),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  separatorBuilder: (_, __) => const SizedBox(height: 9),
                   itemBuilder: (context, index) {
                     final item = items[index];
                     final overdue = !item.isCompleted &&
                         item.dueAt != null &&
                         DateUtils.dateOnly(item.dueAt!)
                             .isBefore(DateUtils.dateOnly(DateTime.now()));
-                    return Card(
-                      child: ListTile(
-                        leading: Checkbox(
-                          value: item.isCompleted,
-                          onChanged: (value) =>
-                              db.setTaskCompleted(item.id, value ?? false),
-                        ),
-                        title: Text(
-                          item.title,
-                          style: item.isCompleted
-                              ? const TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                )
-                              : null,
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (item.details.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Text(
-                                  item.details,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                    final color = colors[index % colors.length];
+                    final foreground = color.computeLuminance() > 0.48
+                        ? const Color(0xFF171717)
+                        : Colors.white;
+                    return Material(
+                      color: color,
+                      borderRadius: BorderRadius.circular(19),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () => _editTask(task: item),
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(14, 11, 10, 11),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: foreground,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900,
+                                        decoration: item.isCompleted
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                      ),
+                                    ),
+                                    if (item.details.isNotEmpty) ...[
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        item.details,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: foreground.withValues(
+                                              alpha: 0.82),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                    const SizedBox(height: 10),
+                                    Wrap(
+                                      spacing: 7,
+                                      runSpacing: 5,
+                                      children: [
+                                        _taskPill(foreground,
+                                            _priorityLabel(item.priority)),
+                                        if (item.noteId != null)
+                                          _taskPill(foreground, 'Linked note'),
+                                        if (item.dueAt != null)
+                                          _taskPill(
+                                            overdue ? Colors.white : foreground,
+                                            'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                          ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
-                            const SizedBox(height: 4),
-                            Wrap(
-                              spacing: 12,
-                              children: [
-                                Text(
-                                  'Priority: ${_priorityLabel(item.priority)}',
-                                ),
-                                if (item.noteId != null)
-                                  const Text('Linked to a note'),
-                                if (item.dueAt != null)
-                                  Text(
-                                    'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
-                                    style: TextStyle(
-                                      color: overdue
-                                          ? Theme.of(context).colorScheme.error
-                                          : null,
-                                      fontWeight:
-                                          overdue ? FontWeight.bold : null,
+                              const SizedBox(width: 12),
+                              Column(
+                                children: [
+                                  IconButton.filled(
+                                    style: IconButton.styleFrom(
+                                      backgroundColor: const Color(0xFF171717),
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    tooltip: item.isCompleted
+                                        ? 'Mark incomplete'
+                                        : 'Mark complete',
+                                    onPressed: () => db.setTaskCompleted(
+                                      item.id,
+                                      !item.isCompleted,
+                                    ),
+                                    icon: Icon(
+                                      item.isCompleted
+                                          ? Icons.check_rounded
+                                          : Icons.circle_outlined,
                                     ),
                                   ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        trailing: PopupMenuButton<String>(
-                          onSelected: (action) async {
-                            if (action == 'edit') {
-                              await _editTask(task: item);
-                            } else if (action == 'delete') {
-                              await db.deleteTask(item.id);
-                            }
-                          },
-                          itemBuilder: (_) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Delete'),
-                            ),
-                          ],
+                                  PopupMenuButton<String>(
+                                    icon: Icon(Icons.more_horiz,
+                                        color: foreground),
+                                    onSelected: (action) async {
+                                      if (action == 'edit') {
+                                        await _editTask(task: item);
+                                      } else if (action == 'delete') {
+                                        await db.deleteTask(item.id);
+                                      }
+                                    },
+                                    itemBuilder: (_) => const [
+                                      PopupMenuItem(
+                                          value: 'edit', child: Text('Edit')),
+                                      PopupMenuItem(
+                                          value: 'delete',
+                                          child: Text('Delete')),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -319,6 +393,42 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: 1,
+        destinations: const [
+          NavigationDestination(
+              icon: Icon(Icons.note_alt_outlined), label: 'Notes'),
+          NavigationDestination(
+              icon: Icon(Icons.checklist_rounded), label: 'Tasks'),
+          NavigationDestination(
+              icon: Icon(Icons.insights_outlined), label: 'Insights'),
+          NavigationDestination(
+              icon: Icon(Icons.settings_outlined), label: 'Settings'),
+        ],
+        onDestinationSelected: (index) {
+          if (index == 0) Navigator.of(context).pop();
+          if (index == 2) context.push('/insights');
+          if (index == 3) context.push('/settings');
+        },
+      ),
     );
   }
+
+  Widget _taskPill(Color foreground, String label) => DecoratedBox(
+        decoration: BoxDecoration(
+          color: foreground.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: foreground,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      );
 }

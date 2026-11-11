@@ -8,10 +8,10 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('About')),
         body: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
           children: [
-            const Icon(Icons.archive_rounded,
-                size: 80, color: Colors.deepPurple),
+            Icon(Icons.archive_rounded,
+                size: 68, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 16),
             Text(
               'MindVault Archive',
@@ -26,8 +26,8 @@ class AboutScreen extends StatelessWidget {
               'A private space for your thoughts, ideas, and memories.',
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
-            const Divider(),
+            const SizedBox(height: 24),
+            const Divider(height: 24),
             const ListTile(
               leading: Icon(Icons.person),
               title: Text('Developer'),
@@ -41,7 +41,7 @@ class AboutScreen extends StatelessWidget {
                 const ClipboardData(text: 'https://github.com/marufallammahim'),
               ),
             ),
-            const Divider(),
+            const Divider(height: 24),
             const ListTile(
               leading: Icon(Icons.privacy_tip),
               title: Text('Privacy'),
