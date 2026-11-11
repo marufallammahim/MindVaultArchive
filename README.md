@@ -8,7 +8,6 @@ and SQLite.
 ## Identity
 - App: MindVault Archive
 - Android application ID: `com.marufallammahim.mindvaultarchive`
-- Developer: Maruf Allam Mahim
 - Product promise: local-first notes without advertisements or a mandatory account.
 
 ## Implemented features
@@ -51,21 +50,19 @@ flutter run
 
 ## Feature-branch verification and APK
 
-The `feature/ultimate-all-in-one-mindvault` branch has three independent
-GitHub Actions workflows. A push to that branch starts all three in parallel:
+The dedicated `feature/hybrid-native-architecture` branch has four independent
+GitHub Actions workflows. A push starts the matching checks in parallel:
 
 1. **Feature Branch - Code Check** — resolves dependencies, generates Drift and
-   Riverpod sources, formats Dart files, commits formatting corrections when
-   needed, and runs `flutter analyze`.
-2. **Feature Branch - Regression Tests** — runs the complete Flutter test
-   suite after dependency and code generation.
-3. **Feature Branch - Android APK Artifact** — builds a debug APK and uploads
-   `MindVaultArchive-debug.apk`, its SHA-256 checksum, and build metadata as a
-   30-day artifact.
+   Riverpod sources, checks handwritten Dart formatting and runs `flutter analyze`.
+2. **Feature Branch - Regression Tests** — runs the complete Flutter test suite.
+3. **Feature Branch - Android APK Artifact** — builds a debug APK, verifies the
+   file, computes SHA-256 and uploads the APK plus build metadata as a 30-day artifact.
+4. **Native Architecture CI** — checks Rust formatting, unit tests and Clippy;
+   builds the C++ shared library and runs its C ABI contract test.
 
-Each workflow also supports manual execution with GitHub Actions
-`workflow_dispatch`. Open the [feature-branch Actions runs](https://github.com/marufallammahim/MindVaultArchive/actions?query=branch%3Afeature%2Fultimate-all-in-one-mindvault)
-and inspect each workflow for the exact commit. The APK can be downloaded from
+Open the [hybrid-architecture Actions runs](https://github.com/marufallammahim/MindVaultArchive/actions?query=branch%3Afeature%2Fhybrid-native-architecture)
+and inspect all workflows for the exact commit. The APK can be downloaded from
 the successful build run's **Artifacts** section. A queued or failed run does
 not mean an APK is available.
 
@@ -77,14 +74,27 @@ dart format --output=none --set-exit-if-changed lib test
 flutter analyze
 flutter test --reporter expanded
 flutter build apk --debug
+cargo test --workspace --locked --manifest-path native/rust/Cargo.toml
+cmake -S native/cpp -B build/native-cpp -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build build/native-cpp --config Release --parallel 2
+ctest --test-dir build/native-cpp --output-on-failure
 ```
 
 ## Android production release
+
 Production release builds require a private owner-controlled signing keystore.
 Follow [Android release signing setup](docs/ANDROID_RELEASE_SIGNING.md).
 Never commit `android/key.properties`, `*.jks` or signing passwords.
 
 ## Storage and privacy
+
 Notes and tasks are stored in an app-private SQLite database. No account, remote
 sync or AI provider is configured. JSON exports are plaintext; protect them as
 sensitive personal data.
+
+## Hybrid architecture status
+
+Rust and C++ currently provide versioned native health/API probes and automated
+foundation tests. They are not yet connected to Dart through a production bridge,
+and they do not implement encryption, synchronization or database ownership.
+See [Hybrid Implementation Plan](docs/HYBRID_IMPLEMENTATION_PLAN.md).
