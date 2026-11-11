@@ -521,7 +521,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               _taskDockItem(
                 Icons.checklist_rounded,
                 'List',
-                true,
+                !_progressMode,
                 () => setState(() {
                   _progressMode = false;
                   _completed = false;
@@ -530,8 +530,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
               _taskDockItem(
                 Icons.insights_rounded,
                 'Stats',
-                false,
-                () => context.push('/insights'),
+                _progressMode,
+                () => setState(() => _progressMode = true),
               ),
               _taskDockItem(
                 Icons.settings_rounded,
