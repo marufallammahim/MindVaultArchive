@@ -4,38 +4,57 @@ Branch: `feature/ultimate-all-in-one-mindvault`
 
 ## Synchronization audit
 
-- Compared the tracked file paths in `main` with the feature branch.
-- Every file path present on `main` is also present on this feature branch.
+- Compared the tracked file paths in `main` with the feature branch at the synchronization checkpoint.
+- Every file path present on `main` was present on the feature branch at that checkpoint.
 - The feature branch retains its additional UI work and feature-specific files; these were not overwritten with older `main` versions.
-- Current tree inventory at the audit checkpoint: 86 files on `main`, 92 files on the feature branch. There were no main-branch paths missing from the feature branch.
+- The feature branch currently contains 94 tracked files, including 12 Flutter test files and 29 project documentation files.
 
-## Stability changes
+## Stability changes already committed
 
 - Made app-lock service injectable so startup and lock-gate behavior can be tested without invoking the platform secure-storage plugin.
 - Added defensive handling when secure storage fails during PIN verification and lockout-state lookup. The gate remains closed on storage errors rather than leaking an unhandled asynchronous exception.
-- Fixed a malformed persisted profile-avatar value path. Profile image decoding now uses the existing safe decoder and cannot throw from the profile editor when stored image data is invalid.
+- Fixed a malformed persisted profile-avatar value path. Profile image decoding now uses the existing safe decoder.
 - Removed a nullable category selection force-unwrap from the home screen query path.
+- Added regression coverage for app startup, app-lock gate failure paths and malformed/valid avatar data.
 
-## Regression tests added (not executed yet)
+## Three independent feature-branch workflows
 
-- `test/app_startup_test.dart`: application root, theme/provider setup, database injection, and splash startup smoke test.
-- `test/app_lock_gate_test.dart`: valid unlock, storage unavailable/fail-closed, and incorrect PIN UI paths.
-- `test/user_profile_test.dart`: empty, malformed, and valid Base64 avatar values.
+All three workflows are scoped to `feature/ultimate-all-in-one-mindvault`, support push, pull request targeting that branch, and manual `workflow_dispatch`. They use separate concurrency groups so they can run concurrently without cancelling one another.
 
-Existing database, migration-adjacent, editor, search, archive import/export, backup, task, Markdown, theme, and app-lock service tests remain in place.
+1. `.github/workflows/android-ci.yml` — **Feature Branch - Code Check**: Flutter setup, dependency resolution, Drift/Riverpod code generation, Dart formatting (with a formatting-only commit if required), then `flutter analyze`.
+2. `.github/workflows/code-quality.yml` — **Feature Branch - Regression Tests**: dependency resolution, code generation and `flutter test --reporter expanded`.
+3. `.github/workflows/feature-branch-apk.yml` — **Feature Branch - Android APK Artifact**: Android/Java setup, safe native platform scaffolding, dependency/code generation, debug APK build, non-empty APK verification, SHA-256 checksum, build metadata and 30-day artifact upload.
 
-## Deferred verification
+The build lane intentionally creates a debug APK for direct device installation. It is not a production-signed release. Production signing remains a separate workflow and requires owner-managed secrets.
 
-Per project direction, full test/build execution is deferred until the source/UI synchronization and implementation phase is complete. CI test/build workflows are now manual for this feature branch; the formatter workflow remains automatic. Run the full verification sequence before release:
+## Root cause from the previous feature workflow run
+
+Run `43101264990` completed with failure. Dependency resolution and Drift/Riverpod code generation succeeded. The job then failed at `dart format --output=none --set-exit-if-changed lib test` because three files needed formatting:
+
+- `lib/app/app.dart`
+- `test/app_lock_gate_test.dart`
+- `test/user_profile_test.dart`
+
+Static analysis, tests, APK build and artifact upload were skipped as a consequence. This failure was a formatting gate failure, not evidence that those later stages passed or failed. The new code-check lane formats and commits these corrections before analysis.
+
+## Regression tests
+
+The branch contains 12 test files covering app startup, app lock, theme, database, editor provider, archive search/transfer, full backup, Markdown toolbar, tasks and user profile handling. Test coverage is not a guarantee of crash-free operation; device-level QA remains necessary.
+
+## Verification status at the time of this report
+
+The three new workflow definitions have been committed and the first parallel push-triggered runs have been created. The latest observed runs were still queued or in progress; no passing analyzer/test/build result or downloadable APK had yet been confirmed.
+
+Track the exact commit SHA, each workflow conclusion, job logs and uploaded artifact before reporting completion. If a runner stays queued, distinguish runner scheduling from a source-code failure.
+
+## Required final validation
 
 1. `flutter pub get`
 2. `dart run build_runner build --delete-conflicting-outputs`
 3. `dart format --output=none --set-exit-if-changed lib test`
 4. `flutter analyze`
-5. `flutter test`
+5. `flutter test --reporter expanded`
 6. `flutter build apk --debug`
-7. `flutter build apk --release` and `flutter build appbundle --release` when release signing is configured.
+7. Install the APK on a physical Android device and verify startup, navigation, database persistence, app lock, backup/restore and lifecycle behavior.
 
-## Important status
-
-This report records source-level changes and test coverage added, not passing test results. No claim of crash-free behavior or successful Android build should be made until the deferred verification and device-level startup checks pass.
+No claim of crash-free behavior, successful tests, or successful APK generation should be made until those checks have completed and the artifact has been verified.
