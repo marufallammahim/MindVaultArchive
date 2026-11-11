@@ -461,6 +461,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
+    );
   }
 
   Widget _dockItem(
