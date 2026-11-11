@@ -52,8 +52,7 @@ class TrashScreen extends ConsumerWidget {
     );
     if (confirmed != true) return;
     try {
-      final db = ref.read(databaseProvider);
-      await (db.delete(db.notes)..where((item) => item.id.equals(note.id))).go();
+      await ref.read(databaseProvider).permanentlyDeleteNote(note.id);
     } catch (error) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
