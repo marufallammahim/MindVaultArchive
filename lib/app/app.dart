@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/app/router.dart';
@@ -25,9 +25,13 @@ class MindVaultArchiveApp extends ConsumerWidget {
           ? AppTheme.amoledThemeFor(accent)
           : AppTheme.darkThemeFor(accent),
       routerConfig: appRouter,
-      builder: (context, child) => AppLockGate(
-        service: _appLockService,
-        child: child ?? const SizedBox.shrink(),
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: GlobalMaterialLocalizations.supportedLocales,
+      builder: (context, child) => MaterialUiCompatibilityBridge(
+        child: AppLockGate(
+          service: _appLockService,
+          child: child ?? const SizedBox.shrink(),
+        ),
       ),
       debugShowCheckedModeBanner: false,
     );
