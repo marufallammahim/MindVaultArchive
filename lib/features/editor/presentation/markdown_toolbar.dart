@@ -52,13 +52,14 @@ class MarkdownToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final tick = String.fromCharCode(96);
     final tripleTick = List.filled(3, tick).join();
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF202024),
+        color: scheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
