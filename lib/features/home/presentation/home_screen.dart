@@ -542,7 +542,7 @@ class _NoteCard extends StatelessWidget {
     final foreground = color.computeLuminance() > 0.48
         ? const Color(0xFF171717)
         : Colors.white;
-    final words = RegExp(r'\\S+').allMatches(note.documentContent).length;
+    final words = RegExp(r'\S+').allMatches(note.documentContent).length;
     return Material(
       color: color,
       borderRadius: BorderRadius.circular(30),
