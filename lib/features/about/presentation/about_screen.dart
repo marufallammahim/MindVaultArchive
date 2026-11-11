@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter/services.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -10,6 +11,12 @@ class AboutScreen extends StatelessWidget {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
           children: [
+            const FeatureHero(
+              icon: Icons.auto_awesome_rounded,
+              title: 'Your thoughts. Your archive.',
+              subtitle: 'A private, local-first home for ideas, knowledge and memories.',
+            ),
+            const SizedBox(height: 20),
             Icon(Icons.archive_rounded,
                 size: 68, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 16),
