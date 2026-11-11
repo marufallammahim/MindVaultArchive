@@ -25,10 +25,8 @@ class MindVaultArchiveApp extends ConsumerWidget {
           ? AppTheme.amoledThemeFor(accent)
           : AppTheme.darkThemeFor(accent),
       routerConfig: appRouter,
-      localizationsDelegates:
-          GlobalMaterialLocalizations.delegates,
-      supportedLocales:
-          GlobalMaterialLocalizations.supportedLocales,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      supportedLocales: GlobalMaterialLocalizations.supportedLocales,
       builder: (context, child) => MaterialUiCompatibilityBridge(
         child: AppLockGate(
           service: _appLockService,
