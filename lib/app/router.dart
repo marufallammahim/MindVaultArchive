@@ -37,14 +37,22 @@ final appRouter = GoRouter(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.route_outlined, size: 52, color: Color(0xFFFFB36B)),
+            const Icon(
+              Icons.route_outlined,
+              size: 52,
+              color: Color(0xFFFFB36B),
+            ),
             const SizedBox(height: 16),
-            const Text('This page could not be opened.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            const Text(
+              'This page could not be opened.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 8),
-            const Text('Your saved content is safe. Return home and try again.',
-                textAlign: TextAlign.center),
+            const Text(
+              'Your saved content is safe. Return home and try again.',
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: () => context.go('/home'),

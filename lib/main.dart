@@ -23,15 +23,23 @@ void main() {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline_rounded, color: Color(0xFFFF8A80), size: 42),
+              Icon(
+                Icons.error_outline_rounded,
+                color: Color(0xFFFF8A80),
+                size: 42,
+              ),
               SizedBox(height: 12),
-              Text('This screen could not be displayed.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white, fontSize: 16)),
+              Text(
+                'This screen could not be displayed.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
               SizedBox(height: 6),
-              Text('Go back and try again. Your saved notes remain safe.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 13)),
+              Text(
+                'Go back and try again. Your saved notes remain safe.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, fontSize: 13),
+              ),
             ],
           ),
         ),
