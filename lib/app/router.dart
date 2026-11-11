@@ -16,12 +16,14 @@ import 'package:mindvault_archive/features/security/presentation/app_lock_settin
 import 'package:mindvault_archive/features/insights/presentation/archive_insights_screen.dart';
 import 'package:mindvault_archive/features/timeline/presentation/archive_timeline_screen.dart';
 import 'package:mindvault_archive/features/developer/presentation/developer_notebook_screen.dart';
+import 'package:mindvault_archive/features/trash/presentation/trash_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/',
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+    GoRoute(path: '/trash', builder: (context, state) => const TrashScreen()),
     GoRoute(
       path: '/editor/:id',
       builder: (context, state) =>
