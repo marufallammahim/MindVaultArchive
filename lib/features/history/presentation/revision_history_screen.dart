@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart' show OrderingTerm;
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -79,10 +80,21 @@ class RevisionHistoryScreen extends ConsumerWidget {
           }
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
-            itemCount: revisions.length,
+            itemCount: revisions.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              final revision = revisions[index];
+              if (index == 0) {
+                return const Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: FeatureHero(
+                    icon: Icons.history_rounded,
+                    title: 'Every edit remembered',
+                    subtitle: 'Review an earlier version and restore it when needed.',
+                    compact: true,
+                  ),
+                );
+              }
+              final revision = revisions[index - 1];
               return Card(
                 child: ListTile(
                   title: Text(
