@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mindvault_archive/app/branding_assets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -70,9 +70,10 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(9),
-                      child: SvgPicture.asset(
-                        'assets/branding/mindvault_logo.svg',
-                        fit: BoxFit.contain,
+                      child: Image.memory(
+                        BrandingAssets.appLogo,
+                        fit: BoxFit.cover,
+                        filterQuality: FilterQuality.high,
                       ),
                     ),
                   ),
