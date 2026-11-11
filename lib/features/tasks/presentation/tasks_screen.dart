@@ -17,6 +17,7 @@ class TasksScreen extends ConsumerStatefulWidget {
 
 class _TasksScreenState extends ConsumerState<TasksScreen> {
   bool _completed = false;
+  bool _progressMode = false;
   DateTime _selectedDay = DateUtils.dateOnly(DateTime.now());
 
   Future<void> _editTask({VaultTask? task}) async {
@@ -187,6 +188,15 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         title: Text(widget.noteId == null ? 'To-do list' : 'Note tasks'),
         actions: [
           IconButton(
+            tooltip: _progressMode ? 'Back to tasks' : 'Progress calendar',
+            onPressed: () => setState(() => _progressMode = !_progressMode),
+            icon: Icon(
+              _progressMode
+                  ? Icons.checklist_rounded
+                  : Icons.calendar_month_rounded,
+            ),
+          ),
+          IconButton(
             tooltip: 'Settings',
             onPressed: () => context.push('/settings'),
             icon: const Icon(Icons.tune_rounded),
@@ -197,7 +207,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         onPressed: () => _editTask(),
         child: const Icon(Icons.add_rounded, size: 28),
       ),
-      body: Column(
+      body: _progressMode
+          ? _progressView(db)
+          : Column(
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 2, 16, 15),
@@ -530,6 +542,177 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       ),
     );
   }
+
+  Widget _progressView(AppDatabase db) {
+    final allTasks = db.select(db.tasks)
+      ..where((task) {
+        if (widget.noteId == null) return const Constant(true);
+        return task.noteId.equals(widget.noteId!);
+      });
+    return StreamBuilder<List<VaultTask>>(
+      stream: allTasks.watch(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text('Could not load progress: ${snapshot.error}'));
+        }
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final tasks = snapshot.data!;
+        final completed = tasks.where((task) => task.isCompleted).length;
+        final dueOnDay = tasks.where((task) =>
+            task.dueAt != null &&
+            DateUtils.isSameDay(task.dueAt, _selectedDay)).length;
+        final progress = tasks.isEmpty ? 0.0 : completed / tasks.length;
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+          children: [
+            Text(
+              'Progress',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                  ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Your consistency, one day at a time.',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Container(
+              padding: const EdgeInsets.all(17),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1A1E),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withValues(alpha: .07)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Task completion',
+                          style: TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                      Text(
+                        '${(progress * 100).round()}%',
+                        style: const TextStyle(
+                          color: Color(0xFFFFD65A),
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 13),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 9,
+                      backgroundColor: Colors.white12,
+                      color: const Color(0xFFFFD65A),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(child: _progressMetric('Completed', '$completed')),
+                      Expanded(child: _progressMetric('Remaining', '${tasks.length - completed}')),
+                      Expanded(child: _progressMetric('Total', '${tasks.length}')),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              MaterialLocalizations.of(context).formatMonthYear(_selectedDay),
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF171719),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: CalendarDatePicker(
+                initialDate: _selectedDay,
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2100),
+                onDateChanged: (day) => setState(
+                  () => _selectedDay = DateUtils.dateOnly(day),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.all(17),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD65A),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.event_available_rounded,
+                      color: Color(0xFF171719), size: 30),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Scheduled for selected day',
+                          style: TextStyle(
+                            color: Color(0xFF171719),
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          '$dueOnDay tasks',
+                          style: const TextStyle(
+                            color: Color(0xFF171719),
+                            fontSize: 22,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _progressMetric(String label, String value) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            value,
+            style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: .58),
+              fontSize: 11,
+            ),
+          ),
+        ],
+      );
 
   Widget _taskDockItem(
     IconData icon,
