@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/branding_assets.dart';
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter/services.dart';
 
@@ -18,10 +19,17 @@ class AboutScreen extends StatelessWidget {
               'A private, local-first home for ideas, knowledge and memories.',
         ),
         const SizedBox(height: 20),
-        Icon(
-          Icons.archive_rounded,
-          size: 68,
-          color: Theme.of(context).colorScheme.primary,
+        Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.memory(
+              BrandingAssets.appLogo,
+              width: 132,
+              height: 132,
+              fit: BoxFit.cover,
+              filterQuality: FilterQuality.high,
+            ),
+          ),
         ),
         const SizedBox(height: 16),
         Text(
