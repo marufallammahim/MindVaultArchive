@@ -45,11 +45,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          find lib test -name '*.dart' \\
-            ! -name '*.g.dart' \\
-            ! -name '*.freezed.dart' \\
-            ! -name '*.mocks.dart' \\
-            -print0 | xargs -0 -r dart format --output=none --set-exit-if-changed
+          find lib test -type f -name '*.dart' ! -name '*.g.dart' ! -name '*.freezed.dart' ! -name '*.mocks.dart' -print0 | xargs -0 -r dart format --output=none --set-exit-if-changed
 
       - name: Static analysis
         run: flutter analyze
