@@ -277,6 +277,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               'Settings',
                               () => context.push('/settings'),
                             ),
+                            const SizedBox(width: 8),
+                            _roundAction(
+                              context,
+                              Icons.delete_outline_rounded,
+                              'Trash',
+                              () => context.push('/trash'),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 30),
