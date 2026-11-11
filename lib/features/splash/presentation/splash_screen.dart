@@ -23,9 +23,10 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
     );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
-    _scale = Tween<double>(begin: .82, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scale = Tween<double>(
+      begin: .82,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
     _controller.forward().whenComplete(() {
       Future.delayed(const Duration(milliseconds: 650), () {
         if (mounted) context.go('/home');
