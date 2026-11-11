@@ -522,7 +522,10 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 Icons.checklist_rounded,
                 'List',
                 true,
-                () {},
+                () => setState(() {
+                  _progressMode = false;
+                  _completed = false;
+                }),
               ),
               _taskDockItem(
                 Icons.insights_rounded,
