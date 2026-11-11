@@ -10,7 +10,8 @@ void main() {
         isNull,
       );
       expect(
-        const UserProfile(name: 'Test', avatarBase64: 'not-valid-base64').avatar,
+        const UserProfile(name: 'Test', avatarBase64: 'not-valid-base64')
+            .avatar,
         isNull,
       );
     });

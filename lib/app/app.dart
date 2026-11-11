@@ -25,11 +25,10 @@ class MindVaultArchiveApp extends ConsumerWidget {
           ? AppTheme.amoledThemeFor(accent)
           : AppTheme.darkThemeFor(accent),
       routerConfig: appRouter,
-      builder: (context, child) =>
-          AppLockGate(
-            service: _appLockService,
-            child: child ?? const SizedBox.shrink(),
-          ),
+      builder: (context, child) => AppLockGate(
+        service: _appLockService,
+        child: child ?? const SizedBox.shrink(),
+      ),
       debugShowCheckedModeBanner: false,
     );
   }

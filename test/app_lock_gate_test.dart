@@ -25,7 +25,8 @@ class _MemorySecureStore implements SecureValueStore {
 }
 
 void main() {
-  testWidgets('app lock gate displays the app after a valid PIN', (tester) async {
+  testWidgets('app lock gate displays the app after a valid PIN',
+      (tester) async {
     final store = _MemorySecureStore();
     final service = AppLockService(store: store);
     await service.setPin('482915');
