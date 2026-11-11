@@ -2,7 +2,7 @@ name: Android Build
 
 on:
   push:
-    branches: ["fix/**", "feature/ultimate-all-in-one-mindvault"]
+    branches: ["fix/**"]
   pull_request:
   workflow_dispatch:
 
