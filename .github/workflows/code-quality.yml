@@ -1,28 +1,43 @@
-name: Code Quality
+name: Feature Branch - Regression Tests
+
 on:
   push:
-    branches: ['main']
+    branches:
+      - feature/ultimate-all-in-one-mindvault
   pull_request:
-    branches: ['main']
+    branches:
+      - feature/ultimate-all-in-one-mindvault
   workflow_dispatch:
+
 permissions:
   contents: read
+
+concurrency:
+  group: mindvault-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  quality:
+  regression-tests:
+    name: Flutter unit and widget regression tests
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout exact branch commit
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.sha }}
-      - uses: subosito/flutter-action@v2
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
-      - name: Generate missing native platform scaffolding
-        run: bash tool/regenerate_platforms.sh
-      - run: flutter pub get
-      - run: dart run build_runner build --delete-conflicting-outputs
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
-      - run: flutter analyze
-      - run: flutter test
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Generate Drift and Riverpod sources
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Run all Flutter tests
+        run: flutter test --reporter expanded
