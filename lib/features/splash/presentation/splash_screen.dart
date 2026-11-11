@@ -46,7 +46,9 @@ class _SplashScreenState extends State<SplashScreen>
     try {
       return BrandingAssets.splashLogo;
     } on FormatException catch (error) {
-      debugPrint('Splash logo data is invalid; using the main app logo: $error');
+      debugPrint(
+        'Splash logo data is invalid; using the main app logo: $error',
+      );
       return BrandingAssets.appLogo;
     }
   }
