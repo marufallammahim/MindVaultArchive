@@ -7,10 +7,9 @@ import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
 import 'package:mindvault_archive/features/security/presentation/app_lock_gate.dart';
 
 class MindVaultArchiveApp extends ConsumerWidget {
-  const MindVaultArchiveApp({super.key, AppLockService? appLockService})
-    : _appLockService = appLockService;
+  const MindVaultArchiveApp({super.key, this.appLockService});
 
-  final AppLockService? _appLockService;
+  final AppLockService? appLockService;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,11 +26,9 @@ class MindVaultArchiveApp extends ConsumerWidget {
       routerConfig: appRouter,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('en', 'US')],
-      builder: (context, child) => MaterialUiCompatibilityBridge(
-        child: AppLockGate(
-          service: _appLockService,
-          child: child ?? const SizedBox.shrink(),
-        ),
+      builder: (context, child) => AppLockGate(
+        service: appLockService,
+        child: child ?? const SizedBox.shrink(),
       ),
       debugShowCheckedModeBanner: false,
     );
