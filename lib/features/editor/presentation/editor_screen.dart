@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:material_ui/material_ui.dart' as flutter_material;
 import 'package:drift/drift.dart' hide Column;
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
@@ -749,9 +748,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             : MarkdownBody(
                                 data: _contentController.text,
                                 selectable: true,
-                                styleSheet: MarkdownStyleSheet.fromTheme(
-                                  flutter_material.Theme.of(context),
-                                ),
                               ),
                       )
                     : Column(
