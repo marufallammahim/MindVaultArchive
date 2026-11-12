@@ -43,9 +43,7 @@ class MarkdownToolbar extends StatelessWidget {
     return IconButton(
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
-      style: IconButton.styleFrom(
-        backgroundColor: const Color(0xFF000000),
-      ),
+      style: IconButton.styleFrom(backgroundColor: const Color(0xFF000000)),
       onPressed: action,
       icon: Icon(icon, color: Colors.white),
     );

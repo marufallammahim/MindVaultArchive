@@ -330,14 +330,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           surfaceTintColor: Colors.transparent,
           title: const Text(
             'Create a Note',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+            ),
           ),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1),
-            child: Container(
-              height: 1,
-              color: Colors.transparent,
-            ),
+            child: Container(height: 1, color: Colors.transparent),
           ),
           actions: [
             IconButton(
@@ -464,166 +465,170 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         body: CustomPaint(
           painter: _PixelDotPainter(),
           child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-          child: Column(
-            children: [
-              if (state.saveError != null)
-                MaterialBanner(
-                  content: Text(state.saveError!),
-                  leading: const Icon(Icons.error_outline),
-                  actions: [
-                    TextButton(
-                      onPressed: () async {
-                        final saved = await ref
-                            .read(editorProvider(widget.noteId).notifier)
-                            .forceSave();
-                        if (!context.mounted) return;
-                        if (saved) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Note saved.')),
-                          );
-                        }
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              TextField(
-                controller: _titleController,
-                onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.8,
-                  height: 1.12,
-                ),
-                decoration: const InputDecoration(
-                  filled: false,
-                  hintText: 'Give this note a title',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
-                ),
-                maxLines: null,
-              ),
-              AnimatedBuilder(
-                animation: _contentController,
-                builder: (context, child) {
-                  final text = _contentController.text;
-                  final words = RegExp(r'\S+').allMatches(text).length;
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 2, bottom: 8),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text('$words words  •  ${text.length} characters'),
-                    ),
-                  );
-                },
-              ),
-              Expanded(
-                child: _previewMode
-                    ? SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
-                        child: _contentController.text.trim().isEmpty
-                            ? const Center(
-                                child: Text('Nothing to preview yet.'),
-                              )
-                            : MarkdownBody(
-                                data: _contentController.text,
-                                selectable: true,
-                                styleSheet: MarkdownStyleSheet(),
-                              ),
-                      )
-                    : Column(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _contentController,
-                              onChanged: (_) => _onTextChanged(),
-                              style: Theme.of(context).textTheme.bodyLarge
-                                  ?.copyWith(
-                                    height: 1.65,
-                                    fontSize: 16,
-                                    color: const Color(0xFF000000),
-                                  ),
-                              cursorColor: const Color(0xFF000000),
-                              decoration: InputDecoration(
-                                hintText: 'Start writing your note…',
-                                hintStyle: const TextStyle(color: Color(0xFF77716C)),
-                                filled: false,
-                                contentPadding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  18,
-                                  16,
-                                  18,
-                                ),
-                                border: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                              ),
-                              maxLines: null,
-                              expands: true,
-                              textAlignVertical: TextAlignVertical.top,
-                              keyboardType: TextInputType.multiline,
-                            ),
-                          ),
-                        ],
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            child: Column(
+              children: [
+                if (state.saveError != null)
+                  MaterialBanner(
+                    content: Text(state.saveError!),
+                    leading: const Icon(Icons.error_outline),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          final saved = await ref
+                              .read(editorProvider(widget.noteId).notifier)
+                              .forceSave();
+                          if (!context.mounted) return;
+                          if (saved) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Note saved.')),
+                            );
+                          }
+                        },
+                        child: const Text('Retry'),
                       ),
-              ),
-              StreamBuilder<List<Attachment>>(
-                stream: attachmentQuery.watch(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
+                    ],
+                  ),
+                TextField(
+                  controller: _titleController,
+                  onChanged: (_) => _onTextChanged(),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                    height: 1.12,
+                  ),
+                  decoration: const InputDecoration(
+                    filled: false,
+                    hintText: 'Give this note a title',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  maxLines: null,
+                ),
+                AnimatedBuilder(
+                  animation: _contentController,
+                  builder: (context, child) {
+                    final text = _contentController.text;
+                    final words = RegExp(r'\S+').allMatches(text).length;
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        'Could not load attachments: ${snapshot.error}',
+                      padding: const EdgeInsets.only(top: 2, bottom: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '$words words  •  ${text.length} characters',
+                        ),
                       ),
                     );
-                  }
-                  final attachments = snapshot.data ?? [];
-                  if (attachments.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return SizedBox(
-                    height: 88,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.only(bottom: 12),
-                      itemCount: attachments.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final item = attachments[index];
-                        return SizedBox(
-                          width: 240,
-                          child: Card(
-                            child: ListTile(
-                              dense: true,
-                              leading: Icon(_attachmentIcon(item)),
-                              title: Text(
-                                item.filename,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(item.type.toUpperCase()),
-                              onTap: () => _openAttachment(item),
-                              trailing: IconButton(
-                                tooltip: 'Remove attachment',
-                                icon: const Icon(Icons.close, size: 18),
-                                onPressed: () => _removeAttachment(item),
+                  },
+                ),
+                Expanded(
+                  child: _previewMode
+                      ? SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
+                          child: _contentController.text.trim().isEmpty
+                              ? const Center(
+                                  child: Text('Nothing to preview yet.'),
+                                )
+                              : MarkdownBody(
+                                  data: _contentController.text,
+                                  selectable: true,
+                                  styleSheet: MarkdownStyleSheet(),
+                                ),
+                        )
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _contentController,
+                                onChanged: (_) => _onTextChanged(),
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
+                                      height: 1.65,
+                                      fontSize: 16,
+                                      color: const Color(0xFF000000),
+                                    ),
+                                cursorColor: const Color(0xFF000000),
+                                decoration: InputDecoration(
+                                  hintText: 'Start writing your note…',
+                                  hintStyle: const TextStyle(
+                                    color: Color(0xFF77716C),
+                                  ),
+                                  filled: false,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    18,
+                                    16,
+                                    18,
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                ),
+                                maxLines: null,
+                                expands: true,
+                                textAlignVertical: TextAlignVertical.top,
+                                keyboardType: TextInputType.multiline,
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-              MarkdownToolbar(
-                controller: _contentController,
-                onChanged: _onTextChanged,
-              ),
-            ],
-          ),
+                          ],
+                        ),
+                ),
+                StreamBuilder<List<Attachment>>(
+                  stream: attachmentQuery.watch(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          'Could not load attachments: ${snapshot.error}',
+                        ),
+                      );
+                    }
+                    final attachments = snapshot.data ?? [];
+                    if (attachments.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return SizedBox(
+                      height: 88,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.only(bottom: 12),
+                        itemCount: attachments.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final item = attachments[index];
+                          return SizedBox(
+                            width: 240,
+                            child: Card(
+                              child: ListTile(
+                                dense: true,
+                                leading: Icon(_attachmentIcon(item)),
+                                title: Text(
+                                  item.filename,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(item.type.toUpperCase()),
+                                onTap: () => _openAttachment(item),
+                                trailing: IconButton(
+                                  tooltip: 'Remove attachment',
+                                  icon: const Icon(Icons.close, size: 18),
+                                  onPressed: () => _removeAttachment(item),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+                MarkdownToolbar(
+                  controller: _contentController,
+                  onChanged: _onTextChanged,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -634,7 +639,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 class _PixelDotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = const Color(0xFFB8B0A7).withValues(alpha: 0.42);
+    final paint = Paint()
+      ..color = const Color(0xFFB8B0A7).withValues(alpha: 0.42);
     const step = 16.0;
     for (double y = 8; y < size.height; y += step) {
       for (double x = 8; x < size.width; x += step) {

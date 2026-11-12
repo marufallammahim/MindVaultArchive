@@ -279,14 +279,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                           right: 8,
                                         ),
                                         child: ChoiceChip(
-                                          label: Text('#${category.name}', style: const TextStyle(color: Color(0xFF000000), fontWeight: FontWeight.w800)),
+                                          label: Text(
+                                            '#${category.name}',
+                                            style: const TextStyle(
+                                              color: Color(0xFF000000),
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
                                           selected:
                                               _view == 'category' &&
                                               _selectedCategoryId ==
                                                   category.id,
-                                          backgroundColor: const Color(0xFFC0F7FE),
-                                          selectedColor: const Color(0xFF99E885),
-                                          side: const BorderSide(color: Color(0xFF000000), width: 1.5),
+                                          backgroundColor: const Color(
+                                            0xFFC0F7FE,
+                                          ),
+                                          selectedColor: const Color(
+                                            0xFF99E885,
+                                          ),
+                                          side: const BorderSide(
+                                            color: Color(0xFF000000),
+                                            width: 1.5,
+                                          ),
                                           onSelected: (_) => setState(() {
                                             _view = 'category';
                                             _selectedCategoryId = category.id;
