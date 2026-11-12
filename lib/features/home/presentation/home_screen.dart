@@ -17,14 +17,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final _searchController = TextEditingController();
   String _query = '';
   String _view = 'all';
   String? _selectedCategoryId;
 
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -416,8 +414,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
             color: const Color(0xFF171719).withValues(alpha: 0.97),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: const Color(0xFF000000), width: 2),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.32),
@@ -469,7 +467,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         : Colors.white.withValues(alpha: 0.68);
     return Expanded(
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(4),
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
