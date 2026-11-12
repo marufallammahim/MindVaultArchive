@@ -328,10 +328,16 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           backgroundColor: const Color(0xFF080809),
           foregroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
-          title: const Text('Create a Note', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          title: const Text(
+            'Create a Note',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1),
-            child: Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+            child: Container(
+              height: 1,
+              color: Colors.white.withValues(alpha: 0.08),
+            ),
           ),
           actions: [
             IconButton(
@@ -437,18 +443,18 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   shape: const StadiumBorder(),
                 ),
                 onPressed: () async {
-                final saved = await ref
-                    .read(editorProvider(widget.noteId).notifier)
-                    .forceSave();
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      saved ? 'Note saved.' : 'Could not save note.',
+                  final saved = await ref
+                      .read(editorProvider(widget.noteId).notifier)
+                      .forceSave();
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        saved ? 'Note saved.' : 'Could not save note.',
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
                 child: const Text('Save'),
               ),
             ),
@@ -784,29 +790,44 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             child: TextField(
                               controller: _contentController,
                               onChanged: (_) => _onTextChanged(),
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                height: 1.65,
-                                fontSize: 16,
-                                color: const Color(0xFFF4F4F5),
-                              ),
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    height: 1.65,
+                                    fontSize: 16,
+                                    color: const Color(0xFFF4F4F5),
+                                  ),
                               cursorColor: const Color(0xFF4388FF),
                               decoration: InputDecoration(
                                 hintText: 'Start writing your note…',
-                                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.38)),
+                                hintStyle: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.38),
+                                ),
                                 filled: true,
                                 fillColor: const Color(0xFF171719),
-                                contentPadding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+                                contentPadding: const EdgeInsets.fromLTRB(
+                                  16,
+                                  18,
+                                  16,
+                                  18,
+                                ),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white.withValues(alpha: 0.08),
+                                  ),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                                  borderSide: BorderSide(
+                                    color: Colors.white.withValues(alpha: 0.08),
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(18),
-                                  borderSide: const BorderSide(color: Color(0xFF4388FF), width: 1.2),
+                                  borderSide: const BorderSide(
+                                    color: Color(0xFF4388FF),
+                                    width: 1.2,
+                                  ),
                                 ),
                               ),
                               maxLines: null,

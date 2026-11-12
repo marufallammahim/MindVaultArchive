@@ -43,7 +43,9 @@ class MarkdownToolbar extends StatelessWidget {
     return IconButton(
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
-      style: IconButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.045),),
+      style: IconButton.styleFrom(
+        backgroundColor: Colors.white.withValues(alpha: 0.045),
+      ),
       onPressed: action,
       icon: Icon(icon, color: Colors.white70),
     );
@@ -60,9 +62,7 @@ class MarkdownToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF242427),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.10),
-        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
