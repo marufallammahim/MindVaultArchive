@@ -226,7 +226,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                             ),
                                       ),
                                       Text(
-                                        'Your personal archive',
+                                        'Your Archive from Brain',
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodySmall
@@ -248,13 +248,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               'Search',
                               () => context.push('/search'),
                             ),
-                            const SizedBox(width: 8),
-                            _roundAction(
-                              context,
-                              Icons.settings_outlined,
-                              'Settings',
-                              () => context.push('/settings'),
-                            ),
+
                             const SizedBox(width: 8),
                             _roundAction(
                               context,
@@ -265,15 +259,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ],
                         ),
                         const SizedBox(height: 30),
-                        Text(
-                          'my notes',
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: -1.1,
-                              ),
-                        ),
-                        const SizedBox(height: 18),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
@@ -314,30 +299,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        TextField(
-                          controller: _searchController,
-                          onChanged: (value) =>
-                              setState(() => _query = value.trim()),
-                          decoration: InputDecoration(
-                            hintText: 'Search your notes...',
-                            prefixIcon: const Icon(Icons.search_rounded),
-                            suffixIcon: _query.isEmpty
-                                ? null
-                                : IconButton(
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      setState(() => _query = '');
-                                    },
-                                    icon: const Icon(Icons.close),
-                                  ),
-                          ),
-                        ),
-                        const SizedBox(height: 22),
+                        const SizedBox(height: 14),
                         Row(
                           children: [
                             const Expanded(
                               child: Text(
-                                'Recent notes',
+                                'Recent Notes',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
