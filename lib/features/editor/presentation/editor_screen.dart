@@ -323,18 +323,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         }
       },
       child: Scaffold(
+        backgroundColor: const Color(0xFF080809),
         appBar: AppBar(
-          title: Text(
-            state.saveError != null
-                ? 'Save failed'
-                : state.isSaving
-                ? 'Saving…'
-                : 'Saved',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: state.saveError != null
-                  ? Theme.of(context).colorScheme.error
-                  : null,
-            ),
+          backgroundColor: const Color(0xFF080809),
+          foregroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          title: const Text('Create a Note', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
           ),
           actions: [
             IconButton(
@@ -430,10 +427,16 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               icon: const Icon(Icons.brush),
               onPressed: () => context.push('/drawing/${widget.noteId}'),
             ),
-            IconButton(
-              tooltip: 'Save',
-              icon: const Icon(Icons.check),
-              onPressed: () async {
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF4388FF),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  shape: const StadiumBorder(),
+                ),
+                onPressed: () async {
                 final saved = await ref
                     .read(editorProvider(widget.noteId).notifier)
                     .forceSave();
@@ -446,6 +449,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   ),
                 );
               },
+                child: const Text('Save'),
+              ),
             ),
           ],
         ),
