@@ -587,8 +587,8 @@ class _NoteCard extends StatelessWidget {
                         ),
                       ),
                       if (note.sortOrder == 1)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 5),
+                        const Padding(
+                          padding: EdgeInsets.only(right: 5),
                           child: Icon(
                             Icons.push_pin_rounded,
                             color: foreground,
@@ -596,8 +596,8 @@ class _NoteCard extends StatelessWidget {
                           ),
                         ),
                       if (note.isFavorite)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 5),
+                        const Padding(
+                          padding: EdgeInsets.only(right: 5),
                           child: Icon(
                             Icons.star_rounded,
                             color: foreground,
@@ -617,7 +617,7 @@ class _NoteCard extends StatelessWidget {
                       PopupMenuButton<String>(
                         tooltip: 'More note actions',
                         padding: EdgeInsets.zero,
-                        icon: Icon(Icons.more_horiz, color: foreground),
+                        icon: const Icon(Icons.more_horiz, color: foreground),
                         onSelected: onAction,
                         itemBuilder: (_) => actions,
                       ),
@@ -628,7 +628,7 @@ class _NoteCard extends StatelessWidget {
                     note.title.trim().isEmpty ? 'Untitled note' : note.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: foreground,
                       fontSize: 21,
                       height: 1.16,
