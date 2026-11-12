@@ -104,19 +104,19 @@ class AppTheme {
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: dark ? darkSurface : primary,
-        foregroundColor: ink,
+        foregroundColor: dark ? scheme.onSurface : ink,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 62,
         titleTextStyle: const TextStyle(
-          color: ink,
+          color: dark ? scheme.onSurface : ink,
           fontSize: 21,
           fontWeight: FontWeight.w800,
           letterSpacing: -0.55,
         ),
-        iconTheme: const IconThemeData(color: ink, size: 22),
+        iconTheme: IconThemeData(color: dark ? scheme.onSurface : ink, size: 22),
       ),
       cardTheme: CardThemeData(
         color: card,
@@ -158,7 +158,10 @@ class AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: card,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: ink, width: 2.5),
+        ),
         titleTextStyle: TextStyle(
           color: scheme.onSurface,
           fontSize: 21,
@@ -171,20 +174,27 @@ class AppTheme {
         modalBackgroundColor: card,
         showDragHandle: true,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+          side: BorderSide(color: ink, width: 2.5),
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: card,
         surfaceTintColor: Colors.transparent,
         textStyle: TextStyle(color: scheme.onSurface),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(7),
+          side: const BorderSide(color: ink, width: 2),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: card,
         contentTextStyle: TextStyle(color: scheme.onSurface),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(7),
+          side: const BorderSide(color: ink, width: 2),
+        ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: dark ? darkSurface : lightSurface,
