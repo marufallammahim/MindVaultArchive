@@ -2,17 +2,17 @@ import 'package:material_ui/material_ui.dart';
 
 /// Shared AMOLED-first design system for every MindVault Archive route.
 class AppTheme {
-  static const defaultBrand = Color(0xFFFFD65A);
+  static const defaultBrand = Color(0xFFF7CB46);
   static const brandLight = Color(0xFFFFE28A);
-  static const darkSurface = Color(0xFF101014);
-  static const darkCard = Color(0xFF171719);
-  static const lightSurface = Color(0xFFF4F1F2);
+  static const darkSurface = Color(0xFFFCEFE8);
+  static const darkCard = Color(0xFFFCEFE8);
+  static const lightSurface = Color(0xFFFCEFE8);
 
   static ThemeData get lightTheme => lightThemeFor(defaultBrand);
 
   static ThemeData lightThemeFor(Color accent) {
     final scheme = ColorScheme.fromSeed(
-      seedColor: accent,
+      seedColor: defaultBrand,
       brightness: Brightness.light,
       surface: lightSurface,
     );
@@ -49,10 +49,8 @@ class AppTheme {
     final outline = scheme.outlineVariant.withValues(alpha: 0.42);
     final card = amoled ? darkCard : scheme.surfaceContainerLow;
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(22),
-      side: BorderSide(
-        color: amoled ? Colors.white.withValues(alpha: 0.055) : outline,
-      ),
+      borderRadius: BorderRadius.circular(4),
+      side: const BorderSide(color: Color(0xFF000000), width: 2),
     );
 
     return ThemeData(
@@ -63,8 +61,8 @@ class AppTheme {
       visualDensity: VisualDensity.standard,
       fontFamily: 'Roboto',
       appBarTheme: AppBarTheme(
-        backgroundColor: background,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: const Color(0xFF000000),
+        foregroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
         elevation: 0,
@@ -104,8 +102,8 @@ class AppTheme {
           color: scheme.onSurfaceVariant.withValues(alpha: 0.78),
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(17),
-          borderSide: BorderSide(color: outline),
+          borderRadius: BorderRadius.circular(4),
+          borderSide: const BorderSide(color: Color(0xFF000000), width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
@@ -113,7 +111,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(17),
-          borderSide: BorderSide(color: scheme.primary, width: 1.7),
+          borderSide: const BorderSide(color: Color(0xFF000000), width: 2),
         ),
       ),
       dialogTheme: DialogThemeData(
