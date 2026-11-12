@@ -548,10 +548,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                     ?.copyWith(
                                       height: 1.65,
                                       fontSize: 16,
-                                      color: const Color(0xFF000000),
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
-                                cursorColor: const Color(0xFF000000),
-                                decoration: const InputDecoration(
+                                cursorColor: Theme.of(context).colorScheme.primary,
+                                decoration: InputDecoration(
                                   hintText: 'Start writing your note…',
                                   hintStyle: TextStyle(
                                     color: Theme.of(context).colorScheme.onSurfaceVariant,
