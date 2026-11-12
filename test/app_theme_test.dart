@@ -32,10 +32,12 @@ void main() {
     });
 
     test('dark theme keeps strong visible component outlines', () {
-      final shape = AppTheme.darkTheme.cardTheme.shape as RoundedRectangleBorder;
+      final shape =
+          AppTheme.darkTheme.cardTheme.shape as RoundedRectangleBorder;
       expect(shape.side.color, const Color(0xFFF5F1EC));
-      final input = AppTheme.darkTheme.inputDecorationTheme.enabledBorder
-          as OutlineInputBorder;
+      final input =
+          AppTheme.darkTheme.inputDecorationTheme.enabledBorder
+              as OutlineInputBorder;
       expect(input.borderSide.color, const Color(0xFFF5F1EC));
     });
 
