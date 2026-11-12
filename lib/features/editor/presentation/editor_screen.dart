@@ -500,6 +500,20 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
                 maxLines: null,
               ),
+              AnimatedBuilder(
+                animation: _contentController,
+                builder: (context, child) {
+                  final text = _contentController.text;
+                  final words = RegExp(r'\S+').allMatches(text).length;
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 2, bottom: 8),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('$words words  •  ${text.length} characters'),
+                    ),
+                  );
+                },
+              ),
               StreamBuilder<List<VaultTask>>(
                 stream:
                     (db.select(db.tasks)
@@ -695,30 +709,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               MarkdownToolbar(
                 controller: _contentController,
                 onChanged: _onTextChanged,
-              ),
-              AnimatedBuilder(
-                animation: _contentController,
-                builder: (context, child) {
-                  final text = _contentController.text;
-                  final words = RegExp(r'\S+').allMatches(text).length;
-                  final readingMinutes = (words / 200).ceil();
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(4, 4, 4, 12),
-                    child: Row(
-                      children: [
-                        Text('$words words'),
-                        const SizedBox(width: 12),
-                        Text('${text.length} characters'),
-                        const Spacer(),
-                        Text(
-                          readingMinutes == 0
-                              ? 'Less than 1 min'
-                              : '$readingMinutes min read',
-                        ),
-                      ],
-                    ),
-                  );
-                },
               ),
               StreamBuilder<List<Attachment>>(
                 stream: attachmentQuery.watch(),
