@@ -7,6 +7,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
 import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
@@ -323,17 +324,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFFCEFE8),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF000000),
-          foregroundColor: Colors.white,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
           surfaceTintColor: Colors.transparent,
           title: const Text(
             'Create a Note',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: Theme.of(context).appBarTheme.foregroundColor,
             ),
           ),
           bottom: PreferredSize(
@@ -438,9 +439,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF000000),
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.white, width: 1),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                  side: BorderSide(color: Theme.of(context).colorScheme.outline),
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   shape: const StadiumBorder(),
                 ),
@@ -551,7 +552,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                 decoration: const InputDecoration(
                                   hintText: 'Start writing your note…',
                                   hintStyle: TextStyle(
-                                    color: Color(0xFF77716C),
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   filled: false,
                                   contentPadding: EdgeInsets.fromLTRB(
@@ -640,7 +641,7 @@ class _PixelDotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFB8B0A7).withValues(alpha: 0.42);
+      ..color = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.28);
     const step = 16.0;
     for (double y = 8; y < size.height; y += step) {
       for (double x = 8; x < size.width; x += step) {
