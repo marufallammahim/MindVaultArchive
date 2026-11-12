@@ -110,7 +110,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 62,
-        titleTextStyle: const TextStyle(
+        titleTextStyle: TextStyle(
           color: dark ? scheme.onSurface : ink,
           fontSize: 21,
           fontWeight: FontWeight.w800,
