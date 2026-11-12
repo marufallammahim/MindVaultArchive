@@ -55,12 +55,12 @@ class AppTheme {
         scrolledUnderElevation: 0,
         toolbarHeight: 62,
         titleTextStyle: TextStyle(
-          color: scheme.onSurface,
+          color: Colors.white,
           fontSize: 21,
           fontWeight: FontWeight.w800,
           letterSpacing: -0.55,
         ),
-        iconTheme: IconThemeData(color: scheme.onSurface, size: 22),
+        iconTheme: const IconThemeData(color: Colors.white, size: 22),
       ),
       cardTheme: CardThemeData(
         color: card,
