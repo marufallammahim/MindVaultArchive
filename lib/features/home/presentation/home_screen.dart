@@ -388,11 +388,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       itemBuilder: (context, index) {
                         final note = notes[index];
                         const colors = [
-                          const Color(0xFFF7CB46),
-                          const Color(0xFFE9E0E8),
-                          const Color(0xFFC0F7FE),
-                          const Color(0xFF99E885),
-                          const Color(0xFFFCEFE8),
+                          Color(0xFFF7CB46),
+                          Color(0xFFE9E0E8),
+                          Color(0xFFC0F7FE),
+                          Color(0xFF99E885),
+                          Color(0xFFFCEFE8),
                         ];
                         final color = note.color == null
                             ? colors[index % colors.length]
