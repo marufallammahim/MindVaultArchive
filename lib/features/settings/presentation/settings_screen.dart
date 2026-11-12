@@ -13,16 +13,12 @@ class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   static const _palette = <Color>[
-    Color(0xFF5A0719),
-    Color(0xFFB64D69),
-    Color(0xFFE97855),
-    Color(0xFFFFC94A),
-    Color(0xFFA8D76D),
-    Color(0xFF4D91F0),
-    Color(0xFF9270D8),
-    Color(0xFF24A89A),
-    Color(0xFF64748B),
-    Color(0xFF202124),
+    Color(0xFFF7CB46),
+    Color(0xFFC0F7FE),
+    Color(0xFF99E885),
+    Color(0xFFFE90E8),
+    Color(0xFFFFDC8B),
+    Color(0xFF000000),
   ];
 
   Future<void> _editProfile(BuildContext context, WidgetRef ref) async {
