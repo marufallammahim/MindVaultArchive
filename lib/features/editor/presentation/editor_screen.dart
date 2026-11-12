@@ -423,11 +423,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(value: -1, child: Text('Default color')),
-                PopupMenuItem(value: 0xFFFFF0D8, child: Text('Warm cream')),
-                PopupMenuItem(value: 0xFFE1F2E5, child: Text('Soft green')),
-                PopupMenuItem(value: 0xFFE2ECFF, child: Text('Soft blue')),
-                PopupMenuItem(value: 0xFFF4E4F4, child: Text('Soft lavender')),
-                PopupMenuItem(value: 0xFFFFE5E5, child: Text('Soft rose')),
+                PopupMenuItem(value: 0xFFF7CB46, child: Text('Sunflower yellow')),
+                PopupMenuItem(value: 0xFFC0F7FE, child: Text('Sky cyan')),
+                PopupMenuItem(value: 0xFF99E885, child: Text('Pixel green')),
+                PopupMenuItem(value: 0xFFFE90E8, child: Text('Bubblegum pink')),
+                PopupMenuItem(value: 0xFFFFDC8B, child: Text('Warm cream')),
               ],
             ),
             IconButton(
@@ -435,34 +435,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               icon: const Icon(Icons.brush),
               onPressed: () => context.push('/drawing/${widget.noteId}'),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  side: BorderSide(
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  shape: const StadiumBorder(),
-                ),
-                onPressed: () async {
-                  final saved = await ref
-                      .read(editorProvider(widget.noteId).notifier)
-                      .forceSave();
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        saved ? 'Note saved.' : 'Could not save note.',
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('Save'),
-              ),
-            ),
+
           ],
         ),
         body: CustomPaint(
