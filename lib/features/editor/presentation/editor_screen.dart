@@ -10,6 +10,7 @@ import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
 import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
+import 'package:mindvault_archive/features/editor/presentation/markdown_preview_editing_controller.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path/path.dart' as p;
