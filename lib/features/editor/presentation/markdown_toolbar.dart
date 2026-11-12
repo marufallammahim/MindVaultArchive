@@ -1,6 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
-/// Small Markdown authoring toolbar for the plain-text note editor.
+/// Compact formatting controls for the live Markdown note editor.
 class MarkdownToolbar extends StatelessWidget {
   const MarkdownToolbar({
     super.key,
@@ -43,8 +43,9 @@ class MarkdownToolbar extends StatelessWidget {
     return IconButton(
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.045),),
       onPressed: action,
-      icon: Icon(icon),
+      icon: Icon(icon, color: Colors.white70),
     );
   }
 
@@ -55,12 +56,12 @@ class MarkdownToolbar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(22),
+        color: const Color(0xFF242427),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.45),
+          color: Colors.white.withValues(alpha: 0.10),
         ),
       ),
       child: SingleChildScrollView(
