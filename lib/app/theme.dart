@@ -152,7 +152,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
-          borderSide: const BorderSide(color: ink, width: 2),
+          borderSide: BorderSide(color: borderInk, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
@@ -179,7 +179,7 @@ class AppTheme {
         showDragHandle: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
-          side: BorderSide(color: ink, width: 2.5),
+          side: BorderSide(color: borderInk, width: 2.5),
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
