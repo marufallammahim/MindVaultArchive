@@ -414,8 +414,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.small(
-        backgroundColor: const Color(0xFFB88AF2),
-        foregroundColor: const Color(0xFF171719),
+        backgroundColor: const Color(0xFFF7CB46),
+        foregroundColor: const Color(0xFF000000),
         onPressed: () => context.push('/editor/${const Uuid().v4()}'),
         child: const Icon(Icons.add_rounded, size: 25),
       ),
@@ -426,15 +426,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: 66,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
-            color: const Color(0xFF171719).withValues(alpha: 0.97),
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: const Color(0xFF000000), width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.32),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              ),
+            color: const Color(0xFFC0F7FE),
+            borderRadius: BorderRadius.circular(7),
+            border: Border.all(color: const Color(0xFF000000), width: 2.5),
+            boxShadow: const [
+              BoxShadow(color: Colors.black, blurRadius: 0, offset: Offset(5, 5)),
             ],
           ),
           child: Row(
@@ -475,9 +471,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     bool selected,
     VoidCallback onTap,
   ) {
-    final foreground = selected
-        ? const Color(0xFF171719)
-        : Colors.white.withValues(alpha: 0.68);
+    const foreground = Color(0xFF000000);
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.circular(4),
@@ -485,8 +479,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFF3F0E9) : Colors.transparent,
-            borderRadius: BorderRadius.circular(17),
+            color: selected ? const Color(0xFFF7CB46) : Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
@@ -556,15 +550,21 @@ class _NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const foreground = Color(0xFF000000);
     final words = RegExp(r'\S+').allMatches(note.documentContent).length;
-    return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(4),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
-        side: const BorderSide(color: Color(0xFF000000), width: 2),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(7),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
+      padding: const EdgeInsets.only(right: 4, bottom: 4),
+      child: Material(
+        color: color,
+        borderRadius: BorderRadius.circular(5),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+          side: const BorderSide(color: Color(0xFF000000), width: 2.5),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
         onTap: onTap,
         child: Stack(
           children: [
@@ -683,6 +683,7 @@ class _NoteCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
