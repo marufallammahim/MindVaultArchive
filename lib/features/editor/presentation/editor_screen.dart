@@ -497,6 +497,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   height: 1.12,
                 ),
                 decoration: const InputDecoration(
+                  filled: false,
                   hintText: 'Give this note a title',
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 12),
@@ -547,8 +548,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                               decoration: InputDecoration(
                                 hintText: 'Start writing your note…',
                                 hintStyle: const TextStyle(color: Color(0xFF77716C)),
-                                filled: true,
-                                fillColor: const Color(0xFFFCEFE8),
+                                filled: false,
                                 contentPadding: const EdgeInsets.fromLTRB(
                                   16,
                                   18,
