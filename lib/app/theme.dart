@@ -29,8 +29,6 @@ class AppTheme {
           tertiary: tertiary,
           onTertiary: ink,
           error: const Color(0xFFE64B3C),
-          tertiary: tertiary,
-          onTertiary: ink,
           surface: lightSurface,
           onSurface: ink,
           surfaceContainerLowest: const Color(0xFFFFFFFF),
