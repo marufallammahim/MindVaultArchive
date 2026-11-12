@@ -55,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFF06152F),
+    backgroundColor: const Color(0xFFFCEFE8),
     body: Center(
       child: FadeTransition(
         opacity: _animation,
@@ -88,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
               const Text(
                 'MindVault Archive',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF171719),
                   fontSize: 27,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -.7,
@@ -98,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
               Text(
                 'Your Thoughts. Your Archive.',
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: .68),
+                  color: const Color(0xFF171719).withValues(alpha: .68),
                   fontSize: 14,
                   letterSpacing: .3,
                 ),
