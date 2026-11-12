@@ -374,11 +374,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       itemBuilder: (context, index) {
                         final note = notes[index];
                         final colors = [
-                          const Color(0xFFFF795F),
-                          const Color(0xFFC5EFB5),
-                          const Color(0xFFFFD65A),
-                          const Color(0xFFB88AF2),
-                          const Color(0xFF8BCBFA),
+                          const Color(0xFFF7CB46),
+                          const Color(0xFFE9E0E8),
+                          const Color(0xFFC0F7FE),
+                          const Color(0xFF99E885),
+                          const Color(0xFFFCEFE8),
                         ];
                         final color = note.color == null
                             ? colors[index % colors.length]
@@ -540,13 +540,15 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = color.computeLuminance() > 0.48
-        ? const Color(0xFF171717)
-        : Colors.white;
+    final foreground = const Color(0xFF000000);
     final words = RegExp(r'\S+').allMatches(note.documentContent).length;
     return Material(
       color: color,
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(4),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(4),
+        side: const BorderSide(color: Color(0xFF000000), width: 2),
+      ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
