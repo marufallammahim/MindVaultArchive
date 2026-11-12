@@ -39,7 +39,12 @@ class MarkdownToolbar extends StatelessWidget {
     onChanged();
   }
 
-  Widget _tool(BuildContext context, String tooltip, IconData icon, VoidCallback action) {
+  Widget _tool(
+    BuildContext context,
+    String tooltip,
+    IconData icon,
+    VoidCallback action,
+  ) {
     final scheme = Theme.of(context).colorScheme;
     return IconButton(
       tooltip: tooltip,
@@ -60,14 +65,22 @@ class MarkdownToolbar extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1.5),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+          width: 1.5,
+        ),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
             _tool(context, 'Bold', Icons.format_bold, () => _wrap('**', '**')),
-            _tool(context, 'Italic', Icons.format_italic, () => _wrap('_', '_')),
+            _tool(
+              context,
+              'Italic',
+              Icons.format_italic,
+              () => _wrap('_', '_'),
+            ),
             _tool(context, 'Inline code', Icons.code, () => _wrap(tick, tick)),
             _tool(context, 'Heading', Icons.title, () => _prefixLine('## ')),
             _tool(
@@ -82,7 +95,12 @@ class MarkdownToolbar extends StatelessWidget {
               Icons.check_box_outlined,
               () => _prefixLine('- [ ] '),
             ),
-            _tool(context, 'Quote', Icons.format_quote, () => _prefixLine('> ')),
+            _tool(
+              context,
+              'Quote',
+              Icons.format_quote,
+              () => _prefixLine('> '),
+            ),
             _tool(context, 'Link', Icons.link, () => _wrap('[', '](url)')),
             _tool(
               context,

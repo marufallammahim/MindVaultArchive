@@ -441,7 +441,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 style: FilledButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   shape: const StadiumBorder(),
                 ),
@@ -465,8 +467,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         ),
         body: CustomPaint(
           painter: _PixelDotPainter(
-             dotColor: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.28),
-           ),
+            dotColor: Theme.of(context).colorScheme.outlineVariant
+                .withValues(alpha: 0.28),
+          ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
             child: Column(
@@ -548,13 +551,19 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                     ?.copyWith(
                                       height: 1.65,
                                       fontSize: 16,
-                                      color: Theme.of(context).colorScheme.onSurface,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
-                                cursorColor: Theme.of(context).colorScheme.primary,
+                                cursorColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary,
                                 decoration: InputDecoration(
                                   hintText: 'Start writing your note…',
                                   hintStyle: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
                                   ),
                                   filled: false,
                                   contentPadding: EdgeInsets.fromLTRB(
