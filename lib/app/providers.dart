@@ -72,7 +72,7 @@ final amoledThemeProvider = StateNotifierProvider<AmoledThemeNotifier, bool>(
 );
 
 class AccentColorNotifier extends StateNotifier<Color> {
-  AccentColorNotifier() : super(const Color(0xFF5A0719)) {
+  AccentColorNotifier() : super(const Color(0xFFF7CB46)) {
     _load();
   }
 
