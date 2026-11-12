@@ -3,14 +3,16 @@ import 'package:material_ui/material_ui.dart';
 /// Semantic, contrast-first palette shared by every MindVault screen.
 class AppTheme {
   static const primary = Color(0xFFF7CB46);
-  static const secondary = Color(0xFF8DE7F2);
+  static const secondary = Color(0xFFC0F7FE);
+  static const pink = Color(0xFFFE90E8);
+  static const warmYellow = Color(0xFFFFDC8B);
   static const tertiary = Color(0xFF99E885);
-  static const lightBackground = Color(0xFFFCEFE8);
-  static const lightSurface = Color(0xFFFFFAF6);
-  static const darkBackground = Color(0xFF121316);
-  static const darkSurface = Color(0xFF1D2025);
-  static const darkCard = Color(0xFF272B31);
-  static const ink = Color(0xFF171719);
+  static const lightBackground = Color(0xFFFFFDF2);
+  static const lightSurface = Color(0xFFFFFEFA);
+  static const darkBackground = Color(0xFF171512);
+  static const darkSurface = Color(0xFF24211C);
+  static const darkCard = Color(0xFF302B24);
+  static const ink = Color(0xFF000000);
 
   static ThemeData get lightTheme => lightThemeFor(primary);
   static ThemeData lightThemeFor(Color accent) {
@@ -26,6 +28,9 @@ class AppTheme {
           onSecondary: ink,
           tertiary: tertiary,
           onTertiary: ink,
+          error: const Color(0xFFE64B3C),
+          tertiary: tertiary,
+          onTertiary: ink,
           surface: lightSurface,
           onSurface: ink,
           surfaceContainerLowest: const Color(0xFFFFFFFF),
@@ -33,8 +38,8 @@ class AppTheme {
           surfaceContainer: const Color(0xFFF4E9E1),
           surfaceContainerHigh: const Color(0xFFEDE1D8),
           onSurfaceVariant: const Color(0xFF49443F),
-          outline: const Color(0xFF6E655D),
-          outlineVariant: const Color(0xFFB8AAA0),
+          outline: ink,
+          outlineVariant: const Color(0xFF000000),
         );
     return _build(scheme, lightBackground, dark: false);
   }
@@ -64,8 +69,8 @@ class AppTheme {
           surfaceContainer: const Color(0xFF272B31),
           surfaceContainerHigh: const Color(0xFF30353D),
           onSurfaceVariant: const Color(0xFFD0CBC4),
-          outline: const Color(0xFF9A958D),
-          outlineVariant: const Color(0xFF555B64),
+          outline: const Color(0xFF000000),
+          outlineVariant: const Color(0xFF000000),
         );
     return _build(
       scheme,
@@ -82,8 +87,8 @@ class AppTheme {
     final card = dark ? darkCard : lightSurface;
     final outline = scheme.outlineVariant;
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(5),
-      side: BorderSide(color: dark ? outline : ink, width: dark ? 1 : 1.5),
+      borderRadius: BorderRadius.circular(7),
+      side: const BorderSide(color: Color(0xFF000000), width: 2.5),
     );
     final text = dark ? scheme.onSurface : ink;
 
@@ -140,16 +145,16 @@ class AppTheme {
         hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         labelStyle: TextStyle(color: scheme.onSurfaceVariant),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: outline),
+          borderRadius: BorderRadius.circular(7),
+          borderSide: const BorderSide(color: ink, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: outline),
+          borderRadius: BorderRadius.circular(7),
+          borderSide: const BorderSide(color: ink, width: 2),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
-          borderSide: BorderSide(color: scheme.primary, width: 2),
+          borderRadius: BorderRadius.circular(7),
+          borderSide: const BorderSide(color: ink, width: 3),
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -222,7 +227,10 @@ class AppTheme {
           backgroundColor: scheme.primary,
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+            side: const BorderSide(color: ink, width: 2.5),
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -231,8 +239,11 @@ class AppTheme {
           foregroundColor: scheme.onSurface,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          side: BorderSide(color: outline),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+            side: const BorderSide(color: ink, width: 2),
+          ),
+          side: const BorderSide(color: ink, width: 2),
         ),
       ),
       chipTheme:
@@ -242,9 +253,9 @@ class AppTheme {
             labelStyle: TextStyle(color: scheme.onSurface),
           ).copyWith(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(5),
             ),
-            side: BorderSide(color: outline),
+            side: const BorderSide(color: ink, width: 2),
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           ),
       switchTheme: SwitchThemeData(
