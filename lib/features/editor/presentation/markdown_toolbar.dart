@@ -39,13 +39,14 @@ class MarkdownToolbar extends StatelessWidget {
     onChanged();
   }
 
-  Widget _tool(String tooltip, IconData icon, VoidCallback action) {
+  Widget _tool(BuildContext context, String tooltip, IconData icon, VoidCallback action) {
+    final scheme = Theme.of(context).colorScheme;
     return IconButton(
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
-      style: IconButton.styleFrom(backgroundColor: const Color(0xFF000000)),
+      style: IconButton.styleFrom(backgroundColor: scheme.surfaceContainerHigh),
       onPressed: action,
-      icon: Icon(icon, color: Colors.white),
+      icon: Icon(icon, color: scheme.onSurface),
     );
   }
 
@@ -57,31 +58,34 @@ class MarkdownToolbar extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7CB46),
+        color: Theme.of(context).colorScheme.surfaceContainerLow,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: const Color(0xFF000000), width: 2),
+        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1.5),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
-            _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
-            _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
-            _tool('Heading', Icons.title, () => _prefixLine('## ')),
+            _tool(context, 'Bold', Icons.format_bold, () => _wrap('**', '**')),
+            _tool(context, 'Italic', Icons.format_italic, () => _wrap('_', '_')),
+            _tool(context, 'Inline code', Icons.code, () => _wrap(tick, tick)),
+            _tool(context, 'Heading', Icons.title, () => _prefixLine('## ')),
             _tool(
+              context,
               'Bullet list',
               Icons.format_list_bulleted,
               () => _prefixLine('- '),
             ),
             _tool(
+              context,
               'Checklist',
               Icons.check_box_outlined,
               () => _prefixLine('- [ ] '),
             ),
-            _tool('Quote', Icons.format_quote, () => _prefixLine('> ')),
-            _tool('Link', Icons.link, () => _wrap('[', '](url)')),
+            _tool(context, 'Quote', Icons.format_quote, () => _prefixLine('> ')),
+            _tool(context, 'Link', Icons.link, () => _wrap('[', '](url)')),
             _tool(
+              context,
               'Code block',
               Icons.data_object,
               () => _wrap('$tripleTick\n', '\n$tripleTick'),
