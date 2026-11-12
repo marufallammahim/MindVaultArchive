@@ -17,7 +17,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String _query = '';
+  final String _query = '';
   String _view = 'all';
   String? _selectedCategoryId;
 
@@ -387,7 +387,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final note = notes[index];
-                        final colors = [
+                        const colors = [
                           const Color(0xFFF7CB46),
                           const Color(0xFFE9E0E8),
                           const Color(0xFFC0F7FE),
@@ -554,7 +554,7 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foreground = const Color(0xFF000000);
+    const foreground = Color(0xFF000000);
     final words = RegExp(r'\S+').allMatches(note.documentContent).length;
     return Material(
       color: color,
