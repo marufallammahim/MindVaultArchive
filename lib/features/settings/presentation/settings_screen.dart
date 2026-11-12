@@ -260,11 +260,6 @@ class SettingsScreen extends ConsumerWidget {
                     showSelectedIcon: false,
                     segments: const [
                       ButtonSegment(
-                        value: ThemeMode.system,
-                        label: Text('System'),
-                        icon: Icon(Icons.settings_suggest_outlined),
-                      ),
-                      ButtonSegment(
                         value: ThemeMode.light,
                         label: Text('Light'),
                         icon: Icon(Icons.light_mode_outlined),
