@@ -437,8 +437,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF4388FF),
+                  backgroundColor: const Color(0xFF000000),
                   foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.white, width: 1),
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   shape: const StadiumBorder(),
                 ),
@@ -567,10 +568,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         ],
                       ),
               ),
-              MarkdownToolbar(
-                controller: _contentController,
-                onChanged: _onTextChanged,
-              ),
               StreamBuilder<List<Attachment>>(
                 stream: attachmentQuery.watch(),
                 builder: (context, snapshot) {
@@ -620,6 +617,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                     ),
                   );
                 },
+              ),
+              MarkdownToolbar(
+                controller: _contentController,
+                onChanged: _onTextChanged,
               ),
             ],
           ),
