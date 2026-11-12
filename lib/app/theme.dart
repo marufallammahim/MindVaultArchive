@@ -67,8 +67,8 @@ class AppTheme {
           surfaceContainer: const Color(0xFF272B31),
           surfaceContainerHigh: const Color(0xFF30353D),
           onSurfaceVariant: const Color(0xFFD0CBC4),
-          outline: const Color(0xFF000000),
-          outlineVariant: const Color(0xFF000000),
+          outline: const Color(0xFFE7DFD3),
+          outlineVariant: const Color(0xFFE7DFD3),
         );
     return _build(
       scheme,
@@ -84,9 +84,10 @@ class AppTheme {
   }) {
     final card = dark ? darkCard : lightSurface;
     final outline = scheme.outlineVariant;
+    final borderInk = dark ? const Color(0xFFF5F1EC) : ink;
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(7),
-      side: const BorderSide(color: Color(0xFF000000), width: 2.5),
+      side: BorderSide(color: borderInk, width: 2.5),
     );
     final text = dark ? scheme.onSurface : ink;
 
@@ -147,7 +148,7 @@ class AppTheme {
         labelStyle: TextStyle(color: scheme.onSurfaceVariant),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
-          borderSide: const BorderSide(color: ink, width: 2),
+          borderSide: BorderSide(color: borderInk, width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
@@ -155,7 +156,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
-          borderSide: const BorderSide(color: ink, width: 3),
+          borderSide: BorderSide(color: borderInk, width: 3),
         ),
       ),
       dialogTheme: DialogThemeData(
@@ -163,7 +164,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
-          side: const BorderSide(color: ink, width: 2.5),
+          side: BorderSide(color: borderInk, width: 2.5),
         ),
         titleTextStyle: TextStyle(
           color: scheme.onSurface,
@@ -187,7 +188,7 @@ class AppTheme {
         textStyle: TextStyle(color: scheme.onSurface),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(7),
-          side: const BorderSide(color: ink, width: 2),
+          side: BorderSide(color: borderInk, width: 2),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
@@ -196,7 +197,7 @@ class AppTheme {
         contentTextStyle: TextStyle(color: scheme.onSurface),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(7),
-          side: const BorderSide(color: ink, width: 2),
+          side: BorderSide(color: borderInk, width: 2),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
