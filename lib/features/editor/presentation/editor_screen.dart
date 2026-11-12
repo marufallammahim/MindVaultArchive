@@ -330,7 +330,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           surfaceTintColor: Colors.transparent,
           title: const Text(
             'Create a Note',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
           ),
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(1),
@@ -460,7 +460,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             ),
           ],
         ),
-        body: Padding(
+        body: CustomPaint(
+          painter: _PixelDotPainter(),
+          child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
           child: Column(
             children: [
@@ -552,18 +554,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                   16,
                                   18,
                                 ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide(
-                                    color: Colors.white.withValues(alpha: 0.08),
-                                  ),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                  borderSide: BorderSide(
-                                    color: Colors.white.withValues(alpha: 0.08),
-                                  ),
-                                ),
+                                border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
                                 focusedBorder: InputBorder.none,
                               ),
                               maxLines: null,
@@ -631,8 +623,25 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ),
             ],
           ),
+          ),
         ),
       ),
     );
   }
+}
+
+class _PixelDotPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = const Color(0xFFB8B0A7).withValues(alpha: 0.42);
+    const step = 16.0;
+    for (double y = 8; y < size.height; y += step) {
+      for (double x = 8; x < size.width; x += step) {
+        canvas.drawCircle(Offset(x, y), 0.8, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
