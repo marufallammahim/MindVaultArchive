@@ -548,7 +548,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                       color: const Color(0xFF000000),
                                     ),
                                 cursorColor: const Color(0xFF000000),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   hintText: 'Start writing your note…',
                                   hintStyle: const TextStyle(
                                     color: Color(0xFF77716C),
