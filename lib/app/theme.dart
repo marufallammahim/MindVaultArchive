@@ -5,7 +5,7 @@ class AppTheme {
   static const defaultBrand = Color(0xFFF7CB46);
   static const brandLight = Color(0xFFFFE28A);
   static const darkSurface = Color(0xFFFCEFE8);
-  static const darkCard = Color(0xFFFCEFE8);
+  static const darkCard = Color(0xFF252525);
   static const lightSurface = Color(0xFFFCEFE8);
 
   static ThemeData get lightTheme => lightThemeFor(defaultBrand);
@@ -25,7 +25,14 @@ class AppTheme {
 
   static ThemeData get darkTheme => darkThemeFor(defaultBrand);
 
-  static ThemeData darkThemeFor(Color accent) => lightThemeFor(accent);
+  static ThemeData darkThemeFor(Color accent) {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: accent,
+      brightness: Brightness.dark,
+      surface: const Color(0xFF171719),
+    );
+    return _build(scheme, const Color(0xFF171719), amoled: true);
+  }
 
   static ThemeData _build(
     ColorScheme scheme,
@@ -54,7 +61,7 @@ class AppTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 62,
-        titleTextStyle: TextStyle(
+        titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 21,
           fontWeight: FontWeight.w800,
