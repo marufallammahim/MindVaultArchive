@@ -46,14 +46,14 @@ class AppTheme {
       side: const BorderSide(color: Color(0xFF000000), width: 2),
     );
 
-    return ThemeData(
+    return const ThemeData(
       useMaterial3: true,
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
       canvasColor: background,
       visualDensity: VisualDensity.standard,
       fontFamily: 'Roboto',
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: const Color(0xFF000000),
         foregroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
