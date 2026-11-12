@@ -21,25 +21,11 @@ class AppTheme {
 
   static ThemeData get amoledTheme => amoledThemeFor(defaultBrand);
 
-  static ThemeData amoledThemeFor(Color accent) {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: accent,
-      brightness: Brightness.dark,
-      surface: Colors.black,
-    );
-    return _build(scheme, Colors.black, amoled: true);
-  }
+  static ThemeData amoledThemeFor(Color accent) => lightThemeFor(accent);
 
   static ThemeData get darkTheme => darkThemeFor(defaultBrand);
 
-  static ThemeData darkThemeFor(Color accent) {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: accent,
-      brightness: Brightness.dark,
-      surface: darkSurface,
-    );
-    return _build(scheme, darkSurface);
-  }
+  static ThemeData darkThemeFor(Color accent) => lightThemeFor(accent);
 
   static ThemeData _build(
     ColorScheme scheme,
