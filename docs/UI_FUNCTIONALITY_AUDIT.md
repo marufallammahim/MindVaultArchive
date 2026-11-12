@@ -1,10 +1,10 @@
-# UI and Functionality Audit — 2026-11-11
+# UI and Functionality Audit — 2026-11-13
 
 Branch: `feature/ultimate-all-in-one-mindvault`
 
 ## Design direction
-- AMOLED black is the default dark surface; burgundy is the default accent.
-- Use compact, rounded cards, expressive but restrained color, strong text contrast, and thumb-reachable primary actions.
+- Follow the uploaded Neo-Brutalist references: cream/dotted canvas, black outlines, flat yellow/cyan/green/pink/warm-cream blocks, bold typography and hard unblurred shadows.
+- Keep compact, readable content hierarchy, strong contrast and thumb-reachable primary actions; dark/AMOLED mode must retain readable foreground colors.
 - Keep layouts content-first; avoid decorative blur on large scrolling surfaces to preserve performance on mid-range Android devices.
 - Preserve Material 3 semantics, scalable text, visible focus/pressed states, and accessible contrast.
 - Use brief state transitions and provide reduced-motion-friendly behavior.
@@ -65,3 +65,20 @@ The following presentation files received screen-level compactness and visual hi
 - GitHub Actions formatter workflow committed the Dart formatting corrections in commit `aac57b6ea24bbf3188f47685889b4f7b3fd54a0e`.
 - The earlier Code Quality and Android CI failures were caused by the formatter check detecting those pending style changes before the formatter workflow's commit landed. They did not reach analyzer, tests, APK build, or artifact upload.
 - A new source commit is being used to trigger fresh validation against the formatted branch head.
+
+
+## Uploaded-reference Neo-Brutalist pass — 2026-11-13
+
+Committed on `feature/ultimate-all-in-one-mindvault`:
+- Shared Material theme now uses the reference palette and 2–3px black outlines for cards, inputs, dialogs, bottom sheets, menus and buttons.
+- Dark app-bar foregrounds now follow the dark ColorScheme rather than using black text on a dark surface.
+- Settings accent presets and editor note-color choices use the six reference colors.
+- Home note cards and bottom dock use flat color blocks, black outlines and zero-blur offset shadows.
+- Editor writing area remains borderless with its dotted canvas; redundant manual Save action was removed while autosave and save-before-exit remain.
+
+## Remaining verification and implementation boundaries
+
+- The latest UI commits have not yet been verified by a fresh Flutter analyzer/test/APK CI run; the current commit has no reported status checks available through the connected GitHub status endpoint.
+- No emulator/physical-device screenshot comparison was run, so exact pixel identity is not claimed.
+- This visual pass does not complete every feature in the master specification. AI, cloud sync and collaboration remain unimplemented without configured providers; notebooks/folders, OCR, reminders/recurrence, calendar/habits and advanced editor workflows remain partial or pending.
+- A complete feature-by-feature source audit and runtime acceptance pass is still required before release readiness can be claimed.
