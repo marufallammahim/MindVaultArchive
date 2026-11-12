@@ -26,7 +26,7 @@ class EditorScreen extends ConsumerStatefulWidget {
 
 class _EditorScreenState extends ConsumerState<EditorScreen> {
   late final TextEditingController _titleController;
-  late final TextEditingController _contentController;
+  late final MarkdownPreviewEditingController _contentController;
   bool _initialized = false;
   bool _previewMode = false;
   bool _leaving = false;
@@ -35,7 +35,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController();
-    _contentController = TextEditingController();
+    _contentController = MarkdownPreviewEditingController();
   }
 
   @override
@@ -778,9 +778,30 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                             child: TextField(
                               controller: _contentController,
                               onChanged: (_) => _onTextChanged(),
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              decoration: const InputDecoration(
-                                hintText: 'Write with Markdown…',
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                height: 1.65,
+                                fontSize: 16,
+                                color: const Color(0xFFF4F4F5),
+                              ),
+                              cursorColor: const Color(0xFF4388FF),
+                              decoration: InputDecoration(
+                                hintText: 'Start writing your note…',
+                                hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.38)),
+                                filled: true,
+                                fillColor: const Color(0xFF171719),
+                                contentPadding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                  borderSide: const BorderSide(color: Color(0xFF4388FF), width: 1.2),
+                                ),
                               ),
                               maxLines: null,
                               expands: true,
