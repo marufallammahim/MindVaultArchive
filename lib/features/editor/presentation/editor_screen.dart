@@ -464,7 +464,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           ],
         ),
         body: CustomPaint(
-          painter: _PixelDotPainter(),
+          painter: _PixelDotPainter(
+             dotColor: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.28),
+           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
             child: Column(
@@ -638,10 +640,13 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 }
 
 class _PixelDotPainter extends CustomPainter {
+  const _PixelDotPainter({required this.dotColor});
+
+  final Color dotColor;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.28);
+    final paint = Paint()..color = dotColor;
     const step = 16.0;
     for (double y = 8; y < size.height; y += step) {
       for (double x = 8; x < size.width; x += step) {
@@ -651,5 +656,6 @@ class _PixelDotPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _PixelDotPainter oldDelegate) =>
+      oldDelegate.dotColor != dotColor;
 }
