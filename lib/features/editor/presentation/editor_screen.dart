@@ -323,9 +323,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF080809),
+        backgroundColor: const Color(0xFFFCEFE8),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF080809),
+          backgroundColor: const Color(0xFF000000),
           foregroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
           title: const Text(
@@ -336,7 +336,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             preferredSize: const Size.fromHeight(1),
             child: Container(
               height: 1,
-              color: Colors.white.withValues(alpha: 0.08),
+              color: Colors.transparent,
             ),
           ),
           actions: [
@@ -500,141 +500,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
                 maxLines: null,
               ),
-              StreamBuilder<List<Category>>(
-                stream:
-                    (db.select(db.categories)..orderBy([
-                          (category) => OrderingTerm.asc(category.name),
-                        ]))
-                        .watch(),
-                builder: (context, categoriesSnapshot) {
-                  final categories = categoriesSnapshot.data ?? [];
-                  return StreamBuilder<Note?>(
-                    stream:
-                        (db.select(db.notes)
-                              ..where((note) => note.id.equals(widget.noteId)))
-                            .watchSingleOrNull(),
-                    builder: (context, noteSnapshot) {
-                      final selectedId = noteSnapshot.data?.categoryId;
-                      return DropdownButtonFormField<String?>(
-                        initialValue:
-                            categories.any((item) => item.id == selectedId)
-                            ? selectedId
-                            : null,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.folder_outlined),
-                          hintText: 'Add a category',
-                        ),
-                        items: [
-                          const DropdownMenuItem<String?>(
-                            value: null,
-                            child: Text('Uncategorized'),
-                          ),
-                          for (final category in categories)
-                            DropdownMenuItem<String?>(
-                              value: category.id,
-                              child: Text(category.name),
-                            ),
-                        ],
-                        onChanged: categoriesSnapshot.hasError
-                            ? null
-                            : (value) async {
-                                try {
-                                  await db.setNoteCategory(
-                                    widget.noteId,
-                                    value,
-                                  );
-                                } catch (error) {
-                                  if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Could not assign category: $error',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                      );
-                    },
-                  );
-                },
-              ),
-              StreamBuilder<List<Tag>>(
-                stream: (db.select(
-                  db.tags,
-                )..orderBy([(tag) => OrderingTerm.asc(tag.name)])).watch(),
-                builder: (context, tagsSnapshot) {
-                  final tags = tagsSnapshot.data ?? [];
-                  return StreamBuilder<List<NoteTag>>(
-                    stream:
-                        (db.select(db.noteTags)..where(
-                              (item) => item.noteId.equals(widget.noteId),
-                            ))
-                            .watch(),
-                    builder: (context, selectedSnapshot) {
-                      final selectedIds = (selectedSnapshot.data ?? [])
-                          .map((item) => item.tagId)
-                          .toSet();
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: tags.isEmpty
-                                  ? const Text('No tags yet')
-                                  : Wrap(
-                                      spacing: 8,
-                                      runSpacing: 4,
-                                      children: [
-                                        for (final tag in tags)
-                                          FilterChip(
-                                            label: Text(tag.name),
-                                            selected: selectedIds.contains(
-                                              tag.id,
-                                            ),
-                                            onSelected: (selected) async {
-                                              final next = {...selectedIds};
-                                              if (selected) {
-                                                next.add(tag.id);
-                                              } else {
-                                                next.remove(tag.id);
-                                              }
-                                              try {
-                                                await db.setNoteTags(
-                                                  widget.noteId,
-                                                  next.toList(),
-                                                );
-                                              } catch (error) {
-                                                if (!context.mounted) return;
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      'Could not update tags: $error',
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                      ],
-                                    ),
-                            ),
-                            IconButton(
-                              tooltip: 'Manage tags',
-                              icon: const Icon(Icons.settings_outlined),
-                              onPressed: () => context.push('/tags'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
               StreamBuilder<List<VaultTask>>(
                 stream:
                     (db.select(db.tasks)
@@ -782,10 +647,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                       )
                     : Column(
                         children: [
-                          MarkdownToolbar(
-                            controller: _contentController,
-                            onChanged: _onTextChanged,
-                          ),
                           Expanded(
                             child: TextField(
                               controller: _contentController,
@@ -794,16 +655,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                   ?.copyWith(
                                     height: 1.65,
                                     fontSize: 16,
-                                    color: const Color(0xFFF4F4F5),
+                                    color: const Color(0xFF000000),
                                   ),
-                              cursorColor: const Color(0xFF4388FF),
+                              cursorColor: const Color(0xFF000000),
                               decoration: InputDecoration(
                                 hintText: 'Start writing your note…',
-                                hintStyle: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.38),
-                                ),
+                                hintStyle: const TextStyle(color: Color(0xFF77716C)),
                                 filled: true,
-                                fillColor: const Color(0xFF171719),
+                                fillColor: const Color(0xFFFCEFE8),
                                 contentPadding: const EdgeInsets.fromLTRB(
                                   16,
                                   18,
@@ -822,13 +681,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                     color: Colors.white.withValues(alpha: 0.08),
                                   ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                  borderSide: const BorderSide(
-                                    color: Color(0xFF4388FF),
-                                    width: 1.2,
-                                  ),
-                                ),
+                                focusedBorder: InputBorder.none,
                               ),
                               maxLines: null,
                               expands: true,
@@ -838,6 +691,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                           ),
                         ],
                       ),
+              ),
+              MarkdownToolbar(
+                controller: _contentController,
+                onChanged: _onTextChanged,
               ),
               AnimatedBuilder(
                 animation: _contentController,
