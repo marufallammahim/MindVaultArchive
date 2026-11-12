@@ -329,7 +329,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
           surfaceTintColor: Colors.transparent,
-          title: const Text(
+          title: Text(
             'Create a Note',
             style: TextStyle(
               fontSize: 16,
