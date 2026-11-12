@@ -550,11 +550,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                 cursorColor: const Color(0xFF000000),
                                 decoration: const InputDecoration(
                                   hintText: 'Start writing your note…',
-                                  hintStyle: const TextStyle(
+                                  hintStyle: TextStyle(
                                     color: Color(0xFF77716C),
                                   ),
                                   filled: false,
-                                  contentPadding: const EdgeInsets.fromLTRB(
+                                  contentPadding: EdgeInsets.fromLTRB(
                                     16,
                                     18,
                                     16,
