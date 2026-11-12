@@ -39,10 +39,11 @@ class AppTheme {
   }
 
   static ThemeData get amoledTheme => amoledThemeFor(primary);
-  static ThemeData amoledThemeFor(Color accent) => darkThemeFor(accent);
+  static ThemeData amoledThemeFor(Color accent) =>
+      darkThemeFor(accent, amoled: true);
   static ThemeData get darkTheme => darkThemeFor(primary);
 
-  static ThemeData darkThemeFor(Color accent) {
+  static ThemeData darkThemeFor(Color accent, {bool amoled = false}) {
     final scheme = ColorScheme.fromSeed(
       seedColor: accent,
       brightness: Brightness.dark,
@@ -64,7 +65,7 @@ class AppTheme {
       outline: const Color(0xFF9A958D),
       outlineVariant: const Color(0xFF555B64),
     );
-    return _build(scheme, darkBackground, dark: true);
+    return _build(scheme, amoled ? const Color(0xFF000000) : darkBackground, dark: true);
   }
 
   static ThemeData _build(ColorScheme scheme, Color background, {required bool dark}) {
