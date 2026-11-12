@@ -116,7 +116,10 @@ class AppTheme {
           fontWeight: FontWeight.w800,
           letterSpacing: -0.55,
         ),
-        iconTheme: IconThemeData(color: dark ? scheme.onSurface : ink, size: 22),
+        iconTheme: IconThemeData(
+          color: dark ? scheme.onSurface : ink,
+          size: 22,
+        ),
       ),
       cardTheme: CardThemeData(
         color: card,

@@ -430,7 +430,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             borderRadius: BorderRadius.circular(7),
             border: Border.all(color: const Color(0xFF000000), width: 2.5),
             boxShadow: const [
-              BoxShadow(color: Colors.black, blurRadius: 0, offset: Offset(5, 5)),
+              BoxShadow(
+                color: Colors.black,
+                blurRadius: 0,
+                offset: Offset(5, 5),
+              ),
             ],
           ),
           child: Row(
@@ -565,125 +569,125 @@ class _NoteCard extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-        onTap: onTap,
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(19, 17, 74, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          MaterialLocalizations.of(context)
-                              .formatShortDate(note.updatedAt),
-                          style: TextStyle(
-                            color: foreground.withValues(alpha: 0.78),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
+          onTap: onTap,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(19, 17, 74, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            MaterialLocalizations.of(context)
+                                .formatShortDate(note.updatedAt),
+                            style: TextStyle(
+                              color: foreground.withValues(alpha: 0.78),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
-                      ),
-                      if (note.sortOrder == 1)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Icon(
-                            Icons.push_pin_rounded,
-                            color: foreground,
-                            size: 17,
+                        if (note.sortOrder == 1)
+                          const Padding(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Icon(
+                              Icons.push_pin_rounded,
+                              color: foreground,
+                              size: 17,
+                            ),
                           ),
-                        ),
-                      if (note.isFavorite)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 5),
-                          child: Icon(
-                            Icons.star_rounded,
-                            color: foreground,
-                            size: 18,
+                        if (note.isFavorite)
+                          const Padding(
+                            padding: EdgeInsets.only(right: 5),
+                            child: Icon(
+                              Icons.star_rounded,
+                              color: foreground,
+                              size: 18,
+                            ),
                           ),
+                        IconButton(
+                          tooltip: 'Edit note',
+                          visualDensity: VisualDensity.compact,
+                          style: IconButton.styleFrom(
+                            backgroundColor: foreground.withValues(alpha: 0.10),
+                            foregroundColor: foreground,
+                          ),
+                          onPressed: onTap,
+                          icon: const Icon(Icons.edit_rounded, size: 18),
                         ),
-                      IconButton(
-                        tooltip: 'Edit note',
-                        visualDensity: VisualDensity.compact,
-                        style: IconButton.styleFrom(
-                          backgroundColor: foreground.withValues(alpha: 0.10),
-                          foregroundColor: foreground,
+                        PopupMenuButton<String>(
+                          tooltip: 'More note actions',
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.more_horiz, color: foreground),
+                          onSelected: onAction,
+                          itemBuilder: (_) => actions,
                         ),
-                        onPressed: onTap,
-                        icon: const Icon(Icons.edit_rounded, size: 18),
-                      ),
-                      PopupMenuButton<String>(
-                        tooltip: 'More note actions',
-                        padding: EdgeInsets.zero,
-                        icon: const Icon(Icons.more_horiz, color: foreground),
-                        onSelected: onAction,
-                        itemBuilder: (_) => actions,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 23),
-                  Text(
-                    note.title.trim().isEmpty ? 'Untitled note' : note.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: foreground,
-                      fontSize: 21,
-                      height: 1.16,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.45,
+                      ],
                     ),
-                  ),
-                  if (note.documentContent.trim().isNotEmpty) ...[
-                    const SizedBox(height: 9),
+                    const SizedBox(height: 23),
                     Text(
-                      note.documentContent,
+                      note.title.trim().isEmpty ? 'Untitled note' : note.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: foreground.withValues(alpha: 0.82),
-                        height: 1.35,
-                        fontSize: 13,
+                      style: const TextStyle(
+                        color: foreground,
+                        fontSize: 21,
+                        height: 1.16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.45,
                       ),
                     ),
-                  ],
-                  const SizedBox(height: 20),
-                  Wrap(
-                    spacing: 7,
-                    runSpacing: 6,
-                    children: [
-                      _metaPill(foreground, '1 note'),
-                      _metaPill(foreground, '$words words'),
+                    if (note.documentContent.trim().isNotEmpty) ...[
+                      const SizedBox(height: 9),
+                      Text(
+                        note.documentContent,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: foreground.withValues(alpha: 0.82),
+                          height: 1.35,
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
-                  ),
-                ],
+                    const SizedBox(height: 20),
+                    Wrap(
+                      spacing: 7,
+                      runSpacing: 6,
+                      children: [
+                        _metaPill(foreground, '1 note'),
+                        _metaPill(foreground, '$words words'),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Positioned(
-              right: 13,
-              bottom: 13,
-              child: Material(
-                color: const Color(0xFFFFD65A),
-                shape: const CircleBorder(),
-                child: InkWell(
-                  customBorder: const CircleBorder(),
-                  onTap: onTap,
-                  child: const SizedBox(
-                    width: 54,
-                    height: 54,
-                    child: Icon(
-                      Icons.arrow_outward_rounded,
-                      color: Color(0xFF171717),
-                      size: 27,
+              Positioned(
+                right: 13,
+                bottom: 13,
+                child: Material(
+                  color: const Color(0xFFFFD65A),
+                  shape: const CircleBorder(),
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onTap,
+                    child: const SizedBox(
+                      width: 54,
+                      height: 54,
+                      child: Icon(
+                        Icons.arrow_outward_rounded,
+                        color: Color(0xFF171717),
+                        size: 27,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         ),
       ),
     );

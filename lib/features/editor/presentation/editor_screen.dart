@@ -423,7 +423,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(value: -1, child: Text('Default color')),
-                PopupMenuItem(value: 0xFFF7CB46, child: Text('Sunflower yellow')),
+                PopupMenuItem(
+                  value: 0xFFF7CB46,
+                  child: Text('Sunflower yellow'),
+                ),
                 PopupMenuItem(value: 0xFFC0F7FE, child: Text('Sky cyan')),
                 PopupMenuItem(value: 0xFF99E885, child: Text('Pixel green')),
                 PopupMenuItem(value: 0xFFFE90E8, child: Text('Bubblegum pink')),
@@ -435,7 +438,6 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               icon: const Icon(Icons.brush),
               onPressed: () => context.push('/drawing/${widget.noteId}'),
             ),
-
           ],
         ),
         body: CustomPaint(
