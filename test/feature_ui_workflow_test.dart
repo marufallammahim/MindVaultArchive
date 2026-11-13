@@ -12,6 +12,18 @@ import 'package:mindvault_archive/features/editor/presentation/editor_screen.dar
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 import 'package:mindvault_archive/features/tasks/presentation/tasks_screen.dart';
 
+Future<void> _pumpUntil(
+  WidgetTester tester,
+  Future<bool> Function() condition, {
+  int attempts = 40,
+}) async {
+  for (var attempt = 0; attempt < attempts; attempt++) {
+    if (await condition()) return;
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  fail('Timed out waiting for the widget workflow to complete.');
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -45,8 +57,13 @@ void main() {
       'Saved from widget test',
     );
     await tester.tap(find.text('Save'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 150));
+    await _pumpUntil(tester, () async {
+      final notes = await database.select(database.notes).get();
+      final preferences = await SharedPreferences.getInstance();
+      return notes.length == 1 &&
+          preferences.getString('quick_capture_draft_title') == null &&
+          preferences.getString('quick_capture_draft_content') == null;
+    });
 
     final notes = await database.select(database.notes).get();
     expect(notes, hasLength(1));
@@ -99,8 +116,11 @@ void main() {
     await tester.enterText(find.byType(TextField).at(0), 'Continue editing');
     await tester.enterText(find.byType(TextField).at(1), 'Captured body');
     await tester.tap(find.text('Save and continue editing'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await _pumpUntil(tester, () async {
+      final notes = await database.select(database.notes).get();
+      return notes.length == 1 && find.text('Create a Note').evaluate().isNotEmpty;
+    });
+    await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.text('Create a Note'), findsOneWidget);
     final notes = await database.select(database.notes).get();
@@ -175,8 +195,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 150));
     await tester.enterText(find.byType(TextField), 'Research');
     await tester.tap(find.text('Save'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 150));
+    await _pumpUntil(tester, () async {
+      await tester.pump(const Duration(milliseconds: 50));
+      return (await database.select(database.tags).get()).length == 1;
+    });
 
     final tags = await database.select(database.tags).get();
     expect(tags, hasLength(1));
@@ -211,8 +233,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 150));
     await tester.enterText(find.byType(TextField).first, 'Test task');
     await tester.tap(find.text('Save'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 200));
+    await _pumpUntil(tester, () async {
+      await tester.pump(const Duration(milliseconds: 50));
+      return (await database.select(database.tasks).get()).length == 1;
+    });
 
     final tasks = await database.select(database.tasks).get();
     expect(tasks, hasLength(1));
