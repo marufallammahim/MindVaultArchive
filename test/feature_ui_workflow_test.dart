@@ -242,6 +242,28 @@ void main() {
     expect(tasks, hasLength(1));
     expect(tasks.single.title, 'Test task');
     expect(find.text('Test task'), findsOneWidget);
+
+    await tester.tap(find.text('Test task'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    expect(find.text('Edit task'), findsOneWidget);
+    await tester.enterText(find.byType(TextField).first, 'Updated task');
+    await tester.enterText(find.byType(TextField).at(1), 'Updated details');
+    await tester.tap(find.text('Save'));
+    await _pumpUntil(tester, () async {
+      final updated = await database.select(database.tasks).getSingle();
+      return updated.title == 'Updated task' &&
+          updated.details == 'Updated details';
+    });
+
+    await tester.tap(find.byTooltip('Mark complete'));
+    await _pumpUntil(tester, () async {
+      final updated = await database.select(database.tasks).getSingle();
+      return updated.isCompleted;
+    });
+    await tester.tap(find.text('Done'));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('Updated task'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
