@@ -2,11 +2,13 @@ import 'package:drift/native.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
+import 'package:mindvault_archive/features/editor/presentation/editor_screen.dart';
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
 import 'package:mindvault_archive/features/tasks/presentation/tasks_screen.dart';
 
@@ -53,6 +55,60 @@ void main() {
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('quick_capture_draft_title'), isNull);
     expect(preferences.getString('quick_capture_draft_content'), isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+
+  testWidgets('Quick Capture saves and opens the canonical editor route', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final database = AppDatabase(NativeDatabase.memory());
+    final router = GoRouter(
+      initialLocation: '/capture',
+      routes: [
+        GoRoute(
+          path: '/capture',
+          builder: (context, state) => const QuickCaptureScreen(),
+        ),
+        GoRoute(
+          path: '/editor/:id',
+          builder: (context, state) => EditorScreen(
+            noteId: state.pathParameters['id']!,
+          ),
+        ),
+      ],
+    );
+    addTearDown(() async {
+      router.dispose();
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
+      await database.close();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(database)],
+        child: MaterialApp.router(
+          theme: AppTheme.lightTheme,
+          routerConfig: router,
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.enterText(find.byType(TextField).at(0), 'Continue editing');
+    await tester.enterText(find.byType(TextField).at(1), 'Captured body');
+    await tester.tap(find.text('Save and continue editing'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Create a Note'), findsOneWidget);
+    final notes = await database.select(database.notes).get();
+    expect(notes, hasLength(1));
+    expect(notes.single.title, 'Continue editing');
+    expect(notes.single.documentContent, 'Captured body');
     expect(tester.takeException(), isNull);
   });
 
