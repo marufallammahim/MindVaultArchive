@@ -118,7 +118,8 @@ void main() {
     await tester.tap(find.text('Save and continue editing'));
     await _pumpUntil(tester, () async {
       final notes = await database.select(database.notes).get();
-      return notes.length == 1 && find.text('Create a Note').evaluate().isNotEmpty;
+      return notes.length == 1 &&
+          find.text('Create a Note').evaluate().isNotEmpty;
     });
     await tester.pump(const Duration(milliseconds: 250));
 

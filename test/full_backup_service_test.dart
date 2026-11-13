@@ -82,8 +82,7 @@ void main() {
   });
 
   test('rejects oversized ZIP output before decompression', () async {
-    final archive = Archive()
-      ..addFile(ArchiveFile('large.bin', 1, [1]));
+    final archive = Archive()..addFile(ArchiveFile('large.bin', 1, [1]));
     final bytes = Uint8List.fromList(ZipEncoder().encode(archive)!);
     final data = ByteData.sublistView(bytes);
     var centralDirectoryOffset = -1;
@@ -101,8 +100,10 @@ void main() {
     );
 
     await expectLater(
-      FullBackupService(targetDatabase, restoreDirectory: restoreDirectory)
-          .importZip(bytes),
+      FullBackupService(
+        targetDatabase,
+        restoreDirectory: restoreDirectory,
+      ).importZip(bytes),
       throwsA(isA<FormatException>()),
     );
     expect(await targetDatabase.select(targetDatabase.notes).get(), isEmpty);
