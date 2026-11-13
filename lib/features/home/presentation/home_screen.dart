@@ -511,7 +511,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             color: selected ? scheme.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(5),
           ),
-          padding: const EdgeInsets.symmetric(vertical: 6),
           padding: const EdgeInsets.symmetric(vertical: 2),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
