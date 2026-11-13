@@ -50,6 +50,49 @@ void main() {
     expect(notes, hasLength(1));
     expect(notes.single.title, 'Captured idea');
     expect(notes.single.documentContent, 'Saved from widget test');
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('quick_capture_draft_title'), isNull);
+    expect(preferences.getString('quick_capture_draft_content'), isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+
+  testWidgets('Quick Capture restores an unfinished draft after remount', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
+      await database.close();
+    });
+
+    Widget buildCapture() => ProviderScope(
+      overrides: [databaseProvider.overrideWithValue(database)],
+      child: MaterialApp(
+        theme: AppTheme.lightTheme,
+        home: const QuickCaptureScreen(),
+      ),
+    );
+
+    await tester.pumpWidget(buildCapture());
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.enterText(find.byType(TextField).at(0), 'Recovered thought');
+    await tester.enterText(find.byType(TextField).at(1), 'Draft body');
+    await tester.pump(const Duration(milliseconds: 50));
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1));
+    await tester.pumpWidget(buildCapture());
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('Recovered thought'), findsOneWidget);
+    expect(find.text('Draft body'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
