@@ -315,13 +315,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         const SizedBox(height: 18),
                         Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               child: Text(
                                 'Recent Notes',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -0.35,
+                                    ),
                               ),
                             ),
                             Text(
@@ -386,13 +392,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final note = notes[index];
-                        const colors = [
-                          Color(0xFFF7CB46),
-                          Color(0xFFE9E0E8),
-                          Color(0xFFC0F7FE),
-                          Color(0xFF99E885),
-                          Color(0xFFFCEFE8),
-                        ];
+                        final colors = Theme.of(context).brightness ==
+                                Brightness.dark
+                            ? const [
+                                Color(0xFF5A4717),
+                                Color(0xFF463D49),
+                                Color(0xFF21464B),
+                                Color(0xFF294B24),
+                                Color(0xFF49372C),
+                              ]
+                            : const [
+                                Color(0xFFF7CB46),
+                                Color(0xFFE9E0E8),
+                                Color(0xFFC0F7FE),
+                                Color(0xFF99E885),
+                                Color(0xFFFCEFE8),
+                              ];
                         final color = note.color == null
                             ? colors[index % colors.length]
                             : Color(note.color!);
@@ -561,9 +576,12 @@ class _NoteCard extends StatelessWidget {
         ? const Color(0xFF000000)
         : const Color(0xFFFFFFFF);
     final words = RegExp(r'\S+').allMatches(note.documentContent).length;
+    final borderInk = Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFFF5F1EC)
+        : const Color(0xFF000000);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: borderInk,
         borderRadius: BorderRadius.circular(7),
       ),
       padding: const EdgeInsets.only(right: 4, bottom: 4),
@@ -572,7 +590,7 @@ class _NoteCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
-          side: const BorderSide(color: Color(0xFF000000), width: 2.5),
+          side: BorderSide(color: borderInk, width: 2.5),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
