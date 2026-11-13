@@ -18,6 +18,9 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
   final _content = TextEditingController();
   bool _saving = false;
   bool _restoringDraft = true;
+  bool _suppressDraftPersistence = false;
+  int _draftWriteGeneration = 0;
+  Future<void> _draftWriteQueue = Future<void>.value();
   static const _draftTitleKey = 'quick_capture_draft_title';
   static const _draftContentKey = 'quick_capture_draft_content';
 
@@ -42,18 +45,41 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
     }
   }
 
-  Future<void> _persistDraft() async {
-    if (_restoringDraft || !mounted) return;
-    try {
-      final preferences = await SharedPreferences.getInstance();
-      await preferences.setString(_draftTitleKey, _title.text);
-      await preferences.setString(_draftContentKey, _content.text);
-    } catch (_) {
-      // Explicit Save remains available if draft persistence fails.
+  Future<void> _persistDraft() {
+    if (_restoringDraft || _suppressDraftPersistence || !mounted) {
+      return Future<void>.value();
     }
+    final generation = ++_draftWriteGeneration;
+    final title = _title.text;
+    final content = _content.text;
+    _draftWriteQueue = _draftWriteQueue.then((_) async {
+      if (!mounted ||
+          _restoringDraft ||
+          _suppressDraftPersistence ||
+          generation != _draftWriteGeneration) {
+        return;
+      }
+      try {
+        final preferences = await SharedPreferences.getInstance();
+        if (!mounted ||
+            _suppressDraftPersistence ||
+            generation != _draftWriteGeneration) {
+          return;
+        }
+        await preferences.setString(_draftTitleKey, title);
+        await preferences.setString(_draftContentKey, content);
+      } catch (_) {
+        // Explicit Save remains available if draft persistence fails.
+      }
+    });
+    return _draftWriteQueue;
   }
 
   Future<void> _clearDraft() async {
+    // Invalidate queued writes before removing the keys so a slower keystroke
+    // write cannot recreate the draft after a successful capture.
+    _draftWriteGeneration++;
+    await _draftWriteQueue;
     try {
       final preferences = await SharedPreferences.getInstance();
       await preferences.remove(_draftTitleKey);
@@ -94,16 +120,21 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
             title.isEmpty ? 'Quick capture' : title,
             content,
           );
-      await _clearDraft();
-      if (!mounted) return;
-      if (openEditor) {
-        context.go('/editor/$id');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Saved locally to your archive.')),
-        );
-        _title.clear();
-        _content.clear();
+      _suppressDraftPersistence = true;
+      try {
+        await _clearDraft();
+        if (!mounted) return;
+        if (openEditor) {
+          context.go('/editor/$id');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Saved locally to your archive.')),
+          );
+          _title.clear();
+          _content.clear();
+        }
+      } finally {
+        _suppressDraftPersistence = false;
       }
     } catch (error) {
       if (!mounted) return;
