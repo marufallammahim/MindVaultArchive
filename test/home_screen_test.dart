@@ -45,12 +45,22 @@ void main() {
             child: MaterialApp(theme: theme, home: const HomeScreen()),
           ),
         );
-        await tester.pump();
-        await tester.pump(const Duration(milliseconds: 250));
+        var rendered = false;
+        for (var attempt = 0; attempt < 20; attempt++) {
+          await tester.pump(const Duration(milliseconds: 50));
+          if (find.text('Recent Notes').evaluate().isNotEmpty &&
+              find.text('Saved note').evaluate().isNotEmpty) {
+            rendered = true;
+            break;
+          }
+        }
 
+        expect(rendered, isTrue, reason: 'Home should render the saved note.');
         expect(find.text('Recent Notes'), findsOneWidget);
         expect(find.text('Saved note'), findsOneWidget);
         expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pump(const Duration(milliseconds: 1));
       }
     }
   });
