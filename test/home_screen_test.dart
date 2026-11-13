@@ -20,6 +20,8 @@ void main() {
 
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
       await database.close();
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
