@@ -609,7 +609,7 @@ class _NoteCard extends StatelessWidget {
                             MaterialLocalizations.of(context)
                                 .formatShortDate(note.updatedAt),
                             style: TextStyle(
-                              color: foreground.withValues(alpha: 0.78),
+                              color: foreground,
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
                             ),
@@ -672,7 +672,7 @@ class _NoteCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: foreground.withValues(alpha: 0.82),
+                          color: foreground,
                           height: 1.35,
                           fontSize: 13,
                         ),
@@ -720,7 +720,7 @@ class _NoteCard extends StatelessWidget {
 
   Widget _metaPill(Color foreground, String label) => DecoratedBox(
     decoration: BoxDecoration(
-      color: foreground.withValues(alpha: 0.13),
+      color: foreground.withValues(alpha: 0.10),
       borderRadius: BorderRadius.circular(30),
     ),
     child: Padding(
