@@ -113,3 +113,20 @@ Reference direction: warm cream/dotted canvas; palette yellow `#F7CB46`, cream `
 - Official action documentation/release notes identify setup-java v1-v4 as deprecated and v6 as current; upload-artifact v6 uses Node 24. See the upstream action documentation and releases.
 - The commits generated several intermediate workflow runs which were cancelled by the branch concurrency policy. The most recent observed run was for SHA `468f56dadec6ed49f90ffa5ad2d9c8ce937ece12`, not the latest branch SHA `25cc51d38b4e04b4d5a6783fd39af033b1a87531`. Therefore the action upgrades are NOT yet verified. A fresh complete validation on the exact latest SHA is required.
 - CI baseline success on `a89a4a18074a72ceb6a0d0404a8b370af3e69955` remains valid only for that SHA; it does not validate subsequent workflow edits.
+
+
+## Home display and theme contrast remediation — 2026-11-13
+
+Implementation commit before documentation: `ad3f0265bd63bbb7d27d3a691e8b54d66bad3970`.
+
+- [x] Make the Home `Recent Notes` heading use the active semantic text color.
+- [x] Choose readable black/white note-card foregrounds from the actual card color luminance; remove reduced-opacity metadata/body text.
+- [x] Use a distinct dark-mode note-card palette and high-contrast outline while retaining the reference palette in light mode.
+- [x] Make the bottom dock surface, border and inactive labels follow the active theme; keep the Stats action routed directly to `/insights` using `go`.
+- [x] Make the Flutter build-error fallback use the active theme and provide a Return to Home action. The fallback already logs the underlying exception and stack; the precise production exception still needs device logs to identify its originating widget.
+- [x] Add semantic ColorScheme container/on-container pairs and consistent IconButton, TextButton, ElevatedButton, text-selection and input foreground styles.
+- [x] Add contrast assertions and widget tests for Home rendering in both themes and Stats navigation to Archive Insights.
+- [ ] Validate formatting, analyzer, widget/regression tests and APK build on the latest commit after this documentation update.
+- [ ] Obtain device log/stack trace if the Home error fallback still appears; emulator/physical-device QA and phone screenshot comparison remain outstanding.
+
+Research basis: Flutter Material 3 defines paired foreground/background color roles (for example `primary` / `onPrimary`) and recommends at least 4.5:1 contrast for text. Official references: Flutter `ColorScheme` API and Flutter theming cookbook. The chosen brand colors were retained, with theme-specific semantic pairings rather than relying on hard-coded black/white text across every surface.
