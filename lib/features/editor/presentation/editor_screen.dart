@@ -540,7 +540,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                         .onSurfaceVariant,
                                   ),
                                   filled: false,
-                                  contentPadding: EdgeInsets.fromLTRB(
+                                  contentPadding: const EdgeInsets.fromLTRB(
                                     16,
                                     18,
                                     16,
