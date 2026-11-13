@@ -646,7 +646,7 @@ class _NoteCard extends StatelessWidget {
                         PopupMenuButton<String>(
                           tooltip: 'More note actions',
                           padding: EdgeInsets.zero,
-                          icon: const Icon(Icons.more_horiz, color: foreground),
+                          icon: Icon(Icons.more_horiz, color: foreground),
                           onSelected: onAction,
                           itemBuilder: (_) => actions,
                         ),
@@ -657,7 +657,7 @@ class _NoteCard extends StatelessWidget {
                       note.title.trim().isEmpty ? 'Untitled note' : note.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: foreground,
                         fontSize: 21,
                         height: 1.16,
