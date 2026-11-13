@@ -255,7 +255,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(7),
             side: BorderSide(color: borderInk, width: 2),
           ),
-          side: const BorderSide(color: ink, width: 2),
+          side: BorderSide(color: borderInk, width: 2),
         ),
       ),
       chipTheme:
@@ -267,7 +267,7 @@ class AppTheme {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5),
             ),
-            side: const BorderSide(color: ink, width: 2),
+            side: BorderSide(color: borderInk, width: 2),
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           ),
       switchTheme: SwitchThemeData(
