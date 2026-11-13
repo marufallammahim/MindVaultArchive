@@ -43,8 +43,14 @@ void main() {
       final themes = [AppTheme.lightTheme, AppTheme.darkTheme];
       for (final theme in themes) {
         final scheme = theme.colorScheme;
-        expect(_contrast(scheme.onPrimary, scheme.primary), greaterThanOrEqualTo(4.5));
-        expect(_contrast(scheme.onSecondary, scheme.secondary), greaterThanOrEqualTo(4.5));
+        expect(
+          _contrast(scheme.onPrimary, scheme.primary),
+          greaterThanOrEqualTo(4.5),
+        );
+        expect(
+          _contrast(scheme.onSecondary, scheme.secondary),
+          greaterThanOrEqualTo(4.5),
+        );
         expect(
           _contrast(scheme.onPrimaryContainer, scheme.primaryContainer),
           greaterThanOrEqualTo(4.5),
@@ -53,8 +59,14 @@ void main() {
           _contrast(scheme.onSecondaryContainer, scheme.secondaryContainer),
           greaterThanOrEqualTo(4.5),
         );
-        expect(_contrast(scheme.onSurface, scheme.surface), greaterThanOrEqualTo(4.5));
-        expect(theme.textButtonTheme.style?.foregroundColor?.resolve({}), scheme.onSurface);
+        expect(
+          _contrast(scheme.onSurface, scheme.surface),
+          greaterThanOrEqualTo(4.5),
+        );
+        expect(
+          theme.textButtonTheme.style?.foregroundColor?.resolve({}),
+          scheme.onSurface,
+        );
       }
     });
 
