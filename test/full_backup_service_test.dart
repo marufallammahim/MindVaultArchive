@@ -1,4 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:archive/archive.dart';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
@@ -76,6 +79,33 @@ void main() {
     final restoredFile = File(restoredAttachment.localPath);
     expect(await restoredFile.exists(), isTrue);
     expect(await restoredFile.readAsBytes(), originalBytes);
+  });
+
+  test('rejects oversized ZIP output before decompression', () async {
+    final archive = Archive()
+      ..addFile(ArchiveFile('large.bin', 1, [1]));
+    final bytes = Uint8List.fromList(ZipEncoder().encode(archive)!);
+    final data = ByteData.sublistView(bytes);
+    var centralDirectoryOffset = -1;
+    for (var offset = 0; offset <= bytes.length - 46; offset++) {
+      if (data.getUint32(offset, Endian.little) == 0x02014b50) {
+        centralDirectoryOffset = offset;
+        break;
+      }
+    }
+    expect(centralDirectoryOffset, greaterThanOrEqualTo(0));
+    data.setUint32(
+      centralDirectoryOffset + 24,
+      FullBackupService.maxBackupBytes + 1,
+      Endian.little,
+    );
+
+    await expectLater(
+      FullBackupService(targetDatabase, restoreDirectory: restoreDirectory)
+          .importZip(bytes),
+      throwsA(isA<FormatException>()),
+    );
+    expect(await targetDatabase.select(targetDatabase.notes).get(), isEmpty);
   });
 
   test(
