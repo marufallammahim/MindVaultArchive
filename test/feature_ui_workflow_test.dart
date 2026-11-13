@@ -36,7 +36,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     await tester.enterText(find.byType(TextField).at(0), 'Captured idea');
-    await tester.enterText(find.byType(TextField).at(1), 'Saved from widget test');
+    await tester.enterText(
+      find.byType(TextField).at(1),
+      'Saved from widget test',
+    );
     await tester.tap(find.text('Save'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 150));
