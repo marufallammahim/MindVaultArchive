@@ -202,50 +202,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 borderRadius: BorderRadius.circular(30),
                                 onTap: _editProfile,
                                 child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 22,
-                                    backgroundImage: profile.avatar,
-                                    child: profile.avatar == null
-                                        ? const Icon(Icons.person_outline)
-                                        : null,
-                                  ),
-                                  const SizedBox(width: 11),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Hello, ${profile.name}',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w800,
-                                              ),
-                                        ),
-                                        Text(
-                                          'Your Archive from Brain',
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSurfaceVariant,
-                                              ),
-                                        ),
-                                      ],
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 22,
+                                      backgroundImage: profile.avatar,
+                                      child: profile.avatar == null
+                                          ? const Icon(Icons.person_outline)
+                                          : null,
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 11),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Hello, ${profile.name}',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w800,
+                                                ),
+                                          ),
+                                          Text(
+                                            'Your Archive from Brain',
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .bodySmall
+                                                ?.copyWith(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
                             ),
                             _roundAction(
                               context,
@@ -325,9 +325,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             Expanded(
                               child: Text(
                                 'Recent Notes',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
+                                style: Theme.of(context).textTheme.titleLarge
                                     ?.copyWith(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -399,8 +397,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final note = notes[index];
-                        final colors = Theme.of(context).brightness ==
-                                Brightness.dark
+                        final colors =
+                            Theme.of(context).brightness == Brightness.dark
                             ? const [
                                 Color(0xFF5A4717),
                                 Color(0xFF463D49),

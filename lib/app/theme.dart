@@ -174,9 +174,7 @@ class AppTheme {
           disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
           disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.38),
           side: BorderSide(color: borderInk, width: 2),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(7),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(
