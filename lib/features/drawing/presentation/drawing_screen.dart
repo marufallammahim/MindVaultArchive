@@ -38,7 +38,16 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
   Future<void> _saveDrawing() async {
     if (_saving) return;
     setState(() => _saving = true);
+    File? createdFile;
     try {
+      final db = ref.read(databaseProvider);
+      final note = await (db.select(
+        db.notes,
+      )..where((item) => item.id.equals(widget.noteId))).getSingleOrNull();
+      if (note == null || note.isDeleted) {
+        throw StateError('Open an active note before saving a drawing.');
+      }
+
       final bytes = await _controller.toPngBytes();
       if (bytes == null || bytes.isEmpty) {
         throw StateError('Draw something before saving.');
@@ -53,17 +62,8 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       final id = const Uuid().v4();
       final filename = 'drawing_$id.png';
       final file = File(p.join(directory.path, filename));
+      createdFile = file;
       await file.writeAsBytes(bytes, flush: true);
-
-      final db = ref.read(databaseProvider);
-      final existing = await (db.select(
-        db.notes,
-      )..where((note) => note.id.equals(widget.noteId))).getSingleOrNull();
-      if (existing == null) {
-        await db
-            .into(db.notes)
-            .insert(NotesCompanion.insert(id: widget.noteId));
-      }
 
       await db
           .into(db.attachments)
@@ -83,6 +83,9 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
       );
       context.pop();
     } catch (error) {
+      if (createdFile != null && await createdFile.exists()) {
+        await createdFile.delete();
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
