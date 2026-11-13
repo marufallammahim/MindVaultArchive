@@ -26,7 +26,13 @@ void main() {
           child: MaterialApp(theme: theme, home: const HomeScreen()),
         ),
       );
-      await tester.pumpAndSettle();
+
+      // Home contains continuously animated decorative elements. Pump a
+      // bounded number of frames instead of pumpAndSettle, which can wait
+      // forever when an animation intentionally keeps scheduling frames.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 250));
+      await tester.pump(const Duration(milliseconds: 250));
 
       expect(find.text('Recent Notes'), findsOneWidget);
       expect(find.text('Saved note'), findsOneWidget);
@@ -64,10 +70,13 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
 
     await tester.tap(find.text('Stats'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.text('Archive insights'), findsWidgets);
     expect(find.text('To-do list'), findsNothing);
