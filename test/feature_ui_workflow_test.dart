@@ -56,7 +56,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-
   testWidgets('Quick Capture restores an unfinished draft after remount', (
     tester,
   ) async {

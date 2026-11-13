@@ -65,9 +65,9 @@ void main() {
       throwsArgumentError,
     );
     expect(
-      await (database.select(database.notes)
-            ..where((note) => note.id.equals('missing-note')))
-          .get(),
+      await (database.select(
+        database.notes,
+      )..where((note) => note.id.equals('missing-note'))).get(),
       isEmpty,
     );
   });
