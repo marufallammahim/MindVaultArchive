@@ -105,19 +105,29 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
     File? target;
     try {
+      // Read metadata first so an oversized selection is rejected before
+      // loading its bytes into memory.
       final selection = await FilePicker.platform.pickFiles(
         type: FileType.any,
-        withData: true,
+        withData: false,
       );
       if (selection == null || selection.files.isEmpty) {
         return;
       }
       final picked = selection.files.single;
-      final bytes = picked.bytes;
-      if (bytes == null || bytes.isEmpty) {
-        throw StateError('The selected file could not be read.');
+      final sourcePath = picked.path;
+      if (sourcePath == null || sourcePath.isEmpty) {
+        throw StateError('The selected file path is unavailable.');
       }
-      if (bytes.length > 25 * 1024 * 1024) {
+      final source = File(sourcePath);
+      if (!await source.exists()) {
+        throw StateError('The selected file could not be found.');
+      }
+      final fileSize = await source.length();
+      if (fileSize == 0) {
+        throw StateError('The selected file is empty.');
+      }
+      if (fileSize > 25 * 1024 * 1024) {
         throw StateError('Files larger than 25 MB are not supported yet.');
       }
       final documents = await getApplicationDocumentsDirectory();
@@ -131,7 +141,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
       final filename = '${id}_${safeName.isEmpty ? 'attachment' : safeName}';
       target = File(p.join(directory.path, filename));
-      await target.writeAsBytes(bytes, flush: true);
+      await source.copy(target.path);
       final extension = p.extension(picked.name).toLowerCase();
       final type =
           {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'}.contains(extension)
