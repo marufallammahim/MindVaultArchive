@@ -177,8 +177,8 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         modalBackgroundColor: card,
         showDragHandle: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
           side: BorderSide(color: borderInk, width: 2.5),
         ),
       ),
@@ -241,7 +241,7 @@ class AppTheme {
           textStyle: const TextStyle(fontWeight: FontWeight.w800),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(7),
-            side: const BorderSide(color: ink, width: 2.5),
+            side: BorderSide(color: borderInk, width: 2.5),
           ),
         ),
       ),
@@ -253,7 +253,7 @@ class AppTheme {
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(7),
-            side: const BorderSide(color: ink, width: 2),
+            side: BorderSide(color: borderInk, width: 2),
           ),
           side: const BorderSide(color: ink, width: 2),
         ),
