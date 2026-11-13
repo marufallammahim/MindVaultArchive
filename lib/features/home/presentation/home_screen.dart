@@ -616,8 +616,8 @@ class _NoteCard extends StatelessWidget {
                           ),
                         ),
                         if (note.sortOrder == 1)
-                          const Padding(
-                            padding: EdgeInsets.only(right: 5),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5),
                             child: Icon(
                               Icons.push_pin_rounded,
                               color: foreground,
@@ -625,8 +625,8 @@ class _NoteCard extends StatelessWidget {
                             ),
                           ),
                         if (note.isFavorite)
-                          const Padding(
-                            padding: EdgeInsets.only(right: 5),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 5),
                             child: Icon(
                               Icons.star_rounded,
                               color: foreground,
