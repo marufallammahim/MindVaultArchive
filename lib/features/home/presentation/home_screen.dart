@@ -197,10 +197,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         Row(
                           children: [
-                            InkWell(
-                              borderRadius: BorderRadius.circular(30),
-                              onTap: _editProfile,
-                              child: Row(
+                            Expanded(
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(30),
+                                onTap: _editProfile,
+                                child: Row(
                                 children: [
                                   CircleAvatar(
                                     radius: 22,
@@ -210,36 +211,42 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         : null,
                                   ),
                                   const SizedBox(width: 11),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Hello, ${profile.name}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleSmall
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w800,
-                                            ),
-                                      ),
-                                      Text(
-                                        'Your Archive from Brain',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSurfaceVariant,
-                                            ),
-                                      ),
-                                    ],
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Hello, ${profile.name}',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                fontWeight: FontWeight.w800,
+                                              ),
+                                        ),
+                                        Text(
+                                          'Your Archive from Brain',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                            const Spacer(),
+                            ),
                             _roundAction(
                               context,
                               Icons.search_rounded,
