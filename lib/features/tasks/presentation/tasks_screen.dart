@@ -142,7 +142,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       ),
     );
     final saved = await Navigator.of(context, rootNavigator: true).push(route);
-    await route.completed
+    await route.completed;
 
     final taskTitle = title.text.trim();
     final taskDetails = details.text;
