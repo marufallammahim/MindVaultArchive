@@ -39,7 +39,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       linkedNoteId = null;
     }
 
-    final saved = await showDialog<bool>(
+    final route = DialogRoute<bool>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, refresh) => AlertDialog(
@@ -141,6 +141,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ),
       ),
     );
+    final saved = await Navigator.of(context, rootNavigator: true).push(route);
+    await route.completed
 
     final taskTitle = title.text.trim();
     final taskDetails = details.text;
