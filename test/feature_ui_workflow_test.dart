@@ -20,6 +20,8 @@ void main() {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
       await database.close();
     });
 
@@ -55,6 +57,8 @@ void main() {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
       await database.close();
     });
 
@@ -89,6 +93,8 @@ void main() {
     final database = AppDatabase(NativeDatabase.memory());
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
       await database.close();
     });
 
