@@ -58,7 +58,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-
   testWidgets('Quick Capture saves and opens the canonical editor route', (
     tester,
   ) async {
@@ -73,9 +72,8 @@ void main() {
         ),
         GoRoute(
           path: '/editor/:id',
-          builder: (context, state) => EditorScreen(
-            noteId: state.pathParameters['id']!,
-          ),
+          builder: (context, state) =>
+              EditorScreen(noteId: state.pathParameters['id']!),
         ),
       ],
     );
