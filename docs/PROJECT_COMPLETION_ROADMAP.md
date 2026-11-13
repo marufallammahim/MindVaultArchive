@@ -130,3 +130,45 @@ Implementation commit before documentation: `ad3f0265bd63bbb7d27d3a691e8b54d66ba
 - [ ] Obtain device log/stack trace if the Home error fallback still appears; emulator/physical-device QA and phone screenshot comparison remain outstanding.
 
 Research basis: Flutter Material 3 defines paired foreground/background color roles (for example `primary` / `onPrimary`) and recommends at least 4.5:1 contrast for text. Official references: Flutter `ColorScheme` API and Flutter theming cookbook. The chosen brand colors were retained, with theme-specific semantic pairings rather than relying on hard-coded black/white text across every surface.
+
+
+## Feature acceptance test expansion — 2026-11-13
+
+### Newly confirmed Home regressions (run 43406738374, SHA `9c2305f8866f856c1e2c338bcc6371932172bdd6`)
+- Home note cards threw a Flutter assertion because `Material` received both `borderRadius` and `shape`. This was an application runtime defect, not merely a test harness issue.
+- The Home bottom dock also overflowed vertically by 2 px in the widget-test viewport (RenderFlex at `home_screen.dart:515`).
+- The test failed to find the saved note because the NoteCard build crashed; the Stats navigation assertion was consequently not a valid independent proof of navigation.
+- The first test run also timed out while widget resources/streams remained mounted. Tests now explicitly unmount their widget trees and close their in-memory database, and use bounded frame pumps.
+- Corrections committed after the failed run: remove the conflicting Material borderRadius while retaining the rounded shape; reduce bottom-dock icon/label/padding footprint; expand Home rendering coverage across 320x640, 360x800 and 412x915 viewports in both light and dark themes.
+- These corrections are awaiting CI verification on the latest branch SHA. Do not mark the Home regression closed until the widget test passes.
+
+### Current automated coverage inventory
+Existing test files cover database CRUD/relations/revisions, task database operations, editor-provider autosave/reload, Markdown toolbar, search service, JSON and ZIP backup services, app-lock service/gate, startup, theme contrast, Home (new screen-level test), and user profile persistence.
+
+### Screen-level acceptance matrix — pending unless explicitly evidenced by a passing test
+| Area | Acceptance checks to add/verify |
+|---|---|
+| Home | Empty/loading/error/saved-note states; light/dark/AMOLED; 320/360/412 logical-pixel widths; note open; pin/favorite/archive/trash actions; categories/filters; Stats route; no overflow or uncaught exception |
+| Editor | New and existing note; title/body typing; cursor/selection; Markdown formatting/preview; autosave debounce; save-before-exit; reload/recovery; attachment validation; share/export; category/color; linked task; revision/drawing routes |
+| Tasks | Create/edit/delete; complete/uncomplete; priority; due date; linked note; invalid/empty title; completed filter; narrow screen; persistence after remount |
+| Search | Title/body/task/tag/category; case/prefix/wildcard behavior; empty/no-result/error; deleted item exclusion; open selected result |
+| Tags/categories | Create/rename/delete; assign/unassign; duplicate/empty names; detach references safely; persistence and filtering |
+| Quick Capture | Draft restore after remount; title-only/body-only; empty validation; save and open editor; clear draft only after successful persistence |
+| Templates | Built-in template creates note with exact starter content; custom create/edit/delete; malformed preferences; search/filter; persistence after restart |
+| Drawing/attachments | Undo/redo/clear; empty drawing validation; PNG file written; attachment metadata points to file; restore/backup includes bytes; missing file failure |
+| Archive transfer | JSON round-trip; version mismatch; malformed JSON; ID collisions; referential integrity; ZIP hash/path traversal/duplicate/missing attachment; interrupted restore/rollback |
+| Revision history | Snapshot creation; order/limit; restore old content; deleted note/missing revision; route back to correct editor |
+| Trash | Soft delete; restore; permanent-delete confirmation; attachments/revisions cleanup; deleted notes excluded elsewhere |
+| Insights/timeline | Empty and populated archive; task counts; duplicate title/wikilink detection; date boundary; note navigation |
+| Settings/profile | Theme mode, AMOLED, accent, display name/avatar, category management, archive tools route, settings persistence |
+| Protector | Enable/change/disable PIN; invalid PIN; retry lockout; secure-store unavailable; app background/resume; disclose it is not data encryption |
+| Developer notebook/About/Splash | All actions and links; empty/error states; startup route and first-run setup; no inert controls |
+| Responsive/accessibility | 320/360/412/768 widths; large text scaling; keyboard insets; touch target/semantics; light/dark/AMOLED; contrast and overflow checks |
+
+### Validation policy
+- Run focused tests for each changed feature, then the complete `flutter test --reporter expanded` suite.
+- Run `dart format --output=none --set-exit-if-changed .`, `flutter analyze`, and the Android APK build against the exact same SHA.
+- Add route-level widget tests and UI interaction/persistence tests; service/database tests alone are not evidence that visible buttons work.
+- Inspect logs for uncaught widget exceptions, RenderFlex overflow, asynchronous errors, database warnings and plugin channel failures. Never suppress a warning or loosen an assertion to obtain a green run.
+- Keep emulator/physical-device acceptance as a separate required check. CI APK build success alone does not prove runtime behavior on a phone.
+- Any feature requiring a real backend, provider, permission or platform capability must be marked blocked/not implemented until that dependency exists; do not replace it with fake success.
