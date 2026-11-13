@@ -2,6 +2,14 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mindvault_archive/app/theme.dart';
 
+double _contrast(Color foreground, Color background) {
+  final first = foreground.computeLuminance();
+  final second = background.computeLuminance();
+  final lighter = first > second ? first : second;
+  final darker = first > second ? second : first;
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
 void main() {
   group('AppTheme', () {
     test('provides Material 3 light and dark themes', () {
@@ -29,6 +37,25 @@ void main() {
         dark.appBarTheme.titleTextStyle?.color,
         dark.colorScheme.onSurface,
       );
+    });
+
+    test('semantic foregrounds keep strong contrast on branded containers', () {
+      final themes = [AppTheme.lightTheme, AppTheme.darkTheme];
+      for (final theme in themes) {
+        final scheme = theme.colorScheme;
+        expect(_contrast(scheme.onPrimary, scheme.primary), greaterThanOrEqualTo(4.5));
+        expect(_contrast(scheme.onSecondary, scheme.secondary), greaterThanOrEqualTo(4.5));
+        expect(
+          _contrast(scheme.onPrimaryContainer, scheme.primaryContainer),
+          greaterThanOrEqualTo(4.5),
+        );
+        expect(
+          _contrast(scheme.onSecondaryContainer, scheme.secondaryContainer),
+          greaterThanOrEqualTo(4.5),
+        );
+        expect(_contrast(scheme.onSurface, scheme.surface), greaterThanOrEqualTo(4.5));
+        expect(theme.textButtonTheme.style?.foregroundColor?.resolve({}), scheme.onSurface);
+      }
     });
 
     test('dark theme keeps strong visible component outlines', () {
