@@ -80,9 +80,9 @@ void main() {
       ],
     );
     addTearDown(() async {
-      router.dispose();
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
+      router.dispose();
       await tester.pump(const Duration(milliseconds: 1));
       await database.close();
     });
