@@ -31,6 +31,7 @@ void main() {
   );
 
   test('tags can be assigned to notes and safely deleted', () async {
+    await database.saveNoteContent('tagged-note', 'Tagged note', 'Body');
     await database.saveTag('important', 'Important');
     await database.setNoteTags('tagged-note', ['important']);
     var links = await database.select(database.noteTags).get();
@@ -52,7 +53,23 @@ void main() {
       database.setNoteTags('note-with-bad-tag', ['missing']),
       throwsArgumentError,
     );
-    expect(await database.select(database.tags).get(), isEmpty);
+    await database.saveTag('valid-tag', 'Valid');
+    await expectLater(
+      database.setNoteTags('missing-note', ['valid-tag']),
+      throwsArgumentError,
+    );
+    await database.saveNoteContent('deleted-note', 'Deleted', 'Body');
+    await database.setDeleted('deleted-note', true);
+    await expectLater(
+      database.setNoteTags('deleted-note', ['valid-tag']),
+      throwsArgumentError,
+    );
+    expect(
+      await (database.select(database.notes)
+            ..where((note) => note.id.equals('missing-note')))
+          .get(),
+      isEmpty,
+    );
   });
 
   test('note category assignment validates and persists', () async {
