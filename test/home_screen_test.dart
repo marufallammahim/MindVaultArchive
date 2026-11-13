@@ -12,31 +12,44 @@ import 'package:mindvault_archive/features/insights/presentation/archive_insight
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('home renders saved notes in light and dark themes', (
+  testWidgets('home renders saved notes without layout errors on phone sizes', (
     tester,
   ) async {
     final database = AppDatabase(NativeDatabase.memory());
-    addTearDown(database.close);
     await database.saveNoteContent('home-note', 'Saved note', 'A saved body');
 
-    for (final theme in [AppTheme.lightTheme, AppTheme.darkTheme]) {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [databaseProvider.overrideWithValue(database)],
-          child: MaterialApp(theme: theme, home: const HomeScreen()),
-        ),
-      );
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await database.close();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
-      // Home contains continuously animated decorative elements. Pump a
-      // bounded number of frames instead of pumpAndSettle, which can wait
-      // forever when an animation intentionally keeps scheduling frames.
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 250));
-      await tester.pump(const Duration(milliseconds: 250));
+    final sizes = [
+      const Size(320, 640),
+      const Size(360, 800),
+      const Size(412, 915),
+    ];
 
-      expect(find.text('Recent Notes'), findsOneWidget);
-      expect(find.text('Saved note'), findsOneWidget);
-      expect(tester.takeException(), isNull);
+    for (final size in sizes) {
+      tester.view
+        ..physicalSize = size
+        ..devicePixelRatio = 1;
+
+      for (final theme in [AppTheme.lightTheme, AppTheme.darkTheme]) {
+        await tester.pumpWidget(
+          ProviderScope(
+            overrides: [databaseProvider.overrideWithValue(database)],
+            child: MaterialApp(theme: theme, home: const HomeScreen()),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 250));
+
+        expect(find.text('Recent Notes'), findsOneWidget);
+        expect(find.text('Saved note'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      }
     }
   });
 
@@ -44,7 +57,6 @@ void main() {
     tester,
   ) async {
     final database = AppDatabase(NativeDatabase.memory());
-    addTearDown(database.close);
     final router = GoRouter(
       initialLocation: '/home',
       routes: [
@@ -59,7 +71,12 @@ void main() {
         ),
       ],
     );
-    addTearDown(router.dispose);
+
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      router.dispose();
+      await database.close();
+    });
 
     await tester.pumpWidget(
       ProviderScope(
@@ -75,7 +92,6 @@ void main() {
 
     await tester.tap(find.text('Stats'));
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 250));
     await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.text('Archive insights'), findsWidgets);
