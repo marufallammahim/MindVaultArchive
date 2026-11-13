@@ -3,7 +3,7 @@
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
 Last reviewed: 2026-11-13  
-Baseline commit reviewed: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`
+Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`\nLatest workflow-maintenance commit: `25cc51d38b4e04b4d5a6783fd39af033b1a87531`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -39,7 +39,7 @@ Artifact metadata step passed. APK archive is available from the run's Artifacts
 - [x] Unit/widget regression suite passed (51 tests) on baseline SHA.
 - [x] Android debug APK build and artifact upload passed on baseline SHA.
 - [ ] Investigate Drift multiple-database warnings and verify executor isolation.
-- [ ] Resolve deprecated GitHub Actions runtime/action versions.
+- [x] Upgrade workflow references: checkout v4→v5, setup-java v4→v6, upload-artifact v4→v6 (new versions still require validation on latest SHA).
 - [ ] Resolve shell portability warnings.
 - [ ] Review Kotlin/Gradle plugin warnings and apply safe compatibility updates.
 - [ ] Repeat all required CI workflows on the final updated branch SHA.
@@ -106,3 +106,10 @@ Reference direction: warm cream/dotted canvas; palette yellow `#F7CB46`, cream `
 - APK artifact and build metadata are verified.
 - Actionable warnings are resolved or explicitly justified with evidence.
 - Remaining external/backend/device QA blockers are disclosed; no unsupported 100% claim.
+
+
+## Workflow action maintenance — 2026-11-13
+- Updated all six workflow files to use `actions/checkout@v5`, `actions/setup-java@v6`, and `actions/upload-artifact@v6` where applicable.
+- Official action documentation/release notes identify setup-java v1-v4 as deprecated and v6 as current; upload-artifact v6 uses Node 24. See the upstream action documentation and releases.
+- The commits generated several intermediate workflow runs which were cancelled by the branch concurrency policy. The most recent observed run was for SHA `468f56dadec6ed49f90ffa5ad2d9c8ce937ece12`, not the latest branch SHA `25cc51d38b4e04b4d5a6783fd39af033b1a87531`. Therefore the action upgrades are NOT yet verified. A fresh complete validation on the exact latest SHA is required.
+- CI baseline success on `a89a4a18074a72ceb6a0d0404a8b370af3e69955` remains valid only for that SHA; it does not validate subsequent workflow edits.
