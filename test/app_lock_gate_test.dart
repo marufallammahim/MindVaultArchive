@@ -24,6 +24,18 @@ class _MemorySecureStore implements SecureValueStore {
   }
 }
 
+Future<void> _pumpUntilVisible(
+  WidgetTester tester,
+  Finder finder, {
+  int maxFrames = 20,
+}) async {
+  for (var frame = 0; frame < maxFrames; frame++) {
+    if (finder.evaluate().isNotEmpty) return;
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  fail('Widget did not become visible within $maxFrames frames: $finder');
+}
+
 void main() {
   testWidgets('app lock gate displays the app after a valid PIN', (
     tester,
@@ -40,12 +52,12 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpUntilVisible(tester, find.text('MindVault is locked'));
 
     expect(find.text('MindVault is locked'), findsOneWidget);
     await tester.enterText(find.byType(TextField), '482915');
     await tester.tap(find.text('Unlock'));
-    await tester.pumpAndSettle();
+    await _pumpUntilVisible(tester, find.text('Vault home'));
 
     expect(find.text('Vault home'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -65,7 +77,10 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpUntilVisible(
+      tester,
+      find.textContaining('Could not verify secure app-lock settings'),
+    );
 
     expect(
       find.textContaining('Could not verify secure app-lock settings'),
@@ -88,11 +103,11 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpUntilVisible(tester, find.text('MindVault is locked'));
 
     await tester.enterText(find.byType(TextField), '000000');
     await tester.tap(find.text('Unlock'));
-    await tester.pumpAndSettle();
+    await _pumpUntilVisible(tester, find.text('Incorrect PIN. Try again.'));
 
     expect(find.text('Incorrect PIN. Try again.'), findsOneWidget);
     expect(find.text('Vault home'), findsNothing);
