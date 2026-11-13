@@ -11,7 +11,7 @@ class TagsScreen extends ConsumerWidget {
 
   Future<void> _addTag(BuildContext context, WidgetRef ref, {Tag? tag}) async {
     final controller = TextEditingController(text: tag?.name ?? '');
-    final name = await showDialog<String>(
+    final route = DialogRoute<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(tag == null ? 'New tag' : 'Rename tag'),
@@ -38,6 +38,8 @@ class TagsScreen extends ConsumerWidget {
         ],
       ),
     );
+    final name = await Navigator.of(context, rootNavigator: true).push(route);
+    await route.completed;
     controller.dispose();
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     try {
