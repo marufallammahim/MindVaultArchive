@@ -24,11 +24,18 @@ class AppTheme {
         ).copyWith(
           primary: accent,
           onPrimary: ink,
+          primaryContainer: const Color(0xFFFFE8A6),
+          onPrimaryContainer: ink,
           secondary: secondary,
           onSecondary: ink,
+          secondaryContainer: const Color(0xFFE4F9FC),
+          onSecondaryContainer: ink,
           tertiary: tertiary,
           onTertiary: ink,
-          error: const Color(0xFFE64B3C),
+          tertiaryContainer: const Color(0xFFE9F8E3),
+          onTertiaryContainer: ink,
+          error: const Color(0xFFB3261E),
+          onError: const Color(0xFFFFFFFF),
           surface: lightSurface,
           onSurface: ink,
           surfaceContainerLowest: const Color(0xFFFFFFFF),
@@ -56,10 +63,18 @@ class AppTheme {
         ).copyWith(
           primary: accent,
           onPrimary: ink,
+          primaryContainer: const Color(0xFF5A4717),
+          onPrimaryContainer: const Color(0xFFFFF1C7),
           secondary: secondary,
           onSecondary: ink,
+          secondaryContainer: const Color(0xFF21464B),
+          onSecondaryContainer: const Color(0xFFD9FAFF),
           tertiary: tertiary,
           onTertiary: ink,
+          tertiaryContainer: const Color(0xFF294B24),
+          onTertiaryContainer: const Color(0xFFE2FFDA),
+          error: const Color(0xFFFFB4AB),
+          onError: const Color(0xFF690005),
           surface: darkSurface,
           onSurface: const Color(0xFFF5F1EC),
           surfaceContainerLowest: const Color(0xFF101114),
@@ -136,6 +151,39 @@ class AppTheme {
         minVerticalPadding: 10,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+      iconButtonTheme: IconButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.disabled)
+                ? scheme.onSurface.withValues(alpha: 0.38)
+                : scheme.onSurface,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: scheme.onSurface,
+          disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.38),
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          disabledBackgroundColor: scheme.onSurface.withValues(alpha: 0.12),
+          disabledForegroundColor: scheme.onSurface.withValues(alpha: 0.38),
+          side: BorderSide(color: borderInk, width: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(7),
+          ),
+        ),
+      ),
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: scheme.primary,
+        selectionColor: scheme.primary.withValues(alpha: 0.28),
+        selectionHandleColor: scheme.primary,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: card,
@@ -146,6 +194,9 @@ class AppTheme {
         ),
         hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         labelStyle: TextStyle(color: scheme.onSurfaceVariant),
+        floatingLabelStyle: TextStyle(color: scheme.onSurface),
+        prefixIconColor: scheme.onSurfaceVariant,
+        suffixIconColor: scheme.onSurfaceVariant,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(7),
           borderSide: BorderSide(color: borderInk, width: 2),
