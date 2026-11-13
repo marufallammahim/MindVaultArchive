@@ -512,16 +512,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(vertical: 2),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: foreground, size: 21),
-              const SizedBox(height: 2),
+              Icon(icon, color: foreground, size: 18),
               Text(
                 label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: foreground,
-                  fontSize: 10,
+                  fontSize: 9,
+                  height: 1.1,
                   fontWeight: selected ? FontWeight.w900 : FontWeight.w600,
                 ),
               ),
@@ -592,7 +596,6 @@ class _NoteCard extends StatelessWidget {
       padding: const EdgeInsets.only(right: 4, bottom: 4),
       child: Material(
         color: color,
-        borderRadius: BorderRadius.circular(5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
           side: BorderSide(color: borderInk, width: 2.5),
