@@ -271,6 +271,39 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
   }
 
+  Future<void> _openHistory() async {
+    final notifier = ref.read(editorProvider(widget.noteId).notifier);
+    final saved = await notifier.forceSave();
+    if (!context.mounted) return;
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Save the current note before restoring a revision.'),
+        ),
+      );
+      return;
+    }
+
+    final restored = await context.push<bool>('/history/${widget.noteId}');
+    if (restored != true || !mounted) return;
+    await notifier.reloadFromDatabase();
+    if (!mounted) return;
+    final refreshed = ref.read(editorProvider(widget.noteId));
+    _titleController.text = refreshed.title;
+    _contentController.text = refreshed.content;
+  }
+
+  Future<void> _moveToTrash() async {
+    final saved = await ref
+        .read(editorProvider(widget.noteId).notifier)
+        .forceSave();
+    if (!context.mounted || !saved) return;
+    final confirmed = await context.push<bool>('/delete/${widget.noteId}');
+    if (confirmed != true || !context.mounted) return;
+    await ref.read(databaseProvider).setDeleted(widget.noteId, true);
+    if (context.mounted) context.pop();
+  }
+
   IconData _attachmentIcon(Attachment item) {
     switch (item.type) {
       case 'image':
@@ -357,75 +390,17 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               onPressed: _attachFile,
             ),
             IconButton(
-              tooltip: 'Export or share Markdown',
-              icon: const Icon(Icons.ios_share_outlined),
-              onPressed: _shareMarkdown,
-            ),
-            IconButton(
               tooltip: _previewMode ? 'Edit Markdown' : 'Preview Markdown',
               icon: Icon(
                 _previewMode ? Icons.edit_outlined : Icons.visibility_outlined,
               ),
               onPressed: () => setState(() => _previewMode = !_previewMode),
             ),
-            IconButton(
-              tooltip: 'Tasks linked to this note',
-              icon: const Icon(Icons.task_alt_outlined),
-              onPressed: () => context.push('/tasks?noteId=${widget.noteId}'),
-            ),
-            IconButton(
-              tooltip: 'Version history',
-              icon: const Icon(Icons.history),
-              onPressed: () async {
-                final notifier = ref.read(
-                  editorProvider(widget.noteId).notifier,
-                );
-                final saved = await notifier.forceSave();
-                if (!context.mounted) return;
-                if (!saved) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Save the current note before restoring a revision.',
-                      ),
-                    ),
-                  );
-                  return;
-                }
-
-                final restored = await context.push<bool>(
-                  '/history/${widget.noteId}',
-                );
-                if (restored != true || !mounted) return;
-                await notifier.reloadFromDatabase();
-                if (!mounted) return;
-                final refreshed = ref.read(editorProvider(widget.noteId));
-                _titleController.text = refreshed.title;
-                _contentController.text = refreshed.content;
-              },
-            ),
-            IconButton(
-              tooltip: 'Move note to Trash',
-              icon: const Icon(Icons.delete_outline_rounded),
-              onPressed: () async {
-                final saved = await ref
-                    .read(editorProvider(widget.noteId).notifier)
-                    .forceSave();
-                if (!context.mounted || !saved) return;
-                final confirmed = await context.push<bool>(
-                  '/delete/${widget.noteId}',
-                );
-                if (confirmed == true && context.mounted) {
-                  await db.setDeleted(widget.noteId, true);
-                  if (context.mounted) context.pop();
-                }
-              },
-            ),
             PopupMenuButton<int>(
               tooltip: 'Note color',
               icon: const Icon(Icons.palette_outlined),
               onSelected: (value) async {
-                await db.setNoteColor(
+                await ref.read(databaseProvider).setNoteColor(
                   widget.noteId,
                   value == -1 ? null : value,
                 );
@@ -442,12 +417,51 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 PopupMenuItem(value: 0xFFFFDC8B, child: Text('Warm cream')),
               ],
             ),
-            IconButton(
-              tooltip: 'Draw',
-              icon: const Icon(Icons.brush),
-              onPressed: () => context.push('/drawing/${widget.noteId}'),
+            PopupMenuButton<String>(
+              tooltip: 'More note actions',
+              icon: const Icon(Icons.more_vert_rounded),
+              onSelected: (action) async {
+                switch (action) {
+                  case 'share':
+                    await _shareMarkdown();
+                  case 'tasks':
+                    if (context.mounted) {
+                      context.push('/tasks?noteId=${widget.noteId}');
+                    }
+                  case 'history':
+                    await _openHistory();
+                  case 'trash':
+                    await _moveToTrash();
+                  case 'draw':
+                    if (context.mounted) {
+                      context.push('/drawing/${widget.noteId}');
+                    }
+                }
+              },
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: 'share',
+                  child: Text('Export or share Markdown'),
+                ),
+                PopupMenuItem(
+                  value: 'tasks',
+                  child: Text('Tasks linked to this note'),
+                ),
+                PopupMenuItem(
+                  value: 'history',
+                  child: Text('Version history'),
+                ),
+                PopupMenuItem(
+                  value: 'draw',
+                  child: Text('Add drawing'),
+                ),
+                PopupMenuItem(
+                  value: 'trash',
+                  child: Text('Move note to Trash'),
+                ),
+              ],
             ),
-          ],
+          ],,
         ),
         body: CustomPaint(
           painter: _PixelDotPainter(
