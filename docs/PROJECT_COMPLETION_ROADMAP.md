@@ -312,3 +312,14 @@ This map records the observed presentation-to-data dependencies. A route or prov
 - Riverpod generator still warns that analyzer 6.4.1 supports language version 3.4.0 while CI Dart SDK is 3.14.0. Do not add analyzer 14.7.0 alone until Riverpod generator/linter constraints are reviewed and a coordinated dev-toolchain update is tested.
 - The shell scaffold-copy helper now uses explicit no-overwrite checks and `cp -pP` instead of `cp -Rn`. A local shell simulation verified that existing app files are preserved, missing files copied and symlinks retained. The next APK workflow must confirm the actual scaffold path is warning-free.
 - No Node 20 deprecation message was found in the inspected logs. Checkout v5, setup-java v6 and upload-artifact v6 are in use; recheck future logs for transitive action warnings.
+
+
+## CI workspace parity correction — 2026-11-14
+
+Latest reviewed source head: `07ceaea7c7092e8617fbebffdd83eb706246de41`.
+
+- Code Check run `43571583958` passed on `07ceaea7`, but it did not create a new commit.
+- Regression run `43571583951` stopped before tests because `build_runner` output for `lib/core/database/database.g.dart` was not formatted before the generated-file diff check. Code Check already normalizes this generated binding before checking/committing it.
+- APK run `43571583939` stopped before Gradle because `tool/regenerate_platforms.sh` created the missing iOS scaffold before `flutter pub get`; Flutter then upgraded `analysis_options.yaml` to exclude the newly present platform directories. Code Check and Regression had not generated the same platform scaffold, so their working trees were not equivalent.
+- Corrective workflow change: all three workflows now run `bash tool/regenerate_platforms.sh` before `flutter pub get`; Regression and APK also run `dart format lib/core/database/database.g.dart` before comparing generated output. This makes platform files, Flutter's analyzer config migration and generated Drift formatting consistent across the three jobs.
+- The tests have still not run on a fully synchronized SHA after the widget-test harness changes. The next three runs must complete on one exact head; no skipped test step counts as success.

@@ -52,6 +52,9 @@ jobs:
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Normalize generated Drift binding
+        run: dart format lib/core/database/database.g.dart
+
       - name: Verify generated sources and Dart formatting
         run: |
           git diff --exit-code -- lib

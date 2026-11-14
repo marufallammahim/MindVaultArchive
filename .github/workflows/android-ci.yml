@@ -34,6 +34,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Generate missing native platform scaffolding
+        run: bash tool/regenerate_platforms.sh
+
       - name: Resolve dependencies
         run: flutter pub get
 
