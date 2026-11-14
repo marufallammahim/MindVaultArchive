@@ -70,13 +70,16 @@ void main() {
           preferences.getString('quick_capture_draft_content') == null;
     });
 
-    final notes = await database.select(database.notes).get();
+    final notes =
+        await tester.runAsync(() => database.select(database.notes).get()) ??
+        <Note>[];
     expect(notes, hasLength(1));
     expect(notes.single.title, 'Captured idea');
     expect(notes.single.documentContent, 'Saved from widget test');
-    final preferences = await SharedPreferences.getInstance();
-    expect(preferences.getString('quick_capture_draft_title'), isNull);
-    expect(preferences.getString('quick_capture_draft_content'), isNull);
+    final preferences =
+        await tester.runAsync(SharedPreferences.getInstance);
+    expect(preferences?.getString('quick_capture_draft_title'), isNull);
+    expect(preferences?.getString('quick_capture_draft_content'), isNull);
     expect(tester.takeException(), isNull);
   });
 
@@ -131,7 +134,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 250));
 
     expect(find.text('Create a Note'), findsOneWidget);
-    final notes = await database.select(database.notes).get();
+    final notes =
+        await tester.runAsync(() => database.select(database.notes).get()) ??
+        <Note>[];
     expect(notes, hasLength(1));
     expect(notes.single.title, 'Continue editing');
     expect(notes.single.documentContent, 'Captured body');
@@ -204,7 +209,6 @@ void main() {
     await tester.enterText(find.byType(TextField), 'Research');
     await tester.tap(find.text('Save'));
     await _pumpUntil(tester, () async {
-      await tester.pump(const Duration(milliseconds: 50));
       final tags =
           await tester.runAsync(() => database.select(database.tags).get());
       return tags?.length == 1;
@@ -247,7 +251,6 @@ void main() {
     await tester.enterText(find.byType(TextField).first, 'Test task');
     await tester.tap(find.text('Save'));
     await _pumpUntil(tester, () async {
-      await tester.pump(const Duration(milliseconds: 50));
       final tasks =
           await tester.runAsync(() => database.select(database.tasks).get());
       return tasks?.length == 1;
@@ -272,7 +275,8 @@ void main() {
       final updated = await tester.runAsync(
         () => database.select(database.tasks).getSingle(),
       );
-      return updated?.title == 'Updated task' &&
+      return updated != null &&
+          updated.title == 'Updated task' &&
           updated.details == 'Updated details';
     });
 
