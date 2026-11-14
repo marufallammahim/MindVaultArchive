@@ -78,7 +78,7 @@ Committed on `feature/ultimate-all-in-one-mindvault`:
 
 ## Remaining verification and implementation boundaries
 
-- The latest UI commits have not yet been verified by a fresh Flutter analyzer/test/APK CI run; the current commit has no reported status checks available through the connected GitHub status endpoint.
+- On source SHA c3630a3b1c23bd43c9e4319061415ffb4d0472e4, Code Check run 43574945899 and Android APK run 43574945830 both stopped at the formatting gate; neither reached analyzer or APK packaging. Formatter run 43574945773 passed and committed the two required Dart formatting changes as 604b1d98fc2e32d2c1485c882ce9fa1745847ebc. That formatter-created SHA has no Code Check/APK run yet because the bot commit did not trigger downstream workflows.
 - No emulator/physical-device screenshot comparison was run, so exact pixel identity is not claimed.
 - This visual pass does not complete every feature in the master specification. AI, cloud sync and collaboration remain unimplemented without configured providers; notebooks/folders, OCR, reminders/recurrence, calendar/habits and advanced editor workflows remain partial or pending.
 - A complete feature-by-feature source audit and runtime acceptance pass is still required before release readiness can be claimed.
@@ -96,12 +96,12 @@ The supplied `Mind Vault UI.zip` was opened and inspected. It contains six files
 ### Source-level visual gap findings
 
 These are code comparisons, not emulator screenshot measurements:
-- **Home:** the current route includes profile, search, category filters, colored note cards, a create action and a bottom dock. Its dark card palette is muted compared with the bright coral/green/yellow blocks in the reference; card/action spacing and typography still need emulator comparison.
-- **Tasks:** the route includes task CRUD, due dates, priorities, note links, completion and a progress view. The reference also emphasizes a compact date strip, monthly calendar and brightly colored task rows. The screen exists, but its full visual and interaction parity has not been screenshot-verified.
-- **Editor:** the route contains title/body editing, Markdown toolbar/preview, attachment actions, linked tasks, revision history, note color, drawing and trash navigation. It is functionally richer than the screenshot, but its toolbar density, control placement and narrow-screen behavior still need comparison.
-- **Delete confirmation:** the route has the dark background, brand mark, editorial heading and coral action. Its current purple logo frame and generic draw/delete icons are not the yellow hand-and-cable illustration in the reference; this remains a visible redesign gap.
-- **Shared secondary-screen hero:** `FeatureHero` currently uses a gradient, a 24px radius and a subtle accent border. That differs from the requested flat palette blocks, strong dark outlines and hard unblurred offset shadows. Because this widget is shared, it is a high-leverage consistency gap.
-- **Palette:** `AppTheme` uses yellow `#F7CB46`, cyan `#C0F7FE`, green `#99E885` and warm yellow `#FFDC8B`, but its pink is `#FE90E8` rather than the reference `#E9E0E8`; its light canvas is `#FFFDF2` rather than `#FCEFE8`. Some screen-specific colors remain hard-coded.
+- **Home:** the route now uses the bright reference palette for note cards in both brightness modes, black card keylines, and a cyan hard-shadow dock. Profile, search, filters and create actions remain connected. Side-by-side emulator comparison and narrow-screen visual QA remain.
+- **Tasks:** the route now includes the compact date strip, bright palette task rows, date-aware CRUD, completion filtering, note links and a local progress/calendar view. The monthly calendar and progress layout still need screenshot comparison and date-boundary interaction QA.
+- **Editor:** title/body autosave, Markdown preview/formatting, attachments, linked tasks, revisions, note colors, drawing and Trash remain connected. The app bar now groups secondary actions in an overflow menu and the Markdown toolbar uses cyan/yellow palette blocks with hard outlines. Narrow-screen screenshot and menu-action tests remain.
+- **Delete confirmation:** the route retains the dark background, brand mark, editorial heading, coral destructive action and keep-note action. Its custom painter now draws mirrored yellow hands around a white tangled cable. The drawing is source-level reference work; screenshot comparison remains outstanding.
+- **Shared secondary-screen hero:** FeatureHero now uses a flat sunflower-yellow block, cyan outlined icon tile, 2.5px black keyline and zero-blur offset shadow. Templates and Trash now use it; Protector uses the same palette/block language. Routes with custom writing or dashboard layouts still require individual review.
+- **Palette:** AppTheme now exposes the reference values: yellow #F7CB46, cyan #C0F7FE, green #99E885, pink #E9E0E8, cream canvas #FCEFE8, warm cream #FFDC8B, and black ink. Screen-specific colors remain in a few custom layouts and must be audited.
 - No Android emulator or physical-device screenshots were captured during this review. Pixel-identical replication is not claimed.
 
 ### Routed-screen status inventory
@@ -112,19 +112,19 @@ All 19 GoRouter destinations in `lib/app/router.dart` were enumerated. A route e
 |---|---|---|
 | Splash | Partial | Startup/branding route exists; first-run, contrast and screenshot QA remain |
 | Home | Partial | Note stream, filters, profile, actions and dock exist; responsive widget test is pending CI verification |
-| Editor | Partial | Autosave, Markdown, attachments, task/history/drawing/color/trash actions exist; full interaction and recovery acceptance remains |
+| Editor | Partial | Autosave, Markdown, attachments and all note actions remain connected; overflow menu and toolbar were redesigned; narrow-screen/menu interaction tests remain |
 | Tasks | Partial | Local CRUD, due date, priority, completion, linked notes and progress view exist; end-to-end widget workflow test is pending |
-| Delete confirmation | Partial | Confirm/cancel route exists; supplied illustration is not yet reproduced |
+| Delete confirmation | Partial | Confirm/cancel route and custom two-hand/cable painter exist; emulator screenshot comparison and route test remain |
 | Drawing | Partial | PNG attachment flow exists; save/error/undo/redo/clear and backup lifecycle need complete tests |
 | Quick Capture | Partial | Draft restore and local save exist; save/draft race and route tests are pending |
 | Search | Partial | Local FTS5 note/task search and category/tag filters exist; empty/error/open-result widget coverage remains |
 | Tags | Partial | Local create/rename/delete exists; assignment/filtering and widget persistence coverage remain |
-| Templates | Partial | Five built-ins and local custom templates exist; malformed preference and full CRUD acceptance remains |
+| Templates | Partial | Five built-ins and local custom templates exist; palette cards and FeatureHero added; malformed preference and full CRUD acceptance remains |
 | Archive tools | Partial | JSON and ZIP transfer paths exist; rollback/collision/missing-file acceptance remains |
 | Revision history | Partial | Local snapshots and restore exist; route/editor reload edge cases remain |
-| Trash | Partial | Restore/permanent-delete paths exist; attachment/revision cleanup and exclusion tests remain |
+| Trash | Partial | Restore/permanent-delete paths remain; FeatureHero and branded empty/list states added; attachment/revision cleanup tests remain |
 | Settings | Partial | Theme, AMOLED, accent, profile and organization routes exist; persistence/accessibility matrix remains |
-| App lock settings | Partial | PIN gate and secure storage exist; not encryption, no biometric unlock or recovery |
+| App lock settings | Partial | PIN gate remains; Protector panel and status rows now use reference palette; not encryption, no biometric unlock or recovery |
 | Insights | Partial | Local archive metrics exist; empty/populated and date-boundary UI tests remain |
 | Timeline | Partial | Local chronology and note navigation exist; boundary/empty-state tests remain |
 | Developer notebook | Partial | Local snippet create/open flow exists; complete edit/delete and empty/error acceptance remains |
@@ -147,3 +147,17 @@ Source-level updates on the existing feature branch:
 Verification limits:
 - Source changes are not device screenshot comparisons. The Home, Tasks, Editor and Delete Confirmation reference screenshots still need side-by-side emulator/device QA.
 - Regression tests remain manual-only until all routed UI work is complete. No Flutter test suite was run during this milestone.
+
+
+## UI integration pass — 2026-11-14
+
+The following source-level UI work is committed on the existing feature branch:
+- d19340bc40f7e7a67dbeaec9cc133472afca6c9e: Home, Tasks and Splash reference palette alignment.
+- 391f300dea5ccb946ad0be7f8a8867e1550052d9: Templates grid moved to palette blocks, black outlines and hard offset shadows; shared FeatureHero added.
+- 3e807f890f7d9bdc60b9a21a6b3666a3797e355e: Protector panel and status rows restyled while PIN/security behavior was preserved.
+- 8bd30621e932da821d613cc0a8e6600aec65c949: Trash empty/list states now use FeatureHero and the reference palette.
+- 00074681925072483ffa4e6c695fd8b97e338395: Delete confirmation painter now draws mirrored yellow hands and a white tangled cable.
+- d8ae881dd5cc347407d64b6c7bb170de0b08bfd0 and a6e7b60cbfc885bd68b9cb90caf8a9bc9f76e275: Editor actions grouped into an overflow menu; Markdown toolbar restyled with cyan/yellow blocks and hard outlines.
+- 604b1d98fc2e32d2c1485c882ce9fa1745847ebc: Dart formatter commit for the editor changes.
+
+No Flutter regression tests were run because the all-routes UI implementation gate remains open. Device screenshots and accessibility/text-scaling QA remain outstanding.

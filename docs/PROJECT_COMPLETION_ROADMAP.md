@@ -3,7 +3,8 @@
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
 Last reviewed: 2026-11-14  
-Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`\nLatest workflow-maintenance commit: `25cc51d38b4e04b4d5a6783fd39af033b1a87531`
+Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
+Latest source SHA reviewed: `604b1d98fc2e32d2c1485c882ce9fa1745847ebc`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -40,7 +41,7 @@ Artifact metadata step passed. APK archive is available from the run's Artifacts
 - [x] Android debug APK build and artifact upload passed on baseline SHA.
 - [ ] Investigate Drift multiple-database warnings and verify executor isolation.
 - [x] Upgrade workflow references: checkout v4→v5, setup-java v4→v6, upload-artifact v4→v6 (new versions still require validation on latest SHA).
-- [ ] Resolve shell portability warnings.
+- [x] Replace non-portable cp -n scaffold copying with copy_missing_tree using find -print0 and guarded cp -pP; Linux runner validation is still required.
 - [ ] Review Kotlin/Gradle plugin warnings and apply safe compatibility updates.
 - [ ] Repeat all required CI workflows on the final updated branch SHA.
 
@@ -323,3 +324,68 @@ Latest reviewed source head: `07ceaea7c7092e8617fbebffdd83eb706246de41`.
 - APK run `43571583939` stopped before Gradle because `tool/regenerate_platforms.sh` created the missing iOS scaffold before `flutter pub get`; Flutter then upgraded `analysis_options.yaml` to exclude the newly present platform directories. Code Check and Regression had not generated the same platform scaffold, so their working trees were not equivalent.
 - Corrective workflow change: all three workflows now run `bash tool/regenerate_platforms.sh` before `flutter pub get`; Regression and APK also run `dart format lib/core/database/database.g.dart` before comparing generated output. This makes platform files, Flutter's analyzer config migration and generated Drift formatting consistent across the three jobs.
 - The tests have still not run on a fully synchronized SHA after the widget-test harness changes. The next three runs must complete on one exact head; no skipped test step counts as success.
+
+
+## Current branch review — 2026-11-14
+
+### Exact source and CI state
+
+Latest branch head reviewed: 604b1d98fc2e32d2c1485c882ce9fa1745847ebc.
+
+| Workflow | Run / SHA | Result | Interpretation |
+|---|---|---|---|
+| Format Dart Sources | 43574945773 / parent c3630a3b1c23bd43c9e4319061415ffb4d0472e4 | PASS | Formatter committed two required Dart formatting changes as latest SHA 604b1d98fc2e32d2c1485c882ce9fa1745847ebc. |
+| Feature Branch - Code Check | 43574945899 / c3630a3b1c23bd43c9e4319061415ffb4d0472e4 | FAIL at format step | Build generation passed; format check found editor_screen.dart and markdown_toolbar.dart unformatted. Analyzer was skipped. |
+| Feature Branch - Android APK Artifact | 43574945830 / c3630a3b1c23bd43c9e4319061415ffb4d0472e4 | FAIL at format step | Native scaffolding, dependencies and generation passed; APK build and upload were skipped. |
+| Feature Branch - Regression Tests | Latest SHA | NOT RUN | Deliberately gated until all routed UI work is complete. |
+
+The latest formatter commit was created by the workflow bot and did not trigger downstream Code Check/APK workflows. Validation on the exact latest SHA is still required. No test pass or APK artifact is claimed for this source state.
+
+### Actionable warning review
+
+- Scaffold copy portability: source now uses guarded copy_missing_tree with find -print0 and cp -pP, preserving existing app files and avoiding cp -n. Awaiting runner execution on the latest SHA.
+- GitHub Actions runtimes: workflow references have been migrated to checkout v5, setup-java v6 and upload-artifact v6 where used. Latest-SHA validation and warning-log review remain pending.
+- Riverpod generator/analyzer compatibility: build_runner reports analyzer language version 3.4.0 against SDK language version 3.14.0 and recommends analyzer 14.7.0. Do not pin analyzer alone: current Riverpod generator/lint stack is older and may constrain analyzer. Review a compatible Riverpod generator, riverpod_lint, custom_lint and analyzer upgrade as one dependency set after UI completion.
+- Drift multiple-database warning: the full-backup test intentionally opens source and target databases with separate NativeDatabase.memory() executors and closes both in tearDown. This is a legitimate two-database restore test, not evidence of a shared executor. Confirm the remaining warning against a fresh regression log before changing lifecycle code.
+- Kotlin/Gradle warnings: no broad Gradle/Kotlin upgrade was made. Reassess only from the next successful APK log and resolved plugin versions.
+
+### Routed-screen implementation matrix
+
+Status reflects source review, not screenshot/device QA. A screen remains partial until its visible controls and persistence paths have focused tests.
+
+| Screen / route | Status | Evidence and remaining acceptance |
+|---|---|---|
+| Splash / | Partial | Branded cream/yellow entry; startup and first-run/device QA remain. |
+| Home /home | Partial | Profile, search, filters, note cards and dock; home_screen_test.dart covers phone sizes and light/dark rendering; screenshot and all-action tests remain. |
+| Editor /editor/:id | Partial | Autosave, Markdown toolbar, preview, attachment, linked tasks, revisions, color, drawing and Trash; editor/provider/toolbar tests exist; overflow actions and recovery edge cases remain. |
+| Tasks /tasks | Partial | Local CRUD, due dates, priority, linked notes, completion and progress/calendar view; DB and feature workflow tests exist; date/time boundary and complete UI interaction tests remain. |
+| Delete confirmation /delete/:id | Partial | Confirm/cancel plus two-hand/cable custom painter; route and destructive-flow tests remain. |
+| Drawing /drawing/:id | Partial | PNG attachment save and undo/redo/clear controls; drawing screen test exists; corrupt/missing attachment and file cleanup tests remain. |
+| Settings /settings | Partial | Theme, AMOLED, accent, profile, category/tag and archive links; theme/profile tests exist; full persistence/accessibility matrix remains. |
+| About /about | Implemented static | Static app/privacy/developer details; link and responsive visual QA remain. |
+| Trash /trash | Partial | Restore/permanent-delete DB operations; shared hero and branded empty/list states; attachment/revision cleanup tests remain. |
+| Templates /templates | Partial | Five built-ins and custom local templates; Neo-Brutalist palette cards/hero; custom preference corruption and create/use/delete widget tests remain. |
+| Quick Capture /capture | Partial | Local draft persistence and save/open-editor flow; feature workflow tests exist; process-restart and failure-path tests remain. |
+| Tags /tags | Partial | Local create/rename/delete; feature workflow test exists; note assignment/filtering and error tests remain. |
+| Revision History /history/:id | Partial | Drift snapshots and restore; DB/editor-provider tests exist; screen navigation and restore error tests remain. |
+| Search /search | Partial | FTS5 note/task search with category/tag metadata; search service tests exist; result opening, empty/error/loading widget tests remain. |
+| Protector /app-lock | Partial | Salted PIN hash, secure storage, cooldown and app gate; service/gate tests exist; biometric, PIN recovery and encryption are explicitly unavailable. |
+| Archive Tools /archive-tools | Partial | Versioned JSON transfer and ZIP backup/restore; service tests exist; full UI import/export and rollback acceptance remains. |
+| Insights /insights | Partial | Local note/task aggregates, duplicate title and broken wikilink checks; UI aggregate/date-boundary tests remain. |
+| Timeline /timeline | Partial | Local note/task chronology and editor navigation; empty/date ordering widget tests remain. |
+| Developer Notebook /developer-notebook | Partial | Snippet create/open using canonical note records; edit/delete and widget tests remain. |
+
+### UI milestone recorded in this review
+
+- [x] Shared FeatureHero is flat yellow with cyan icon tile, black keyline and hard offset shadow.
+- [x] Home, Tasks and Splash use the reference palette and preserve existing callbacks/navigation.
+- [x] Templates, Protector and Trash received a source-level Neo-Brutalist pass without changing their storage/service contracts.
+- [x] Delete confirmation now paints the two-hand/cable motif instead of generic symbols.
+- [x] Editor app-bar actions are grouped into an overflow menu; Markdown controls use the shared palette.
+- [ ] Compare all 19 routed screens against the supplied images on an Android emulator/phone; no pixel-identical claim until this is done.
+- [ ] Add focused tests for every new/changed visible control after UI implementation is complete.
+- [ ] Finish remaining screen-by-screen redesign and responsive/text-scale/focus/pressed-state QA.
+
+### Feature-level blockers
+
+AI, cloud sync, collaboration, OCR/PDF extraction, biometric unlock, PIN recovery, encrypted database/files, reminders, recurrence, calendar and habits remain NOT IMPLEMENTED/BLOCKED pending actual provider, platform capability, credentials, privacy design or product decisions. The local foundation must remain usable without those integrations.

@@ -2,7 +2,7 @@
 
 ## Current route inventory
 
-The current GoRouter configuration defines: `/` splash, `/home`, `/editor/:id`, `/drawing/:id`, `/settings`, `/about`, `/tasks` (optional `noteId` query), `/templates`, `/capture`, `/tags`, `/history/:id`, `/search`, `/app-lock` and `/archive-tools`.
+The current GoRouter configuration defines 19 destinations: `/` (Splash), `/home`, `/trash`, `/delete/:id`, `/editor/:id`, `/drawing/:id`, `/settings`, `/about`, `/tasks` (optional `noteId` query), `/templates`, `/capture`, `/tags`, `/history/:id`, `/search`, `/app-lock`, `/archive-tools`, `/insights`, `/timeline`, and `/developer-notebook`.
 
 ## Target primary destinations
 
@@ -21,4 +21,4 @@ Home; Notes; Search; Tasks; Archive; Projects/Workspace as they become functiona
 
 ## Current gap
 
-The router is a flat GoRouter list with no documented nested shell/navigation-state preservation or route-level authentication redirect. Add a ShellRoute only when the corresponding adaptive navigation UI is implemented and tested.
+The router is a flat GoRouter list with no nested shell/navigation-state preservation or route-level authentication redirect. The app lock gate is currently an app lifecycle gate rather than a route-level locked-note authorization system. Add a ShellRoute only when the corresponding adaptive navigation UI is implemented and tested. All 19 destinations require route-level loading/error/empty and back-stack acceptance; route existence alone is not completion.
