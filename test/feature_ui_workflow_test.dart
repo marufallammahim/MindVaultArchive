@@ -66,8 +66,8 @@ void main() {
       final preferences =
           await tester.runAsync(SharedPreferences.getInstance);
       return notes.length == 1 &&
-          preferences.getString('quick_capture_draft_title') == null &&
-          preferences.getString('quick_capture_draft_content') == null;
+          preferences?.getString('quick_capture_draft_title') == null &&
+          preferences?.getString('quick_capture_draft_content') == null;
     });
 
     final notes =
