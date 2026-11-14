@@ -248,3 +248,14 @@ Latest source head at investigation: `417d4a6d3a419e5e46120f6bd3198da861338b11`.
 - The APK log confirmed two portability warnings from `cp -Rn`: GNU `cp` warns that `-n` behavior is non-portable. `tool/regenerate_platforms.sh` is being changed to copy each missing scaffold file with an explicit existence check and portable `cp -pP`, preserving existing app files.
 - The same build log emitted `riverpod_generator`'s analyzer compatibility warning: analyzer `6.4.1` language version `3.4.0` versus Dart SDK language version `3.14.0`; locked `riverpod_generator` is `2.3.10`. Do not add analyzer `14.7.0` alone without checking generator/linter constraints. A coordinated dev-toolchain update needs its own compatibility review.
 - The APK job did not reach Gradle, so file_picker/share_plus Kotlin/Gradle warnings are not yet re-evaluated on this source head.
+
+
+## Flutter 3.50 generated configuration follow-up — 2026-11-14
+
+The failed Code Check log for run `43571130076` showed that `flutter pub get` explicitly printed `Upgrading analysis_options.yaml to exclude build and platform directories.` The resulting tracked-file change was therefore an expected Flutter SDK tooling migration, not an unexpected app-source edit. The generated-source diff also showed only `lib/core/database/database.g.dart`.
+
+The Code Check workflow is now scoped to allow and commit exactly:
+- `analysis_options.yaml` (Flutter's generated analyzer exclude configuration)
+- `lib/core/database/database.g.dart` (Drift binding regenerated from the locked `drift_dev 2.21.2`)
+
+Any other changed file still fails the scope guard. Regression and APK workflows now explicitly require the analyzer config and generated Drift binding to already be committed before running tests/build. The next Code Check run may create a generated-file commit; if it does, re-read the branch head and trigger a fresh three-workflow validation on that exact new SHA.

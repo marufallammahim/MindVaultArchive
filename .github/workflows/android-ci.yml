@@ -43,36 +43,39 @@ jobs:
       - name: Format generated Drift binding
         run: dart format lib/core/database/database.g.dart
 
-      - name: Verify generated source scope
+      - name: Verify generated/tooling change scope
         shell: bash
         run: |
           set -euo pipefail
           while IFS= read -r changed; do
             [[ -z "$changed" ]] && continue
-            if [[ "$changed" != "lib/core/database/database.g.dart" ]]; then
-              echo "::error::Unexpected generated-source change: $changed"
-              exit 1
-            fi
+            case "$changed" in
+              analysis_options.yaml|lib/core/database/database.g.dart) ;;
+              *)
+                echo "::error::Unexpected generated/tooling change: $changed"
+                exit 1
+                ;;
+            esac
           done < <(git diff --name-only)
 
-      - name: Commit regenerated Drift binding on branch pushes
+      - name: Commit generated source and Flutter analyzer config on branch pushes
         if: github.event_name != 'pull_request'
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet -- lib/core/database/database.g.dart; then
-            echo "Generated Drift binding is already current."
+          if git diff --quiet -- analysis_options.yaml lib/core/database/database.g.dart; then
+            echo "Generated Drift binding and analyzer configuration are already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lib/core/database/database.g.dart
-          git commit -m "build: regenerate Drift database bindings"
+          git add analysis_options.yaml lib/core/database/database.g.dart
+          git commit -m "build: refresh generated Drift and analyzer configuration"
           git push origin "HEAD:${GITHUB_REF_NAME}"
 
-      - name: Verify generated sources on pull requests
+      - name: Verify generated/tooling files on pull requests
         if: github.event_name == 'pull_request'
-        run: git diff --exit-code -- lib
+        run: git diff --exit-code -- analysis_options.yaml lib
 
       - name: Verify Dart formatting
         run: dart format --output=none --set-exit-if-changed lib test

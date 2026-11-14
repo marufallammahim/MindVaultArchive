@@ -36,6 +36,9 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
+      - name: Verify Flutter analyzer configuration is committed
+        run: git diff --exit-code -- analysis_options.yaml
+
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
