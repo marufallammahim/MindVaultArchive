@@ -32,11 +32,20 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.byTooltip('Save drawing'));
-    for (var attempt = 0; attempt < 10; attempt++) {
+    var errorVisible = false;
+    for (var attempt = 0; attempt < 20; attempt++) {
       await tester.pump(const Duration(milliseconds: 50));
+      if (find.textContaining('active note').evaluate().isNotEmpty) {
+        errorVisible = true;
+        break;
+      }
     }
 
-    expect(await database.select(database.notes).get(), isEmpty);
+    final notes =
+        await tester.runAsync(() => database.select(database.notes).get()) ??
+        <Note>[];
+    expect(notes, isEmpty);
+    expect(errorVisible, isTrue);
     expect(find.textContaining('active note'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
