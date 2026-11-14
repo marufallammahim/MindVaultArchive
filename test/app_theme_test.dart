@@ -23,7 +23,8 @@ void main() {
       expect(AppTheme.primary, const Color(0xFFF7CB46));
       expect(AppTheme.secondary, const Color(0xFFC0F7FE));
       expect(AppTheme.tertiary, const Color(0xFF99E885));
-      expect(AppTheme.pink, const Color(0xFFFE90E8));
+      expect(AppTheme.pink, const Color(0xFFE9E0E8));
+      expect(AppTheme.lightBackground, const Color(0xFFFCEFE8));
       expect(AppTheme.warmYellow, const Color(0xFFFFDC8B));
       expect(AppTheme.ink, const Color(0xFF000000));
     });

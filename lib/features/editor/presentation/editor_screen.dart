@@ -438,7 +438,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
                 PopupMenuItem(value: 0xFFC0F7FE, child: Text('Sky cyan')),
                 PopupMenuItem(value: 0xFF99E885, child: Text('Pixel green')),
-                PopupMenuItem(value: 0xFFFE90E8, child: Text('Bubblegum pink')),
+                PopupMenuItem(value: 0xFFE9E0E8, child: Text('Soft pink')),
                 PopupMenuItem(value: 0xFFFFDC8B, child: Text('Warm cream')),
               ],
             ),

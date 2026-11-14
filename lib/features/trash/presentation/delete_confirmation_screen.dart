@@ -1,10 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/app/branding_assets.dart';
+import 'package:mindvault_archive/app/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
 
-/// Full-screen, reference-inspired confirmation before moving a note to Trash.
+/// Reference-inspired confirmation before moving a note to Trash.
 class DeleteConfirmationScreen extends ConsumerWidget {
   const DeleteConfirmationScreen({super.key, required this.noteId});
 
@@ -23,11 +24,20 @@ class DeleteConfirmationScreen extends ConsumerWidget {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(
-                child: Text('Could not load note: ${snapshot.error}'),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    'Could not load note: ${snapshot.error}',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
               );
             }
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(color: AppTheme.primary),
+              );
             }
             final note = snapshot.data;
             if (note == null) {
@@ -47,26 +57,22 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                   ),
                   const Spacer(),
                   Container(
-                    width: 92,
-                    height: 92,
+                    width: 88,
+                    height: 88,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF263F9B), Color(0xFF7B43CE)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(27),
-                      border: Border.all(color: Colors.white24),
-                      boxShadow: [
+                      color: AppTheme.primary,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.ink, width: 2.5),
+                      boxShadow: const [
                         BoxShadow(
-                          color: const Color(0xFF6546D7).withValues(alpha: .28),
-                          blurRadius: 28,
-                          spreadRadius: 2,
+                          color: AppTheme.primary,
+                          offset: Offset(4, 4),
+                          blurRadius: 0,
                         ),
                       ],
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.all(9),
+                      padding: const EdgeInsets.all(7),
                       child: Image.memory(
                         BrandingAssets.appLogo,
                         fit: BoxFit.cover,
@@ -74,7 +80,7 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 34),
+                  const SizedBox(height: 28),
                   const Text(
                     'You sure\nabout this?',
                     textAlign: TextAlign.center,
@@ -92,7 +98,7 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                     'If you delete this note, fret not, you can still find it in the bin.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: .64),
+                      color: Colors.white.withValues(alpha: .78),
                       fontSize: 15,
                       height: 1.5,
                     ),
@@ -100,45 +106,44 @@ class DeleteConfirmationScreen extends ConsumerWidget {
                   const Spacer(),
                   Container(
                     width: 220,
-                    height: 150,
+                    height: 140,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF171719),
-                      borderRadius: BorderRadius.circular(34),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Icon(
-                          Icons.draw_rounded,
-                          size: 100,
-                          color: const Color(0xFFFFD65A).withValues(alpha: .18),
-                        ),
-                        const Icon(
-                          Icons.delete_sweep_rounded,
-                          size: 82,
-                          color: Color(0xFFFFB21D),
-                        ),
-                        Positioned(
-                          right: 32,
-                          top: 25,
-                          child: Icon(
-                            Icons.auto_awesome,
-                            color: Colors.white.withValues(alpha: .8),
-                            size: 20,
-                          ),
+                      color: const Color(0xFF181818),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.primary, width: 2),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: AppTheme.primary,
+                          offset: Offset(4, 4),
+                          blurRadius: 0,
                         ),
                       ],
                     ),
+                    child: const CustomPaint(painter: _DeleteCablePainter()),
                   ),
                   const Spacer(),
-                  SizedBox(
+                  Container(
                     width: double.infinity,
                     height: 58,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(7)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.ink,
+                          offset: Offset(4, 4),
+                          blurRadius: 0,
+                        ),
+                      ],
+                    ),
                     child: FilledButton.icon(
                       style: FilledButton.styleFrom(
                         backgroundColor: const Color(0xFFF27F80),
                         foregroundColor: const Color(0xFF251416),
-                        shape: const StadiumBorder(),
+                        elevation: 0,
+                        side: const BorderSide(color: AppTheme.ink, width: 2.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(7),
+                        ),
                       ),
                       onPressed: () => context.pop(true),
                       icon: const Icon(Icons.delete_outline_rounded),
@@ -176,9 +181,12 @@ class DeleteConfirmationScreen extends ConsumerWidget {
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.note_alt_outlined, size: 48),
+        const Icon(Icons.note_alt_outlined, size: 48, color: Colors.white),
         const SizedBox(height: 12),
-        const Text('This note is no longer available.'),
+        const Text(
+          'This note is no longer available.',
+          style: TextStyle(color: Colors.white),
+        ),
         TextButton(
           onPressed: () => context.pop(false),
           child: const Text('Go back'),
@@ -186,4 +194,80 @@ class DeleteConfirmationScreen extends ConsumerWidget {
       ],
     ),
   );
+}
+
+class _DeleteCablePainter extends CustomPainter {
+  const _DeleteCablePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.scale(size.width / 220, size.height / 140);
+
+    final outline = Paint()
+      ..color = AppTheme.ink
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final yellowFill = Paint()
+      ..color = AppTheme.primary
+      ..style = PaintingStyle.fill;
+    final yellowLine = Paint()
+      ..color = AppTheme.primary
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final cable = Path()
+      ..moveTo(118, 55)
+      ..cubicTo(139, 43, 145, 27, 166, 29)
+      ..cubicTo(184, 30, 190, 45, 183, 62);
+    canvas.drawPath(cable, outline);
+    canvas.drawPath(cable, yellowLine);
+
+    final plug = RRect.fromRectAndRadius(
+      const Rect.fromLTWH(104, 43, 25, 24),
+      const Radius.circular(5),
+    );
+    canvas.drawRRect(plug, yellowFill);
+    canvas.drawRRect(plug, outline);
+    canvas.drawLine(const Offset(110, 43), const Offset(110, 32), outline);
+    canvas.drawLine(const Offset(122, 43), const Offset(122, 32), outline);
+
+    final hand = Path()
+      ..moveTo(52, 118)
+      ..cubicTo(46, 107, 42, 92, 43, 81)
+      ..cubicTo(44, 72, 55, 70, 60, 80)
+      ..lineTo(63, 90)
+      ..lineTo(64, 55)
+      ..cubicTo(65, 42, 80, 42, 82, 55)
+      ..lineTo(82, 84)
+      ..lineTo(88, 47)
+      ..cubicTo(90, 34, 105, 37, 106, 50)
+      ..lineTo(103, 87)
+      ..lineTo(113, 62)
+      ..cubicTo(118, 51, 132, 57, 128, 70)
+      ..lineTo(116, 100)
+      ..cubicTo(112, 117, 96, 130, 78, 131)
+      ..cubicTo(67, 131, 58, 126, 52, 118)
+      ..close();
+    canvas.drawShadow(hand, Colors.black, 3, false);
+    canvas.drawPath(hand, yellowFill);
+    canvas.drawPath(hand, outline);
+
+    final sparkle = Paint()
+      ..color = AppTheme.primary
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(const Offset(158, 91), const Offset(158, 105), sparkle);
+    canvas.drawLine(const Offset(151, 98), const Offset(165, 98), sparkle);
+    canvas.drawLine(const Offset(190, 91), const Offset(190, 101), sparkle);
+    canvas.drawLine(const Offset(185, 96), const Offset(195, 96), sparkle);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _DeleteCablePainter oldDelegate) => false;
 }

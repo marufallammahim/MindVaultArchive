@@ -2,7 +2,7 @@
 
 ## Brand and tokens
 
-MindVault Archive follows the uploaded Neo-Brutalist references. The canonical palette is sunflower `#F7CB46`, sky cyan `#C0F7FE`, pixel green `#99E885`, bubblegum pink `#FE90E8`, warm cream `#FFDC8B`, cream canvas `#FFFDF2`, and black `#000000`. The accent provider persists a user-selected accent locally; the reference palette remains available in Settings and the editor.
+MindVault Archive follows the uploaded Neo-Brutalist references. The canonical palette is sunflower `#F7CB46`, sky cyan `#C0F7FE`, pixel green `#99E885`, soft pink `#E9E0E8`, warm cream `#FFDC8B`, cream canvas `#FCEFE8`, and black `#000000`. The accent provider persists a user-selected accent locally; the reference palette remains available in Settings and the editor.
 
 Shared Material 3 tokens define light, charcoal-dark and AMOLED themes. Major cards and controls use clear black outlines, compact geometry and flat fills. Home note cards and the bottom dock use hard, unblurred offset shadows. The editor retains a borderless writing surface and dotted canvas. Dark mode keeps readable foreground roles; pure-black AMOLED is optional.
 
@@ -38,6 +38,9 @@ Shared Material 3 tokens define light, charcoal-dark and AMOLED themes. Major ca
 - Editor word count, character count and estimated reading time.
 - Reference-aligned compactness and visual hierarchy refinements across the
   routed screens listed in `UI_FUNCTIONALITY_AUDIT.md`.
+- Shared `FeatureHero` uses a flat sunflower block, cyan icon tile, 2.5px dark
+  outline and hard unblurred shadow; Delete Confirmation uses a local vector
+  hand-and-cable illustration instead of generic delete/draw glyphs.
 
 ## Remaining UI/UX work
 

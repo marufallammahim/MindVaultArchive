@@ -4,10 +4,10 @@ import 'package:material_ui/material_ui.dart';
 class AppTheme {
   static const primary = Color(0xFFF7CB46);
   static const secondary = Color(0xFFC0F7FE);
-  static const pink = Color(0xFFFE90E8);
+  static const pink = Color(0xFFE9E0E8);
   static const warmYellow = Color(0xFFFFDC8B);
   static const tertiary = Color(0xFF99E885);
-  static const lightBackground = Color(0xFFFFFDF2);
+  static const lightBackground = Color(0xFFFCEFE8);
   static const lightSurface = Color(0xFFFFFEFA);
   static const darkBackground = Color(0xFF171512);
   static const darkSurface = Color(0xFF24211C);

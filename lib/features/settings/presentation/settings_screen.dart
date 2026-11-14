@@ -16,7 +16,7 @@ class SettingsScreen extends ConsumerWidget {
     Color(0xFFF7CB46),
     Color(0xFFC0F7FE),
     Color(0xFF99E885),
-    Color(0xFFFE90E8),
+    Color(0xFFE9E0E8),
     Color(0xFFFFDC8B),
     Color(0xFF000000),
   ];
