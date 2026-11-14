@@ -236,3 +236,15 @@ A new push after this change must produce all three required runs on the same SH
 ### Screen and feature acceptance state
 
 The detailed 19-route inventory and source-level visual gaps are recorded in `docs/UI_FUNCTIONALITY_AUDIT.md` (2026-11-14 reference review). All screens remain subject to visual QA; no pixel-identical claim is made. Local features remain partial until each action → provider/controller → service/repository → persistence path has success, error, edge-case and remount tests. External provider/platform features remain blocked as specified above.
+
+
+## CI follow-up — generated Drift binding and shell portability (2026-11-14)
+
+Latest source head at investigation: `417d4a6d3a419e5e46120f6bd3198da861338b11`.
+
+- Code Check run `43570818043` and Regression Tests run `43570818059` failed before formatting/analyzer/tests because `dart run build_runner build --delete-conflicting-outputs` regenerated only `lib/core/database/database.g.dart`. The GitHub job log's sole diff header was `diff --git a/lib/core/database/database.g.dart b/lib/core/database/database.g.dart`; the generated binding was stale relative to locked `drift_dev 2.21.2`. This is generated output, not a manually edited repository file.
+- Android APK run `43570818099` failed at the same generated-source check before Gradle build or artifact upload. No APK was produced for SHA `417d4a6`.
+- The Code Check workflow is being changed to format and commit only this one generated Drift binding on branch pushes, while rejecting any other generated-source mutation. Regression and APK workflows remain read-only and require the generated binding to be committed before they proceed. After the generated-file commit, create a new feature-branch commit to trigger all three checks on the new exact head; do not combine statuses from earlier SHAs.
+- The APK log confirmed two portability warnings from `cp -Rn`: GNU `cp` warns that `-n` behavior is non-portable. `tool/regenerate_platforms.sh` is being changed to copy each missing scaffold file with an explicit existence check and portable `cp -pP`, preserving existing app files.
+- The same build log emitted `riverpod_generator`'s analyzer compatibility warning: analyzer `6.4.1` language version `3.4.0` versus Dart SDK language version `3.14.0`; locked `riverpod_generator` is `2.3.10`. Do not add analyzer `14.7.0` alone without checking generator/linter constraints. A coordinated dev-toolchain update needs its own compatibility review.
+- The APK job did not reach Gradle, so file_picker/share_plus Kotlin/Gradle warnings are not yet re-evaluated on this source head.
