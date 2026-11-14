@@ -204,67 +204,83 @@ class _DeleteCablePainter extends CustomPainter {
     canvas.save();
     canvas.scale(size.width / 220, size.height / 140);
 
-    final outline = Paint()
+    final cableOutline = Paint()
       ..color = AppTheme.ink
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 7
+      ..strokeWidth = 6
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
-    final yellowFill = Paint()
+    final cable = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final tangledCable = Path()
+      ..moveTo(42, 91)
+      ..cubicTo(61, 72, 76, 55, 92, 65)
+      ..cubicTo(111, 77, 87, 91, 103, 103)
+      ..cubicTo(117, 114, 137, 95, 122, 79)
+      ..cubicTo(109, 65, 120, 49, 137, 55)
+      ..cubicTo(155, 62, 151, 84, 134, 91)
+      ..cubicTo(117, 98, 118, 114, 135, 120)
+      ..cubicTo(151, 126, 165, 109, 153, 97)
+      ..moveTo(71, 111)
+      ..cubicTo(84, 126, 103, 126, 113, 113)
+      ..cubicTo(125, 98, 145, 101, 151, 116)
+      ..moveTo(91, 54)
+      ..cubicTo(100, 37, 124, 35, 136, 47)
+      ..cubicTo(148, 59, 139, 70, 129, 73);
+    canvas.drawPath(tangledCable, cableOutline);
+    canvas.drawPath(tangledCable, cable);
+
+    final handOutline = Paint()
+      ..color = AppTheme.ink
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    final handFill = Paint()
       ..color = AppTheme.primary
       ..style = PaintingStyle.fill;
-    final yellowLine = Paint()
-      ..color = AppTheme.primary
+    final crease = Paint()
+      ..color = const Color(0xFF9A6A00)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final cable = Path()
-      ..moveTo(118, 55)
-      ..cubicTo(139, 43, 145, 27, 166, 29)
-      ..cubicTo(184, 30, 190, 45, 183, 62);
-    canvas.drawPath(cable, outline);
-    canvas.drawPath(cable, yellowLine);
-
-    final plug = RRect.fromRectAndRadius(
-      const Rect.fromLTWH(104, 43, 25, 24),
-      const Radius.circular(5),
-    );
-    canvas.drawRRect(plug, yellowFill);
-    canvas.drawRRect(plug, outline);
-    canvas.drawLine(const Offset(110, 43), const Offset(110, 32), outline);
-    canvas.drawLine(const Offset(122, 43), const Offset(122, 32), outline);
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
 
     final hand = Path()
-      ..moveTo(52, 118)
-      ..cubicTo(46, 107, 42, 92, 43, 81)
-      ..cubicTo(44, 72, 55, 70, 60, 80)
-      ..lineTo(63, 90)
-      ..lineTo(64, 55)
-      ..cubicTo(65, 42, 80, 42, 82, 55)
-      ..lineTo(82, 84)
-      ..lineTo(88, 47)
-      ..cubicTo(90, 34, 105, 37, 106, 50)
-      ..lineTo(103, 87)
-      ..lineTo(113, 62)
-      ..cubicTo(118, 51, 132, 57, 128, 70)
-      ..lineTo(116, 100)
-      ..cubicTo(112, 117, 96, 130, 78, 131)
-      ..cubicTo(67, 131, 58, 126, 52, 118)
+      ..moveTo(11, 118)
+      ..cubicTo(4, 111, 6, 99, 12, 91)
+      ..lineTo(30, 70)
+      ..cubicTo(37, 62, 47, 69, 42, 77)
+      ..lineTo(32, 90)
+      ..lineTo(54, 69)
+      ..cubicTo(62, 62, 71, 69, 64, 78)
+      ..lineTo(44, 99)
+      ..lineTo(67, 82)
+      ..cubicTo(76, 76, 85, 85, 77, 94)
+      ..lineTo(49, 119)
+      ..cubicTo(39, 129, 21, 128, 11, 118)
       ..close();
-    canvas.drawShadow(hand, Colors.black, 3, false);
-    canvas.drawPath(hand, yellowFill);
-    canvas.drawPath(hand, outline);
 
-    final sparkle = Paint()
-      ..color = AppTheme.primary
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(const Offset(158, 91), const Offset(158, 105), sparkle);
-    canvas.drawLine(const Offset(151, 98), const Offset(165, 98), sparkle);
-    canvas.drawLine(const Offset(190, 91), const Offset(190, 101), sparkle);
-    canvas.drawLine(const Offset(185, 96), const Offset(195, 96), sparkle);
+    void drawHand({required bool mirrored}) {
+      canvas.save();
+      if (mirrored) {
+        canvas.translate(220, 0);
+        canvas.scale(-1, 1);
+      }
+      canvas.drawShadow(hand, Colors.black, 3, false);
+      canvas.drawPath(hand, handFill);
+      canvas.drawPath(hand, handOutline);
+      canvas.drawLine(const Offset(28, 105), const Offset(43, 91), crease);
+      canvas.drawLine(const Offset(38, 113), const Offset(54, 99), crease);
+      canvas.restore();
+    }
+
+    drawHand(mirrored: false);
+    drawHand(mirrored: true);
     canvas.restore();
   }
 
