@@ -1,5 +1,7 @@
 import 'package:drift/drift.dart' hide Column;
 import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/theme.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
@@ -85,51 +87,57 @@ class TrashScreen extends ConsumerWidget {
           }
           final notes = snapshot.data!;
           if (notes.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.delete_outline_rounded,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'Trash is empty',
-                      style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+              children: const [
+                FeatureHero(
+                  icon: Icons.delete_outline_rounded,
+                  title: 'Trash is empty.',
+                  subtitle:
                       'Notes you move here can be restored or deleted forever.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                  compact: true,
                 ),
-              ),
+                SizedBox(height: 28),
+                Icon(
+                  Icons.delete_sweep_outlined,
+                  size: 64,
+                  color: AppTheme.primary,
+                ),
+                SizedBox(height: 12),
+                Center(
+                  child: Text(
+                    'Nothing to clean up right now.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
-            itemCount: notes.length,
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+            itemCount: notes.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              final note = notes[index];
+              if (index == 0) {
+                return const Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: FeatureHero(
+                    icon: Icons.delete_outline_rounded,
+                    title: 'Recently removed',
+                    subtitle:
+                        'Restore a note to your archive or remove it permanently.',
+                    compact: true,
+                  ),
+                );
+              }
+              final note = notes[index - 1];
               return Card(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .errorContainer,
-                      foregroundColor: Theme.of(context)
-                          .colorScheme
-                          .onErrorContainer,
+                      backgroundColor: AppTheme.pink,
+                      foregroundColor: AppTheme.ink,
                       child: const Icon(Icons.delete_outline_rounded),
                     ),
                     title: Text(
