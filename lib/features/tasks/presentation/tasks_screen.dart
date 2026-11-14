@@ -508,7 +508,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                             ),
                                           ),
                                           PopupMenuButton<String>(
-                                            icon: Icon(
+                                            icon: const Icon(
                                               Icons.more_horiz,
                                               color: foreground,
                                             ),
