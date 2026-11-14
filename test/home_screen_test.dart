@@ -16,7 +16,10 @@ void main() {
     tester,
   ) async {
     final database = AppDatabase(NativeDatabase.memory());
-    await database.saveNoteContent('home-note', 'Saved note', 'A saved body');
+    await tester.runAsync(() async {
+      await database.saveNoteContent('home-note', 'Saved note', 'A saved body');
+      return true;
+    });
 
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
