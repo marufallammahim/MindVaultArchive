@@ -375,7 +375,7 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                   borderRadius: BorderRadius.circular(7),
                   border: Border.all(color: AppTheme.ink, width: 2),
                 ),
-                child: Row(
+                child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(Icons.info_outline_rounded, color: AppTheme.ink),
