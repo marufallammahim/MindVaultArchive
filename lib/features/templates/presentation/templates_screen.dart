@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/theme.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -314,19 +316,12 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'A good start, every time.',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.7,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Choose a structure and turn it into an editable note.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                  const FeatureHero(
+                    icon: Icons.auto_awesome_rounded,
+                    title: 'A good start, every time.',
+                    subtitle:
+                        'Choose a structure and turn it into an editable note.',
+                    compact: true,
                   ),
                   const SizedBox(height: 18),
                   TextField(
@@ -390,21 +385,32 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                     ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final item = filtered[index];
-                      final colors = [
-                        const Color(0xFFE97855),
-                        const Color(0xFFA8D76D),
-                        const Color(0xFF4D91F0),
-                        const Color(0xFFE5C45B),
-                        const Color(0xFFB28ADD),
+                      const colors = [
+                        AppTheme.primary,
+                        AppTheme.pink,
+                        AppTheme.secondary,
+                        AppTheme.tertiary,
+                        AppTheme.warmYellow,
                       ];
                       final color = colors[index % colors.length];
-                      return Material(
-                        color: Theme.of(context).brightness == Brightness.dark
-                            ? const Color(0xFF171719)
-                            : Theme.of(context).colorScheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(24),
-                        clipBehavior: Clip.antiAlias,
-                        child: InkWell(
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: AppTheme.ink,
+                          borderRadius: BorderRadius.circular(7),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppTheme.ink,
+                              offset: Offset(4, 4),
+                              blurRadius: 0,
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(2.5),
+                        child: Material(
+                          color: color,
+                          borderRadius: BorderRadius.circular(5),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
                           onTap: () => _createFromTemplate(item),
                           child: Padding(
                             padding: const EdgeInsets.all(15),
@@ -417,10 +423,17 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                       width: 42,
                                       height: 42,
                                       decoration: BoxDecoration(
-                                        color: color.withValues(alpha: 0.17),
-                                        borderRadius: BorderRadius.circular(14),
+                                        color: AppTheme.secondary,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: AppTheme.ink,
+                                          width: 2,
+                                        ),
                                       ),
-                                      child: Icon(item.icon, color: color),
+                                      child: const Icon(
+                                        Icons.auto_awesome_rounded,
+                                        color: AppTheme.ink,
+                                      ),
                                     ),
                                     const Spacer(),
                                     if (item.isCustom)
@@ -447,6 +460,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.titleMedium
                                       ?.copyWith(
+                                        color: AppTheme.ink,
                                         fontWeight: FontWeight.w900,
                                         height: 1.1,
                                       ),
@@ -458,9 +472,9 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                   overflow: TextOverflow.ellipsis,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
+                                        color: AppTheme.ink.withValues(
+                                          alpha: 0.72,
+                                        ),
                                       ),
                                 ),
                                 const SizedBox(height: 12),
@@ -469,7 +483,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                     Text(
                                       'Use template',
                                       style: TextStyle(
-                                        color: accent,
+                                        color: AppTheme.ink,
                                         fontWeight: FontWeight.w800,
                                         fontSize: 12,
                                       ),
@@ -478,7 +492,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                     Icon(
                                       Icons.arrow_outward_rounded,
                                       size: 17,
-                                      color: accent,
+                                      color: AppTheme.ink,
                                     ),
                                   ],
                                 ),
@@ -486,6 +500,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                             ),
                           ),
                         ),
+                      ),
                       );
                     }, childCount: filtered.length),
                   );
