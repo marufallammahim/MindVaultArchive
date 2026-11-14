@@ -18,8 +18,10 @@ Future<void> _pumpUntil(
   int attempts = 40,
 }) async {
   for (var attempt = 0; attempt < attempts; attempt++) {
-    if (await condition()) return;
+    // Advance the fake clock before awaiting database/plugin futures. This
+    // lets queued frame work and stream notifications make progress.
     await tester.pump(const Duration(milliseconds: 50));
+    if (await condition()) return;
   }
   fail('Timed out waiting for the widget workflow to complete.');
 }
@@ -58,8 +60,11 @@ void main() {
     );
     await tester.tap(find.text('Save'));
     await _pumpUntil(tester, () async {
-      final notes = await database.select(database.notes).get();
-      final preferences = await SharedPreferences.getInstance();
+      final notes =
+          await tester.runAsync(() => database.select(database.notes).get()) ??
+          <Note>[];
+      final preferences =
+          await tester.runAsync(SharedPreferences.getInstance);
       return notes.length == 1 &&
           preferences.getString('quick_capture_draft_title') == null &&
           preferences.getString('quick_capture_draft_content') == null;
@@ -117,7 +122,9 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), 'Captured body');
     await tester.tap(find.text('Save and continue editing'));
     await _pumpUntil(tester, () async {
-      final notes = await database.select(database.notes).get();
+      final notes =
+          await tester.runAsync(() => database.select(database.notes).get()) ??
+          <Note>[];
       return notes.length == 1 &&
           find.text('Create a Note').evaluate().isNotEmpty;
     });
@@ -198,10 +205,15 @@ void main() {
     await tester.tap(find.text('Save'));
     await _pumpUntil(tester, () async {
       await tester.pump(const Duration(milliseconds: 50));
-      return (await database.select(database.tags).get()).length == 1;
+      final tags =
+          await tester.runAsync(() => database.select(database.tags).get());
+      return tags?.length == 1;
     });
 
-    final tags = await database.select(database.tags).get();
+    await tester.pump();
+    final tags =
+        await tester.runAsync(() => database.select(database.tags).get()) ??
+        <Tag>[];
     expect(tags, hasLength(1));
     expect(tags.single.name, 'Research');
     expect(find.text('Research'), findsOneWidget);
@@ -236,10 +248,15 @@ void main() {
     await tester.tap(find.text('Save'));
     await _pumpUntil(tester, () async {
       await tester.pump(const Duration(milliseconds: 50));
-      return (await database.select(database.tasks).get()).length == 1;
+      final tasks =
+          await tester.runAsync(() => database.select(database.tasks).get());
+      return tasks?.length == 1;
     });
 
-    final tasks = await database.select(database.tasks).get();
+    await tester.pump();
+    final tasks =
+        await tester.runAsync(() => database.select(database.tasks).get()) ??
+        <VaultTask>[];
     expect(tasks, hasLength(1));
     expect(tasks.single.title, 'Test task');
     expect(find.text('Test task'), findsOneWidget);
@@ -252,15 +269,19 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), 'Updated details');
     await tester.tap(find.text('Save'));
     await _pumpUntil(tester, () async {
-      final updated = await database.select(database.tasks).getSingle();
-      return updated.title == 'Updated task' &&
+      final updated = await tester.runAsync(
+        () => database.select(database.tasks).getSingle(),
+      );
+      return updated?.title == 'Updated task' &&
           updated.details == 'Updated details';
     });
 
     await tester.tap(find.byTooltip('Mark complete'));
     await _pumpUntil(tester, () async {
-      final updated = await database.select(database.tasks).getSingle();
-      return updated.isCompleted;
+      final updated = await tester.runAsync(
+        () => database.select(database.tasks).getSingle(),
+      );
+      return updated?.isCompleted == true;
     });
     await tester.tap(find.text('Done'));
     await tester.pump(const Duration(milliseconds: 100));
