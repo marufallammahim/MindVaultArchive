@@ -134,10 +134,10 @@ class TrashScreen extends ConsumerWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 5),
                   child: ListTile(
-                    leading: CircleAvatar(
+                    leading: const CircleAvatar(
                       backgroundColor: AppTheme.pink,
                       foregroundColor: AppTheme.ink,
-                      child: const Icon(Icons.delete_outline_rounded),
+                      child: Icon(Icons.delete_outline_rounded),
                     ),
                     title: Text(
                       note.title.trim().isEmpty ? 'Untitled note' : note.title,
