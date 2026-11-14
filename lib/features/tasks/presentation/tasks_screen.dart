@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:uuid/uuid.dart';
 
@@ -258,20 +259,19 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           .add(Duration(days: index - 3));
                       final selected = DateUtils.isSameDay(day, _selectedDay);
                       return InkWell(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(7),
                         onTap: () => setState(() => _selectedDay = day),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 160),
                           width: 48,
                           decoration: BoxDecoration(
-                            color: selected
-                                ? const Color(0xFFFFD65A)
-                                : const Color(0xFF1A1A1E),
-                            borderRadius: BorderRadius.circular(17),
+                            color: selected ? AppTheme.primary : const Color(0xFF1A1A1E),
+                            borderRadius: BorderRadius.circular(7),
                             border: Border.all(
                               color: selected
-                                  ? const Color(0xFFFFD65A)
-                                  : Colors.white.withValues(alpha: .08),
+                                  ? AppTheme.ink
+                                  : Colors.white.withValues(alpha: .18),
+                              width: selected ? 2.5 : 1,
                             ),
                           ),
                           child: Column(
@@ -376,12 +376,12 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                         );
                       }
                       final colors = [
-                        const Color(0xFFFF7A5E),
-                        const Color(0xFF8BCBFA),
-                        const Color(0xFFF18CB4),
-                        const Color(0xFFFFA36F),
-                        const Color(0xFF4D91F0),
-                        const Color(0xFFFFD65A),
+                        AppTheme.primary,
+                        AppTheme.secondary,
+                        AppTheme.pink,
+                        AppTheme.warmYellow,
+                        AppTheme.tertiary,
+                        AppTheme.lightBackground,
                       ];
                       return ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
@@ -395,14 +395,24 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                               DateUtils.dateOnly(item.dueAt!)
                                   .isBefore(DateUtils.dateOnly(DateTime.now()));
                           final color = colors[index % colors.length];
-                          final foreground = color.computeLuminance() > 0.48
-                              ? const Color(0xFF171717)
-                              : Colors.white;
-                          return Material(
-                            color: color,
-                            borderRadius: BorderRadius.circular(19),
-                            clipBehavior: Clip.antiAlias,
-                            child: InkWell(
+                          const foreground = AppTheme.ink;
+                          return Container(
+                            decoration: const BoxDecoration(
+                              color: AppTheme.ink,
+                              borderRadius: BorderRadius.all(Radius.circular(7)),
+                            ),
+                            padding: const EdgeInsets.only(right: 4, bottom: 4),
+                            child: Material(
+                              color: color,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                side: const BorderSide(
+                                  color: AppTheme.ink,
+                                  width: 2.5,
+                                ),
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: InkWell(
                               onTap: () => _editTask(task: item),
                               child: Padding(
                                 padding: const EdgeInsets.fromLTRB(
@@ -461,10 +471,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                                 ),
                                               if (item.dueAt != null)
                                                 _taskPill(
-                                                  overdue
-                                                      ? Colors.white
-                                                      : foreground,
-                                                  'Due ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                                  foreground,
+                                                  '${overdue ? 'Overdue' : 'Due'} ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
                                                 ),
                                             ],
                                           ),
@@ -522,6 +530,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                                   ],
                                 ),
                               ),
+                              ),
                             ),
                           );
                         },
@@ -537,14 +546,14 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           height: 66,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
-            color: const Color(0xFF171719).withValues(alpha: 0.97),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
-            boxShadow: [
+            color: AppTheme.secondary,
+            borderRadius: BorderRadius.circular(7),
+            border: Border.all(color: AppTheme.ink, width: 2.5),
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.32),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
+                color: AppTheme.ink,
+                blurRadius: 0,
+                offset: Offset(5, 5),
               ),
             ],
           ),
@@ -554,7 +563,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                 Icons.home_rounded,
                 'Home',
                 false,
-                () => Navigator.of(context).pop(),
+                () => context.go('/home'),
               ),
               _taskDockItem(
                 Icons.checklist_rounded,
@@ -630,9 +639,16 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             Container(
               padding: const EdgeInsets.all(17),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1E),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white.withValues(alpha: .07)),
+                color: AppTheme.primary,
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(color: AppTheme.ink, width: 2.5),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppTheme.ink,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,8 +677,8 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 9,
-                      backgroundColor: Colors.white12,
-                      color: const Color(0xFFFFD65A),
+                      backgroundColor: AppTheme.ink.withValues(alpha: .14),
+                      color: AppTheme.secondary,
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -695,8 +711,16 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF171719),
-                borderRadius: BorderRadius.circular(24),
+                color: AppTheme.secondary,
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(color: AppTheme.ink, width: 2.5),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppTheme.ink,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
+                ],
               ),
               child: CalendarDatePicker(
                 initialDate: _selectedDay,
@@ -710,8 +734,16 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
             Container(
               padding: const EdgeInsets.all(17),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFD65A),
-                borderRadius: BorderRadius.circular(20),
+                color: AppTheme.tertiary,
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(color: AppTheme.ink, width: 2.5),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppTheme.ink,
+                    offset: Offset(4, 4),
+                    blurRadius: 0,
+                  ),
+                ],
               ),
               child: Row(
                 children: [
@@ -762,7 +794,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
       Text(
         label,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: .58),
+          color: AppTheme.ink.withValues(alpha: .7),
           fontSize: 11,
         ),
       ),
@@ -775,18 +807,19 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
     bool selected,
     VoidCallback onTap,
   ) {
-    final foreground = selected
-        ? const Color(0xFF171719)
-        : Colors.white.withValues(alpha: 0.68);
+    const foreground = AppTheme.ink;
     return Expanded(
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(5),
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFFFFD65A) : Colors.transparent,
-            borderRadius: BorderRadius.circular(17),
+            color: selected ? AppTheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(5),
+            border: selected
+                ? Border.all(color: AppTheme.ink, width: 2)
+                : null,
           ),
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
@@ -811,8 +844,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
 
   Widget _taskPill(Color foreground, String label) => DecoratedBox(
     decoration: BoxDecoration(
-      color: foreground.withValues(alpha: 0.14),
-      borderRadius: BorderRadius.circular(30),
+      color: foreground.withValues(alpha: 0.12),
+      borderRadius: BorderRadius.circular(4),
+      border: Border.all(color: AppTheme.ink, width: 1),
     ),
     child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),

@@ -48,7 +48,11 @@ class FeatureHero extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: AppTheme.ink, width: 2),
             ),
-            child: Icon(icon, color: AppTheme.ink, size: compact ? 22 : 25),
+            child: Icon(
+              icon,
+              color: AppTheme.ink,
+              size: compact ? 22 : 25,
+            ),
           ),
           const SizedBox(width: 13),
           Expanded(

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:material_ui/material_ui.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/branding_assets.dart';
+import 'package:mindvault_archive/app/theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -55,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFFCEFE8),
+    backgroundColor: AppTheme.lightBackground,
     body: Center(
       child: FadeTransition(
         opacity: _animation,
@@ -68,12 +69,14 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 184,
                 height: 184,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(38),
-                  boxShadow: [
+                  color: AppTheme.primary,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppTheme.ink, width: 2.5),
+                  boxShadow: const [
                     BoxShadow(
-                      color: const Color(0xFF478DFF).withValues(alpha: .24),
-                      blurRadius: 42,
-                      spreadRadius: 4,
+                      color: AppTheme.ink,
+                      offset: Offset(6, 6),
+                      blurRadius: 0,
                     ),
                   ],
                 ),

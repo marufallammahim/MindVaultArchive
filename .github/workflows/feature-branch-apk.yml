@@ -37,7 +37,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.50.0'
           cache: true
 
       - name: Generate missing native platform scaffolding
@@ -47,7 +47,7 @@ jobs:
         run: flutter pub get
 
       - name: Verify Flutter analyzer configuration is committed
-        run: git diff --exit-code -- analysis_options.yaml
+        run: git diff --exit-code -- analysis_options.yaml pubspec.lock
 
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
@@ -83,7 +83,7 @@ jobs:
       - name: Upload installable APK artifact
         uses: actions/upload-artifact@v6
         with:
-          name: MindVaultArchive-debug-${{ github.run_number }}
+          name: MindVaultArchive-debug-${{ github.run_number }}-${{ github.sha }}
           path: dist/*
           if-no-files-found: error
           retention-days: 30

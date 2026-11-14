@@ -131,3 +131,19 @@ All 19 GoRouter destinations in `lib/app/router.dart` were enumerated. A route e
 | About | Implemented static | Static information and links exist; shared visual/accessibility QA remains |
 
 External AI, cloud sync, collaboration, OCR/PDF indexing, biometrics, encrypted database storage, reminders, recurrence, calendar and habits remain not implemented or blocked by provider/platform/product decisions. No mock success state should be added for these features.
+
+
+## Home, Tasks and Splash reference alignment — 2026-11-14
+
+Source-level updates on the existing feature branch:
+- Home now uses the same bright yellow, soft-pink, cyan, green and cream note-card palette in dark and light modes. Note cards keep black outlines, and the bottom dock is a cyan flat block with a hard black shadow in both themes.
+- Home's selected Home dock item now navigates explicitly to `/home` instead of exposing an inert tap target.
+- Tasks now uses the reference palette for task rows, black keylines and compact square geometry. Date selection and task completion/edit/delete callbacks are preserved. The task dock now uses the shared cyan/yellow visual language and its Home action navigates to `/home`.
+- Task progress surfaces use flat palette blocks and hard unblurred shadows; due-date labels explicitly distinguish overdue tasks.
+- Splash now uses the canonical cream canvas and a flat sunflower logo frame with a dark outline and hard shadow instead of a blue blurred glow.
+- The feature APK artifact name now includes the run number and SHA only; it no longer includes the slash-containing branch name that GitHub rejects. The Flutter SDK is pinned to 3.50.0 for reproducible code-check and APK jobs.
+- The legacy `android-build.yml` workflow was restored to its original non-feature triggers. The dedicated `feature-branch-apk.yml` is the sole feature-branch debug APK workflow.
+
+Verification limits:
+- Source changes are not device screenshot comparisons. The Home, Tasks, Editor and Delete Confirmation reference screenshots still need side-by-side emulator/device QA.
+- Regression tests remain manual-only until all routed UI work is complete. No Flutter test suite was run during this milestone.

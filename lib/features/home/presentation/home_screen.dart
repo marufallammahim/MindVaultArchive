@@ -6,6 +6,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:uuid/uuid.dart';
 
@@ -397,22 +398,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, index) {
                         final note = notes[index];
-                        final colors =
-                            Theme.of(context).brightness == Brightness.dark
-                            ? const [
-                                Color(0xFF5A4717),
-                                Color(0xFF463D49),
-                                Color(0xFF21464B),
-                                Color(0xFF294B24),
-                                Color(0xFF49372C),
-                              ]
-                            : const [
-                                Color(0xFFF7CB46),
-                                Color(0xFFE9E0E8),
-                                Color(0xFFC0F7FE),
-                                Color(0xFF99E885),
-                                Color(0xFFFCEFE8),
-                              ];
+                        final colors = [
+                          AppTheme.primary,
+                          AppTheme.pink,
+                          AppTheme.secondary,
+                          AppTheme.tertiary,
+                          AppTheme.lightBackground,
+                        ];
                         final color = note.color == null
                             ? colors[index % colors.length]
                             : Color(note.color!);
@@ -433,8 +425,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.small(
-        backgroundColor: const Color(0xFFF7CB46),
-        foregroundColor: const Color(0xFF000000),
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.ink,
         onPressed: () => context.push('/editor/${const Uuid().v4()}'),
         child: const Icon(Icons.add_rounded, size: 25),
       ),
@@ -445,12 +437,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: 66,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
           decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark
-                ? Theme.of(context).colorScheme.surfaceContainer
-                : const Color(0xFFC0F7FE),
+            color: AppTheme.secondary,
             borderRadius: BorderRadius.circular(7),
             border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
+              color: AppTheme.ink,
               width: 2.5,
             ),
             boxShadow: const [
@@ -463,7 +453,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           child: Row(
             children: [
-              _dockItem(context, Icons.home_rounded, 'Home', true, () {}),
+              _dockItem(context, Icons.home_rounded, 'Home', true, () => context.go('/home')),
               _dockItem(
                 context,
                 Icons.checklist_rounded,
@@ -500,7 +490,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     VoidCallback onTap,
   ) {
     final scheme = Theme.of(context).colorScheme;
-    final foreground = selected ? scheme.onPrimary : scheme.onSurface;
+    final foreground = selected ? scheme.onPrimary : AppTheme.ink;
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.circular(4),
@@ -584,9 +574,7 @@ class _NoteCard extends StatelessWidget {
         ? const Color(0xFF000000)
         : const Color(0xFFFFFFFF);
     final words = RegExp(r'\S+').allMatches(note.documentContent).length;
-    final borderInk = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFF5F1EC)
-        : const Color(0xFF000000);
+    const borderInk = AppTheme.ink;
     return Container(
       decoration: BoxDecoration(
         color: borderInk,
