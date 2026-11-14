@@ -482,7 +482,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                         ),
                                   ),
                                   const SizedBox(height: 12),
-                                  Row(
+                                  const Row(
                                     children: [
                                       Text(
                                         'Use template',
