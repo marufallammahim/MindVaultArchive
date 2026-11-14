@@ -432,8 +432,8 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                             width: 2,
                                           ),
                                         ),
-                                        child: const Icon(
-                                          Icons.auto_awesome_rounded,
+                                        child: Icon(
+                                          item.icon,
                                           color: AppTheme.ink,
                                         ),
                                       ),
