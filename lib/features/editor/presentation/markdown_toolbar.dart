@@ -72,11 +72,7 @@ class MarkdownToolbar extends StatelessWidget {
         borderRadius: BorderRadius.circular(7),
         border: Border.all(color: AppTheme.ink, width: 2.5),
         boxShadow: const [
-          BoxShadow(
-            color: AppTheme.ink,
-            offset: Offset(4, 4),
-            blurRadius: 0,
-          ),
+          BoxShadow(color: AppTheme.ink, offset: Offset(4, 4), blurRadius: 0),
         ],
       ),
       child: SingleChildScrollView(

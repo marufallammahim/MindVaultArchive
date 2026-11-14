@@ -400,10 +400,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               tooltip: 'Note color',
               icon: const Icon(Icons.palette_outlined),
               onSelected: (value) async {
-                await ref.read(databaseProvider).setNoteColor(
-                  widget.noteId,
-                  value == -1 ? null : value,
-                );
+                await ref
+                    .read(databaseProvider)
+                    .setNoteColor(widget.noteId, value == -1 ? null : value);
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(value: -1, child: Text('Default color')),
@@ -452,14 +451,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   value: 'tasks',
                   child: Text('Tasks linked to this note'),
                 ),
-                PopupMenuItem(
-                  value: 'history',
-                  child: Text('Version history'),
-                ),
-                PopupMenuItem(
-                  value: 'draw',
-                  child: Text('Add drawing'),
-                ),
+                PopupMenuItem(value: 'history', child: Text('Version history')),
+                PopupMenuItem(value: 'draw', child: Text('Add drawing')),
                 PopupMenuItem(
                   value: 'trash',
                   child: Text('Move note to Trash'),
