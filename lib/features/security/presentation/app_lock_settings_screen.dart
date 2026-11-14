@@ -242,7 +242,7 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                           ),
                           child: Text(
                             enabled ? 'PROTECTED' : 'NOT ENABLED',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               letterSpacing: 1,
                               fontWeight: FontWeight.w900,
