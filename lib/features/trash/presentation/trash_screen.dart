@@ -124,8 +124,7 @@ class TrashScreen extends ConsumerWidget {
                   child: FeatureHero(
                     icon: Icons.delete_outline_rounded,
                     title: 'Recently removed',
-                    subtitle:
-                        'Restore a note to your archive or remove it permanently.',
+                    subtitle: 'Restore a note to your archive or remove it permanently.',
                     compact: true,
                   ),
                 );

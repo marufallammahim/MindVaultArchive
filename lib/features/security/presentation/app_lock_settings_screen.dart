@@ -269,10 +269,9 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                       enabled
                           ? 'A PIN is required by the app lock gate when the app is opened or resumed.'
                           : 'Set a six-digit PIN to prevent casual access when someone opens your app.',
-                      style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(
-                            color: AppTheme.ink.withValues(alpha: 0.78),
-                          ),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.ink.withValues(alpha: 0.78),
+                      ),
                     ),
                     const SizedBox(height: 18),
                     SizedBox(
@@ -379,18 +378,12 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.info_outline_rounded,
-                      color: AppTheme.ink,
-                    ),
+                    Icon(Icons.info_outline_rounded, color: AppTheme.ink),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Important: Protector is an app access screen, not vault encryption. Your local database and attachments are not encrypted by this feature. Keep your PIN safe; there is currently no PIN recovery option.',
-                        style: TextStyle(
-                          color: AppTheme.ink,
-                          height: 1.4,
-                        ),
+                        style: TextStyle(color: AppTheme.ink, height: 1.4),
                       ),
                     ),
                   ],

@@ -411,96 +411,100 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                           borderRadius: BorderRadius.circular(5),
                           clipBehavior: Clip.antiAlias,
                           child: InkWell(
-                          onTap: () => _createFromTemplate(item),
-                          child: Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 42,
-                                      height: 42,
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.secondary,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: AppTheme.ink,
-                                          width: 2,
-                                        ),
-                                      ),
-                                      child: const Icon(
-                                        Icons.auto_awesome_rounded,
-                                        color: AppTheme.ink,
-                                      ),
-                                    ),
-                                    const Spacer(),
-                                    if (item.isCustom)
-                                      PopupMenuButton<String>(
-                                        tooltip: 'Template actions',
-                                        onSelected: (value) {
-                                          if (value == 'delete') {
-                                            _deleteCustom(item);
-                                          }
-                                        },
-                                        itemBuilder: (_) => const [
-                                          PopupMenuItem(
-                                            value: 'delete',
-                                            child: Text('Delete'),
+                            onTap: () => _createFromTemplate(item),
+                            child: Padding(
+                              padding: const EdgeInsets.all(15),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 42,
+                                        height: 42,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.secondary,
+                                          borderRadius: BorderRadius.circular(
+                                            5,
                                           ),
-                                        ],
-                                      ),
-                                  ],
-                                ),
-                                const Spacer(),
-                                Text(
-                                  item.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.titleMedium
-                                      ?.copyWith(
-                                        color: AppTheme.ink,
-                                        fontWeight: FontWeight.w900,
-                                        height: 1.1,
-                                      ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  item.description,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: AppTheme.ink.withValues(
-                                          alpha: 0.72,
+                                          border: Border.all(
+                                            color: AppTheme.ink,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: const Icon(
+                                          Icons.auto_awesome_rounded,
+                                          color: AppTheme.ink,
                                         ),
                                       ),
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'Use template',
-                                      style: TextStyle(
-                                        color: AppTheme.ink,
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 12,
+                                      const Spacer(),
+                                      if (item.isCustom)
+                                        PopupMenuButton<String>(
+                                          tooltip: 'Template actions',
+                                          onSelected: (value) {
+                                            if (value == 'delete') {
+                                              _deleteCustom(item);
+                                            }
+                                          },
+                                          itemBuilder: (_) => const [
+                                            PopupMenuItem(
+                                              value: 'delete',
+                                              child: Text('Delete'),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
+                                  const Spacer(),
+                                  Text(
+                                    item.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          color: AppTheme.ink,
+                                          fontWeight: FontWeight.w900,
+                                          height: 1.1,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    item.description,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: AppTheme.ink.withValues(
+                                            alpha: 0.72,
+                                          ),
+                                        ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Use template',
+                                        style: TextStyle(
+                                          color: AppTheme.ink,
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                    ),
-                                    const Spacer(),
-                                    Icon(
-                                      Icons.arrow_outward_rounded,
-                                      size: 17,
-                                      color: AppTheme.ink,
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      const Spacer(),
+                                      Icon(
+                                        Icons.arrow_outward_rounded,
+                                        size: 17,
+                                        color: AppTheme.ink,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
                       );
                     }, childCount: filtered.length),
                   );
