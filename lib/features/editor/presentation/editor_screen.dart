@@ -274,7 +274,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   Future<void> _openHistory() async {
     final notifier = ref.read(editorProvider(widget.noteId).notifier);
     final saved = await notifier.forceSave();
-    if (!context.mounted) return;
+    if (!mounted) return;
     if (!saved) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -297,11 +297,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final saved = await ref
         .read(editorProvider(widget.noteId).notifier)
         .forceSave();
-    if (!context.mounted || !saved) return;
+    if (!mounted || !saved) return;
     final confirmed = await context.push<bool>('/delete/${widget.noteId}');
-    if (confirmed != true || !context.mounted) return;
+    if (confirmed != true || !mounted) return;
     await ref.read(databaseProvider).setDeleted(widget.noteId, true);
-    if (context.mounted) context.pop();
+    if (mounted) context.pop();
   }
 
   IconData _attachmentIcon(Attachment item) {
