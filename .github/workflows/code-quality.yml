@@ -36,11 +36,14 @@ jobs:
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Migrate to standalone Material UI
-        run: dart fix --apply --code=migrate_design_widgets
-
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Verify generated sources are committed
+        run: git diff --exit-code -- lib
+
+      - name: Verify Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Run all Flutter tests
         run: flutter test --concurrency=1 --reporter expanded

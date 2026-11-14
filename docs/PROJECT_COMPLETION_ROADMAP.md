@@ -2,7 +2,7 @@
 
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
-Last reviewed: 2026-11-13  
+Last reviewed: 2026-11-14  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`\nLatest workflow-maintenance commit: `25cc51d38b4e04b4d5a6783fd39af033b1a87531`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
@@ -172,3 +172,67 @@ Existing test files cover database CRUD/relations/revisions, task database opera
 - Inspect logs for uncaught widget exceptions, RenderFlex overflow, asynchronous errors, database warnings and plugin channel failures. Never suppress a warning or loosen an assertion to obtain a green run.
 - Keep emulator/physical-device acceptance as a separate required check. CI APK build success alone does not prove runtime behavior on a phone.
 - Any feature requiring a real backend, provider, permission or platform capability must be marked blocked/not implemented until that dependency exists; do not replace it with fake success.
+
+
+## Latest implementation and CI review — 2026-11-14
+
+### Reviewed branch and commits
+
+- Repository: `marufallammahim/MindVaultArchive`
+- Branch: `feature/ultimate-all-in-one-mindvault`
+- Source head before this workflow/roadmap synchronization: `1aaecefbf45ab9d9348ad804dc57c00b58050c03`
+- Pre-format test-fix source: `882c5d19e4b3cbee8ee58f21a554fb36f04f2d7a`
+- The Code Check workflow run `43570404964` completed successfully on `882c5d19`; `flutter analyze` reported `No issues found!`. Its format step changed `test/feature_ui_workflow_test.dart` and generated `lib/core/database/database.g.dart`, then committed those formatting changes as `1aaecefb`. Because the run created a new commit, it does not count as validation of `1aaecefb`.
+
+### Required workflow state
+
+| Workflow | Run | SHA | Result at review | Interpretation |
+|---|---:|---|---|---|
+| Feature Branch - Code Check | 43570404964 | 882c5d19 | PASS | Analyzer clean; formatter created a new commit, so rerun on the new head is required |
+| Feature Branch - Regression Tests | 43570405016 | 882c5d19 | IN PROGRESS | No pass/fail conclusion available at review; cannot count as success |
+| Feature Branch - Android APK Artifact | 43570405019 | 882c5d19 | IN PROGRESS | No artifact available for this run at review |
+| Previous Regression Tests | 43425554560 | d6349918 | CANCELLED | Four widget tests reached the 10-minute test timeout; later `!inTest` errors were cascade failures |
+| Previous Android APK Artifact | 43425554635 | d6349918 | PASS | Artifact `MindVaultArchive-debug-184`, 100,739,691 bytes; expires 2026-12-13. This is not the latest branch SHA |
+
+### Regression-test investigation
+
+Run `43425554560` logged:
+- Quick Capture local-save widget test: `TimeoutException after 0:10:00`.
+- Tasks create/update widget test: `TimeoutException after 0:10:00`.
+- Home responsive render widget test: `TimeoutException after 0:10:00`.
+- Drawing missing-note widget test: `TimeoutException after 0:10:00`.
+- Tags persistence test wrote one tag to the database, but asserted the stream-rendered label before pumping the updated widget frame.
+- The suite was cancelled at the 45-minute job limit. The follow-on `!inTest` assertions are consistent with a timed-out widget test leaving the binding active; they are not independent product failures.
+
+Changes made on the feature branch before the formatter commit:
+- Widget polling now pumps frames before awaiting conditions.
+- Database and SharedPreferences reads in the affected widget tests use `tester.runAsync` so real asynchronous executor/plugin work can complete outside the fake-async zone.
+- Home's initial database fixture and Drawing's persistence/error assertions were made explicitly bounded.
+- Tags now pumps the stream frame after the database write before asserting the rendered tag.
+
+These changes are diagnostic/remedial test-harness changes only. They are NOT accepted as fixes until the regression workflow passes on one exact latest SHA.
+
+### Workflow reproducibility correction
+
+The required workflows previously ran `dart fix --apply --code=migrate_design_widgets` in their working trees, while only Code Check could commit the resulting modifications. This meant Regression Tests and APK could validate a modified workspace rather than the exact checked-out commit. The Code Check workflow also auto-formatted and pushed a commit, which prevented the other workflows from automatically validating that new head.
+
+The workflow files are being changed to:
+- Make all required checks read-only (`contents: read`).
+- Remove the already-applied design migration from CI.
+- Verify generated Drift/Riverpod sources with `git diff --exit-code -- lib`.
+- Check formatting with `dart format --output=none --set-exit-if-changed lib test`.
+- Keep analysis, regression tests and APK build in their dedicated workflows.
+
+A new push after this change must produce all three required runs on the same SHA. No workflow result from a different SHA may be combined into a final pass.
+
+### Warning status
+
+- Drift multiple-`AppDatabase` warning: tests create separate `NativeDatabase.memory()` executors and close their instances in test teardown. Drift's current warning implementation increments a counter by database runtime type rather than comparing executor identity; therefore the warning alone does not prove executor sharing. Do not suppress it globally. Confirm all test teardown and executor lifecycles before deciding whether a narrowly scoped test-only setting is justified. Upstream implementation: https://github.com/simolus3/drift/blob/develop/drift/lib/src/runtime/api/db_base.dart
+- Riverpod generator warning on `test/feature_ui_workflow_test.dart`: still needs investigation.
+- Shell portability: `tool/regenerate_platforms.sh` still uses `cp -Rn`; replace only after validating a portable no-overwrite equivalent.
+- Kotlin/Gradle plugin warnings: inspect resolved `file_picker` and `share_plus` versions and AGP/Kotlin compatibility before any upgrade.
+- GitHub action references already use checkout v5, setup-java v6 and upload-artifact v6; confirm the next clean logs for any remaining Node runtime deprecation warnings.
+
+### Screen and feature acceptance state
+
+The detailed 19-route inventory and source-level visual gaps are recorded in `docs/UI_FUNCTIONALITY_AUDIT.md` (2026-11-14 reference review). All screens remain subject to visual QA; no pixel-identical claim is made. Local features remain partial until each action → provider/controller → service/repository → persistence path has success, error, edge-case and remount tests. External provider/platform features remain blocked as specified above.

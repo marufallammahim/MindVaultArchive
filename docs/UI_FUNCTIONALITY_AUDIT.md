@@ -1,4 +1,4 @@
-# UI and Functionality Audit — 2026-11-13
+# UI and Functionality Audit — 2026-11-14
 
 Branch: `feature/ultimate-all-in-one-mindvault`
 
@@ -82,3 +82,52 @@ Committed on `feature/ultimate-all-in-one-mindvault`:
 - No emulator/physical-device screenshot comparison was run, so exact pixel identity is not claimed.
 - This visual pass does not complete every feature in the master specification. AI, cloud sync and collaboration remain unimplemented without configured providers; notebooks/folders, OCR, reminders/recurrence, calendar/habits and advanced editor workflows remain partial or pending.
 - A complete feature-by-feature source audit and runtime acceptance pass is still required before release readiness can be claimed.
+
+
+## Reference archive review — 2026-11-14
+
+The supplied `Mind Vault UI.zip` was opened and inspected. It contains six files:
+- `Home Screen.jpg` (382×512): dark archive home with profile greeting, search/settings actions, category chips, bright colored note cards, add action and floating bottom dock.
+- `Note Editor, Main Editor.jpg` (512×382): split editor states with title/body, metadata chips, top actions and a compact formatting toolbar.
+- `to do list screen.jpg` (512×382): date selector, task list, calendar/progress view, colored task rows and bottom navigation.
+- `delete screen .jpg` (382×512): dark confirmation page, app mark, large editorial heading, yellow hand/cable illustration, coral destructive action and a keep-note action.
+- `app logo.jpg` (2048×2048) and `app in Animation logo.jpg` (512×512): supplied brand references.
+
+### Source-level visual gap findings
+
+These are code comparisons, not emulator screenshot measurements:
+- **Home:** the current route includes profile, search, category filters, colored note cards, a create action and a bottom dock. Its dark card palette is muted compared with the bright coral/green/yellow blocks in the reference; card/action spacing and typography still need emulator comparison.
+- **Tasks:** the route includes task CRUD, due dates, priorities, note links, completion and a progress view. The reference also emphasizes a compact date strip, monthly calendar and brightly colored task rows. The screen exists, but its full visual and interaction parity has not been screenshot-verified.
+- **Editor:** the route contains title/body editing, Markdown toolbar/preview, attachment actions, linked tasks, revision history, note color, drawing and trash navigation. It is functionally richer than the screenshot, but its toolbar density, control placement and narrow-screen behavior still need comparison.
+- **Delete confirmation:** the route has the dark background, brand mark, editorial heading and coral action. Its current purple logo frame and generic draw/delete icons are not the yellow hand-and-cable illustration in the reference; this remains a visible redesign gap.
+- **Shared secondary-screen hero:** `FeatureHero` currently uses a gradient, a 24px radius and a subtle accent border. That differs from the requested flat palette blocks, strong dark outlines and hard unblurred offset shadows. Because this widget is shared, it is a high-leverage consistency gap.
+- **Palette:** `AppTheme` uses yellow `#F7CB46`, cyan `#C0F7FE`, green `#99E885` and warm yellow `#FFDC8B`, but its pink is `#FE90E8` rather than the reference `#E9E0E8`; its light canvas is `#FFFDF2` rather than `#FCEFE8`. Some screen-specific colors remain hard-coded.
+- No Android emulator or physical-device screenshots were captured during this review. Pixel-identical replication is not claimed.
+
+### Routed-screen status inventory
+
+All 19 GoRouter destinations in `lib/app/router.dart` were enumerated. A route existing is not proof that its full workflow or reference styling is complete.
+
+| Screen | Current status | Evidence / remaining acceptance |
+|---|---|---|
+| Splash | Partial | Startup/branding route exists; first-run, contrast and screenshot QA remain |
+| Home | Partial | Note stream, filters, profile, actions and dock exist; responsive widget test is pending CI verification |
+| Editor | Partial | Autosave, Markdown, attachments, task/history/drawing/color/trash actions exist; full interaction and recovery acceptance remains |
+| Tasks | Partial | Local CRUD, due date, priority, completion, linked notes and progress view exist; end-to-end widget workflow test is pending |
+| Delete confirmation | Partial | Confirm/cancel route exists; supplied illustration is not yet reproduced |
+| Drawing | Partial | PNG attachment flow exists; save/error/undo/redo/clear and backup lifecycle need complete tests |
+| Quick Capture | Partial | Draft restore and local save exist; save/draft race and route tests are pending |
+| Search | Partial | Local FTS5 note/task search and category/tag filters exist; empty/error/open-result widget coverage remains |
+| Tags | Partial | Local create/rename/delete exists; assignment/filtering and widget persistence coverage remain |
+| Templates | Partial | Five built-ins and local custom templates exist; malformed preference and full CRUD acceptance remains |
+| Archive tools | Partial | JSON and ZIP transfer paths exist; rollback/collision/missing-file acceptance remains |
+| Revision history | Partial | Local snapshots and restore exist; route/editor reload edge cases remain |
+| Trash | Partial | Restore/permanent-delete paths exist; attachment/revision cleanup and exclusion tests remain |
+| Settings | Partial | Theme, AMOLED, accent, profile and organization routes exist; persistence/accessibility matrix remains |
+| App lock settings | Partial | PIN gate and secure storage exist; not encryption, no biometric unlock or recovery |
+| Insights | Partial | Local archive metrics exist; empty/populated and date-boundary UI tests remain |
+| Timeline | Partial | Local chronology and note navigation exist; boundary/empty-state tests remain |
+| Developer notebook | Partial | Local snippet create/open flow exists; complete edit/delete and empty/error acceptance remains |
+| About | Implemented static | Static information and links exist; shared visual/accessibility QA remains |
+
+External AI, cloud sync, collaboration, OCR/PDF indexing, biometrics, encrypted database storage, reminders, recurrence, calendar and habits remain not implemented or blocked by provider/platform/product decisions. No mock success state should be added for these features.
