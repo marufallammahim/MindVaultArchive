@@ -424,18 +424,23 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 switch (action) {
                   case 'share':
                     await _shareMarkdown();
+                    break;
                   case 'tasks':
                     if (context.mounted) {
                       context.push('/tasks?noteId=${widget.noteId}');
                     }
+                    break;
                   case 'history':
                     await _openHistory();
+                    break;
                   case 'trash':
                     await _moveToTrash();
+                    break;
                   case 'draw':
                     if (context.mounted) {
                       context.push('/drawing/${widget.noteId}');
                     }
+                    break;
                 }
               },
               itemBuilder: (context) => const [
@@ -461,7 +466,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
               ],
             ),
-          ],,
+          ],
         ),
         body: CustomPaint(
           painter: _PixelDotPainter(
