@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/theme.dart';
 
 /// Compact formatting controls for the live Markdown note editor.
 class MarkdownToolbar extends StatelessWidget {
@@ -45,13 +46,17 @@ class MarkdownToolbar extends StatelessWidget {
     IconData icon,
     VoidCallback action,
   ) {
-    final scheme = Theme.of(context).colorScheme;
     return IconButton(
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
-      style: IconButton.styleFrom(backgroundColor: scheme.surfaceContainerHigh),
+      style: IconButton.styleFrom(
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.ink,
+        side: const BorderSide(color: AppTheme.ink, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      ),
       onPressed: action,
-      icon: Icon(icon, color: scheme.onSurface),
+      icon: Icon(icon, color: AppTheme.ink),
     );
   }
 
@@ -63,12 +68,16 @@ class MarkdownToolbar extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-          width: 1.5,
-        ),
+        color: AppTheme.secondary,
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: AppTheme.ink, width: 2.5),
+        boxShadow: const [
+          BoxShadow(
+            color: AppTheme.ink,
+            offset: Offset(4, 4),
+            blurRadius: 0,
+          ),
+        ],
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
