@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
@@ -133,10 +134,11 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: scheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(13),
+              color: AppTheme.secondary,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: AppTheme.ink, width: 2),
             ),
-            child: Icon(icon, color: scheme.primary, size: 20),
+            child: Icon(icon, color: AppTheme.ink, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -192,12 +194,19 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(22),
-                decoration: BoxDecoration(
-                  color: scheme.primaryContainer.withValues(alpha: 0.42),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                    color: scheme.primary.withValues(alpha: 0.18),
+                decoration: const BoxDecoration(
+                  color: AppTheme.primary,
+                  borderRadius: BorderRadius.all(Radius.circular(7)),
+                  border: Border.fromBorderSide(
+                    BorderSide(color: AppTheme.ink, width: 2.5),
                   ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.ink,
+                      offset: Offset(4, 4),
+                      blurRadius: 0,
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,14 +217,15 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                           width: 54,
                           height: 54,
                           decoration: BoxDecoration(
-                            color: scheme.primary,
-                            borderRadius: BorderRadius.circular(19),
+                            color: AppTheme.secondary,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: AppTheme.ink, width: 2),
                           ),
                           child: Icon(
                             enabled
                                 ? Icons.shield_rounded
                                 : Icons.shield_outlined,
-                            color: scheme.onPrimary,
+                            color: AppTheme.ink,
                             size: 29,
                           ),
                         ),
@@ -226,10 +236,9 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                             vertical: 7,
                           ),
                           decoration: BoxDecoration(
-                            color: enabled
-                                ? Colors.green.withValues(alpha: 0.14)
-                                : scheme.surface.withValues(alpha: 0.65),
-                            borderRadius: BorderRadius.circular(30),
+                            color: enabled ? AppTheme.tertiary : AppTheme.pink,
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: AppTheme.ink, width: 1.5),
                           ),
                           child: Text(
                             enabled ? 'PROTECTED' : 'NOT ENABLED',
@@ -237,9 +246,7 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                               fontSize: 10,
                               letterSpacing: 1,
                               fontWeight: FontWeight.w900,
-                              color: enabled
-                                  ? Colors.green
-                                  : scheme.onSurfaceVariant,
+                              color: AppTheme.ink,
                             ),
                           ),
                         ),
@@ -254,6 +261,7 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                           ?.copyWith(
                             fontWeight: FontWeight.w900,
                             letterSpacing: -0.7,
+                            color: AppTheme.ink,
                           ),
                     ),
                     const SizedBox(height: 7),
@@ -262,7 +270,9 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                           ? 'A PIN is required by the app lock gate when the app is opened or resumed.'
                           : 'Set a six-digit PIN to prevent casual access when someone opens your app.',
                       style: Theme.of(context).textTheme.bodyMedium
-                          ?.copyWith(color: scheme.onSurfaceVariant),
+                          ?.copyWith(
+                            color: AppTheme.ink.withValues(alpha: 0.78),
+                          ),
                     ),
                     const SizedBox(height: 18),
                     SizedBox(
@@ -362,22 +372,23 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: scheme.errorContainer.withValues(alpha: 0.45),
-                  borderRadius: BorderRadius.circular(20),
+                  color: AppTheme.pink,
+                  borderRadius: BorderRadius.circular(7),
+                  border: Border.all(color: AppTheme.ink, width: 2),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(
                       Icons.info_outline_rounded,
-                      color: scheme.onErrorContainer,
+                      color: AppTheme.ink,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Important: Protector is an app access screen, not vault encryption. Your local database and attachments are not encrypted by this feature. Keep your PIN safe; there is currently no PIN recovery option.',
                         style: TextStyle(
-                          color: scheme.onErrorContainer,
+                          color: AppTheme.ink,
                           height: 1.4,
                         ),
                       ),
