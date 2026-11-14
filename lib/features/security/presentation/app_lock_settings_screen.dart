@@ -379,7 +379,7 @@ class _AppLockSettingsScreenState extends ConsumerState<AppLockSettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(Icons.info_outline_rounded, color: AppTheme.ink),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Important: Protector is an app access screen, not vault encryption. Your local database and attachments are not encrypted by this feature. Keep your PIN safe; there is currently no PIN recovery option.',
