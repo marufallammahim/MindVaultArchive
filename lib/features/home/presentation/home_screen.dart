@@ -439,10 +439,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           decoration: BoxDecoration(
             color: AppTheme.secondary,
             borderRadius: BorderRadius.circular(7),
-            border: Border.all(
-              color: AppTheme.ink,
-              width: 2.5,
-            ),
+            border: Border.all(color: AppTheme.ink, width: 2.5),
             boxShadow: const [
               BoxShadow(
                 color: Colors.black,
@@ -453,7 +450,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           child: Row(
             children: [
-              _dockItem(context, Icons.home_rounded, 'Home', true, () => context.go('/home')),
+              _dockItem(
+                context,
+                Icons.home_rounded,
+                'Home',
+                true,
+                () => context.go('/home'),
+              ),
               _dockItem(
                 context,
                 Icons.checklist_rounded,

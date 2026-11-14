@@ -31,11 +31,7 @@ class FeatureHero extends StatelessWidget {
         borderRadius: BorderRadius.circular(7),
         border: Border.all(color: AppTheme.ink, width: 2.5),
         boxShadow: const [
-          BoxShadow(
-            color: AppTheme.ink,
-            offset: Offset(4, 4),
-            blurRadius: 0,
-          ),
+          BoxShadow(color: AppTheme.ink, offset: Offset(4, 4), blurRadius: 0),
         ],
       ),
       child: Row(
@@ -48,11 +44,7 @@ class FeatureHero extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: AppTheme.ink, width: 2),
             ),
-            child: Icon(
-              icon,
-              color: AppTheme.ink,
-              size: compact ? 22 : 25,
-            ),
+            child: Icon(icon, color: AppTheme.ink, size: compact ? 22 : 25),
           ),
           const SizedBox(width: 13),
           Expanded(

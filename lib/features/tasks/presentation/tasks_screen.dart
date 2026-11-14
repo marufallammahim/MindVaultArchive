@@ -265,7 +265,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           duration: const Duration(milliseconds: 160),
                           width: 48,
                           decoration: BoxDecoration(
-                            color: selected ? AppTheme.primary : const Color(0xFF1A1A1E),
+                            color: selected
+                                ? AppTheme.primary
+                                : const Color(0xFF1A1A1E),
                             borderRadius: BorderRadius.circular(7),
                             border: Border.all(
                               color: selected
@@ -399,7 +401,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                           return Container(
                             decoration: const BoxDecoration(
                               color: AppTheme.ink,
-                              borderRadius: BorderRadius.all(Radius.circular(7)),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(7),
+                              ),
                             ),
                             padding: const EdgeInsets.only(right: 4, bottom: 4),
                             child: Material(
@@ -413,123 +417,124 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
                               ),
                               clipBehavior: Clip.antiAlias,
                               child: InkWell(
-                              onTap: () => _editTask(task: item),
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  14,
-                                  11,
-                                  10,
-                                  11,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item.title,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: foreground,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w900,
-                                              decoration: item.isCompleted
-                                                  ? TextDecoration.lineThrough
-                                                  : null,
-                                            ),
-                                          ),
-                                          if (item.details.isNotEmpty) ...[
-                                            const SizedBox(height: 5),
+                                onTap: () => _editTask(task: item),
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    14,
+                                    11,
+                                    10,
+                                    11,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
                                             Text(
-                                              item.details,
+                                              item.title,
                                               maxLines: 2,
                                               overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                color: foreground.withValues(
-                                                  alpha: 0.82,
-                                                ),
-                                                fontSize: 12,
+                                                color: foreground,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w900,
+                                                decoration: item.isCompleted
+                                                    ? TextDecoration.lineThrough
+                                                    : null,
                                               ),
                                             ),
-                                          ],
-                                          const SizedBox(height: 10),
-                                          Wrap(
-                                            spacing: 7,
-                                            runSpacing: 5,
-                                            children: [
-                                              _taskPill(
-                                                foreground,
-                                                _priorityLabel(item.priority),
+                                            if (item.details.isNotEmpty) ...[
+                                              const SizedBox(height: 5),
+                                              Text(
+                                                item.details,
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: foreground.withValues(
+                                                    alpha: 0.82,
+                                                  ),
+                                                  fontSize: 12,
+                                                ),
                                               ),
-                                              if (item.noteId != null)
+                                            ],
+                                            const SizedBox(height: 10),
+                                            Wrap(
+                                              spacing: 7,
+                                              runSpacing: 5,
+                                              children: [
                                                 _taskPill(
                                                   foreground,
-                                                  'Linked note',
+                                                  _priorityLabel(item.priority),
                                                 ),
-                                              if (item.dueAt != null)
-                                                _taskPill(
-                                                  foreground,
-                                                  '${overdue ? 'Overdue' : 'Due'} ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                                if (item.noteId != null)
+                                                  _taskPill(
+                                                    foreground,
+                                                    'Linked note',
+                                                  ),
+                                                if (item.dueAt != null)
+                                                  _taskPill(
+                                                    foreground,
+                                                    '${overdue ? 'Overdue' : 'Due'} ${MaterialLocalizations.of(context).formatShortDate(item.dueAt!)}',
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Column(
+                                        children: [
+                                          IconButton.filled(
+                                            style: IconButton.styleFrom(
+                                              backgroundColor: const Color(
+                                                0xFF171717,
+                                              ),
+                                              foregroundColor: Colors.white,
+                                            ),
+                                            tooltip: item.isCompleted
+                                                ? 'Mark incomplete'
+                                                : 'Mark complete',
+                                            onPressed: () =>
+                                                db.setTaskCompleted(
+                                                  item.id,
+                                                  !item.isCompleted,
                                                 ),
+                                            icon: Icon(
+                                              item.isCompleted
+                                                  ? Icons.check_rounded
+                                                  : Icons.circle_outlined,
+                                            ),
+                                          ),
+                                          PopupMenuButton<String>(
+                                            icon: Icon(
+                                              Icons.more_horiz,
+                                              color: foreground,
+                                            ),
+                                            onSelected: (action) async {
+                                              if (action == 'edit') {
+                                                await _editTask(task: item);
+                                              } else if (action == 'delete') {
+                                                await db.deleteTask(item.id);
+                                              }
+                                            },
+                                            itemBuilder: (_) => const [
+                                              PopupMenuItem(
+                                                value: 'edit',
+                                                child: Text('Edit'),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 'delete',
+                                                child: Text('Delete'),
+                                              ),
                                             ],
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Column(
-                                      children: [
-                                        IconButton.filled(
-                                          style: IconButton.styleFrom(
-                                            backgroundColor: const Color(
-                                              0xFF171717,
-                                            ),
-                                            foregroundColor: Colors.white,
-                                          ),
-                                          tooltip: item.isCompleted
-                                              ? 'Mark incomplete'
-                                              : 'Mark complete',
-                                          onPressed: () => db.setTaskCompleted(
-                                            item.id,
-                                            !item.isCompleted,
-                                          ),
-                                          icon: Icon(
-                                            item.isCompleted
-                                                ? Icons.check_rounded
-                                                : Icons.circle_outlined,
-                                          ),
-                                        ),
-                                        PopupMenuButton<String>(
-                                          icon: Icon(
-                                            Icons.more_horiz,
-                                            color: foreground,
-                                          ),
-                                          onSelected: (action) async {
-                                            if (action == 'edit') {
-                                              await _editTask(task: item);
-                                            } else if (action == 'delete') {
-                                              await db.deleteTask(item.id);
-                                            }
-                                          },
-                                          itemBuilder: (_) => const [
-                                            PopupMenuItem(
-                                              value: 'edit',
-                                              child: Text('Edit'),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 'delete',
-                                              child: Text('Delete'),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
                               ),
                             ),
                           );
@@ -817,9 +822,7 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
           decoration: BoxDecoration(
             color: selected ? AppTheme.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(5),
-            border: selected
-                ? Border.all(color: AppTheme.ink, width: 2)
-                : null,
+            border: selected ? Border.all(color: AppTheme.ink, width: 2) : null,
           ),
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Column(
