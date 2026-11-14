@@ -259,3 +259,56 @@ The Code Check workflow is now scoped to allow and commit exactly:
 - `lib/core/database/database.g.dart` (Drift binding regenerated from the locked `drift_dev 2.21.2`)
 
 Any other changed file still fails the scope guard. Regression and APK workflows now explicitly require the analyzer config and generated Drift binding to already be committed before running tests/build. The next Code Check run may create a generated-file commit; if it does, re-read the branch head and trigger a fresh three-workflow validation on that exact new SHA.
+
+
+## Screen dependency and acceptance map — 2026-11-14
+
+This map records the observed presentation-to-data dependencies. A route or provider reference alone is not acceptance evidence; each listed action still needs a passing success/failure/persistence test.
+
+| Screen | Status | UI/controller and navigation | Data/service dependency | Required acceptance evidence |
+|---|---|---|---|---|
+| Splash | Partial | Splash state and GoRouter navigation to Home | AnimationController; startup route | Cold start, first frame, reduced motion, no stuck splash |
+| Home | Partial | Home screen callbacks; routes to Search, Trash, Editor, Tasks, Insights, Settings | `databaseProvider` note/category streams; `userProfileProvider` profile preference | Empty/loading/error/populated; filters; note actions; responsive widths; theme modes |
+| Editor | Partial | Title/body controllers; Markdown toolbar/preview; task, drawing, history and trash routes | `databaseProvider` notes, revisions, tasks and attachment metadata; local file services | Autosave/reload/recovery; save-before-exit; formatting; attachment errors; all visible actions |
+| Tasks | Partial | Create/edit/delete/complete controls; linked-note navigation | `databaseProvider` tasks and notes | CRUD, priority, due date, invalid title, completed filter, remount persistence |
+| Delete confirmation | Partial | Confirm/cancel route from Trash | `databaseProvider` note/trash lifecycle | Confirm deletes only selected note; cancel preserves note; attachment/revision cleanup |
+| Drawing | Partial | Signature canvas and save/undo/redo/clear controls | `databaseProvider`; SignatureController; path_provider; PNG file I/O | Empty drawing; save; missing note; file-write failure; backup/restore bytes |
+| Quick Capture | Partial | Title/body input and save/open-editor navigation | SharedPreferences draft keys; `databaseProvider` note save | Title-only/body-only; empty validation; draft remount; clear only after successful save |
+| Search | Partial | Query field, result selection, task navigation | `ArchiveSearchService`; SQLite FTS5; `databaseProvider` tags/categories | Title/body/task/tag/category; empty/error; deleted exclusion; open correct result |
+| Tags | Partial | Create/rename/delete controls | `databaseProvider` tags and note-tag join table | Duplicate/empty names; assign/unassign; filter; delete safely; remount persistence |
+| Templates | Partial | Built-in/custom template selection and note creation | Local template preferences; `databaseProvider` note creation | Five built-ins; custom create/edit/delete; malformed preference recovery; exact starter content |
+| Archive tools | Partial | Import/export/backup/restore controls | ArchiveTransferService; FullBackupService; FilePicker; SharePlus; filesystem | JSON v1-v5 round-trip; ZIP hashes; collision/path traversal; missing attachment; rollback |
+| Revision history | Partial | Revision list and restore action | `databaseProvider` note_revisions and note content | Snapshot order/limit; restore and editor reload; deleted/missing note |
+| Trash | Partial | Restore/permanent-delete actions | `databaseProvider` notes, revisions and attachment metadata/files | Soft delete; restore; permanent-delete confirmation; related-file cleanup |
+| Settings | Partial | Theme/AMOLED/accent/profile/category/tag/archive/app-lock controls | themeModeProvider; amoledThemeProvider; accentColorProvider; userProfileProvider; `databaseProvider` | Preference persistence; invalid HEX; profile update; category/tag CRUD; navigation |
+| App lock settings | Partial | PIN enable/change/disable and gate | AppLockService; FlutterSecureStorage; app lifecycle | Enable/change/disable; invalid PIN; lockout; storage unavailable; resume behavior |
+| Insights | Partial | Metrics cards and local report views | `databaseProvider` note/task streams | Empty/populated counts; date boundaries; no duplicate counting |
+| Timeline | Partial | Chronology list and note navigation | `databaseProvider` note timestamps | Empty/populated; ordering; date boundaries; open selected note |
+| Developer notebook | Partial | Snippet create/open/editor navigation | `databaseProvider` local snippet/note data | Create/edit/delete; empty/error; persistence; open correct editor |
+| About | Implemented static | Static information and links | No mutable persistence dependency | Links work; text scaling; contrast; responsive layout |
+
+### External and platform boundaries
+
+- App lock is a local PIN access gate, not database/file encryption; biometric unlock and PIN recovery remain unavailable.
+- AI, cloud sync, collaboration, OCR/PDF indexing, calendar, reminders, recurrence and habits remain blocked until real providers, permissions, backend/authentication, privacy controls and product decisions exist.
+- No feature may display a success state for an unavailable external operation.
+
+## Latest generated-source milestone — 2026-11-14
+
+- Code Check run `43571321476` completed successfully on source SHA `f18e112075fa4c3083d120a03cff2cf495a19bc2`: Drift/Riverpod generation, generated-file formatting, scope guard, Dart formatting and `flutter analyze` all passed.
+- That run committed Flutter 3.50 analyzer configuration and the regenerated Drift binding in commit `218a05a5eb442387b0af182f8b091cd7a045c80e`. This new head is not yet validated by all three required workflows.
+- Regression run `43571320690` and APK run `43571320735` on `f18e1120` stopped before tests/build because Flutter's `flutter pub get` updated `analysis_options.yaml` while Code Check was generating the commit. They are not product test or Gradle failures.
+- The next push will trigger fresh Code Check, Regression Tests and Android APK Artifact runs on one exact head. Require all three to finish on that same SHA before claiming CI success.
+
+## Toolchain warning assessment
+
+- Flutter CI uses Flutter 3.50.0 / Dart 3.14.0. Locked versions include `file_picker 10.3.10`, `share_plus 10.1.4`, `riverpod_generator 2.3.10`, and `analyzer 6.4.1`.
+- The successful older APK log still reports app/plugin Kotlin Gradle Plugin usage from the app module, `file_picker` and `share_plus`. This is a future compatibility warning, not a current build failure. The app module still applies `kotlin-android`.
+- Flutter's built-in Kotlin migration requires Flutter 3.47+ for enabling the feature and requires every Android plugin to be compatible. `share_plus 13.3.1` documents built-in Kotlin support when enabled; `file_picker` 12.x moved to a federated Android plugin that reads the `android.builtInKotlin` flag. These newer majors also require Dart API migrations, so do not bump dependencies or AGP/Gradle in isolation. Review and test the coordinated upgrade after the current CI/test baseline is green:
+  - Flutter guide: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
+  - share_plus changelog: https://pub.dev/packages/share_plus/changelog
+  - file_picker changelog: https://pub.dev/packages/file_picker/changelog
+  - file_picker built-in Kotlin behavior in 12.x: https://github.com/vicajilau/flutter_file_picker/issues/2200
+- Riverpod generator still warns that analyzer 6.4.1 supports language version 3.4.0 while CI Dart SDK is 3.14.0. Do not add analyzer 14.7.0 alone until Riverpod generator/linter constraints are reviewed and a coordinated dev-toolchain update is tested.
+- The shell scaffold-copy helper now uses explicit no-overwrite checks and `cp -pP` instead of `cp -Rn`. A local shell simulation verified that existing app files are preserved, missing files copied and symlinks retained. The next APK workflow must confirm the actual scaffold path is warning-free.
+- No Node 20 deprecation message was found in the inspected logs. Checkout v5, setup-java v6 and upload-artifact v6 are in use; recheck future logs for transitive action warnings.
