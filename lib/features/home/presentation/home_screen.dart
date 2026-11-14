@@ -588,7 +588,7 @@ class _NoteCard extends StatelessWidget {
         color: color,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
-          side: BorderSide(color: borderInk, width: 2.5),
+          side: const BorderSide(color: borderInk, width: 2.5),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
