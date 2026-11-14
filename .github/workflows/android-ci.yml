@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: mindvault-check-${{ github.ref }}
@@ -26,12 +26,17 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
-          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.50.0'
           cache: true
 
       - name: Generate missing native platform scaffolding
@@ -43,42 +48,11 @@ jobs:
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Format generated Drift binding
+      - name: Normalize generated Drift binding
         run: dart format lib/core/database/database.g.dart
 
-      - name: Verify generated/tooling change scope
-        shell: bash
-        run: |
-          set -euo pipefail
-          while IFS= read -r changed; do
-            [[ -z "$changed" ]] && continue
-            case "$changed" in
-              analysis_options.yaml|lib/core/database/database.g.dart) ;;
-              *)
-                echo "::error::Unexpected generated/tooling change: $changed"
-                exit 1
-                ;;
-            esac
-          done < <(git diff --name-only)
-
-      - name: Commit generated source and Flutter analyzer config on branch pushes
-        if: github.event_name != 'pull_request'
-        shell: bash
-        run: |
-          set -euo pipefail
-          if git diff --quiet -- analysis_options.yaml lib/core/database/database.g.dart; then
-            echo "Generated Drift binding and analyzer configuration are already current."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add analysis_options.yaml lib/core/database/database.g.dart
-          git commit -m "build: refresh generated Drift and analyzer configuration"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-
-      - name: Verify generated/tooling files on pull requests
-        if: github.event_name == 'pull_request'
-        run: git diff --exit-code -- analysis_options.yaml lib
+      - name: Verify generated and dependency files are committed
+        run: git diff --exit-code -- analysis_options.yaml pubspec.lock lib
 
       - name: Verify Dart formatting
         run: dart format --output=none --set-exit-if-changed lib test
