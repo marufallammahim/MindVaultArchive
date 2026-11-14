@@ -492,7 +492,7 @@ class _TemplatesScreenState extends ConsumerState<TemplatesScreen> {
                                           fontSize: 12,
                                         ),
                                       ),
-                                      const Spacer(),
+                                      Spacer(),
                                       Icon(
                                         Icons.arrow_outward_rounded,
                                         size: 17,
