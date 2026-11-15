@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:material_ui/material_ui.dart';
@@ -204,97 +205,124 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             title: 'Your archive, protected',
             subtitle: 'Export, restore and move your local knowledge safely.',
           ),
-          const SizedBox(height: 22),
-          Text(
-            'Full device backup',
-            style: Theme.of(context).textTheme.titleLarge
-                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Create or restore a ZIP backup containing your archive data and '
-            'attachment files. Each attachment is checked with SHA-256 before '
-            'restore. Missing source files stop backup creation rather than '
-            'silently producing an incomplete archive.',
-          ),
-          const SizedBox(height: 12),
-          FilledButton.icon(
-            onPressed: _busy ? null : _exportFullBackup,
-            icon: const Icon(Icons.backup_outlined),
-            label: const Text('Create full ZIP backup'),
-          ),
-          OutlinedButton.icon(
-            onPressed: _busy ? null : _importFullBackup,
-            icon: const Icon(Icons.settings_backup_restore_outlined),
-            label: const Text('Restore full ZIP backup'),
-          ),
-          const Divider(height: 28),
-          Text(
-            'Portable JSON transfer',
-            style: Theme.of(context).textTheme.titleLarge
-                ?.copyWith(fontWeight: FontWeight.w800, letterSpacing: -0.4),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Export note, category, tag, task and revision data as versioned '
-            'JSON, or import a previous MindVault JSON archive. Import validates '
-            'the document before writing and protects existing records.',
-          ),
-          const SizedBox(height: 20),
-          FilledButton.icon(
-            onPressed: _busy ? null : _export,
-            icon: const Icon(Icons.file_upload_outlined),
-            label: const Text('Generate archive JSON'),
-          ),
-          if (_exportDocument != null) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
+          NeoBrutalistPanel(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                OutlinedButton.icon(
-                  onPressed: _busy ? null : _copyExport,
-                  icon: const Icon(Icons.copy),
-                  label: const Text('Copy JSON'),
+                Text('Full device backup',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900, letterSpacing: -0.4)),
+                const SizedBox(height: 8),
+                const Text(
+                  'Create or restore a ZIP backup containing your archive data and '
+                  'attachment files. Each attachment is checked with SHA-256 before '
+                  'restore. Missing source files stop backup creation rather than '
+                  'silently producing an incomplete archive.',
                 ),
+                const SizedBox(height: 14),
+                FilledButton.icon(
+                  onPressed: _busy ? null : _exportFullBackup,
+                  icon: const Icon(Icons.backup_outlined),
+                  label: const Text('Create full ZIP backup'),
+                ),
+                const SizedBox(height: 8),
                 OutlinedButton.icon(
-                  onPressed: _busy ? null : _shareExport,
-                  icon: const Icon(Icons.share_outlined),
-                  label: const Text('Share / Save JSON'),
+                  onPressed: _busy ? null : _importFullBackup,
+                  icon: const Icon(Icons.settings_backup_restore_outlined),
+                  label: const Text('Restore full ZIP backup'),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            SelectableText(_exportDocument!, maxLines: 12),
-          ],
-          const SizedBox(height: 28),
-          Text('Import archive', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          const Text(
-            'Paste the complete JSON document. Existing notes and tasks are never '
-            'overwritten. Categories and tags are matched by stable ID.',
           ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: _busy ? null : _pickImportFile,
-            icon: const Icon(Icons.folder_open_outlined),
-            label: const Text('Choose JSON file'),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _importController,
-            minLines: 6,
-            maxLines: 12,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'Paste MindVault archive JSON here',
+          const SizedBox(height: 18),
+          NeoBrutalistPanel(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Portable JSON transfer',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900, letterSpacing: -0.4)),
+                const SizedBox(height: 8),
+                const Text(
+                  'Export note, category, tag, task and revision data as versioned '
+                  'JSON, or import a previous MindVault JSON archive. Import validates '
+                  'the document before writing and protects existing records.',
+                ),
+                const SizedBox(height: 16),
+                FilledButton.icon(
+                  onPressed: _busy ? null : _export,
+                  icon: const Icon(Icons.file_upload_outlined),
+                  label: const Text('Generate archive JSON'),
+                ),
+                if (_exportDocument != null) ...[
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _busy ? null : _copyExport,
+                        icon: const Icon(Icons.copy),
+                        label: const Text('Copy JSON'),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: _busy ? null : _shareExport,
+                        icon: const Icon(Icons.share_outlined),
+                        label: const Text('Share / Save JSON'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  SelectableText(_exportDocument!, maxLines: 12),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          FilledButton.tonalIcon(
-            onPressed: _busy ? null : _import,
-            icon: const Icon(Icons.file_download_outlined),
-            label: const Text('Validate and import'),
+          const SizedBox(height: 18),
+          NeoBrutalistPanel(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Import archive',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900, letterSpacing: -0.4)),
+                const SizedBox(height: 8),
+                const Text(
+                  'Paste the complete JSON document. Existing notes and tasks are never '
+                  'overwritten. Categories and tags are matched by stable ID.',
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _busy ? null : _pickImportFile,
+                  icon: const Icon(Icons.folder_open_outlined),
+                  label: const Text('Choose JSON file'),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _importController,
+                  minLines: 6,
+                  maxLines: 12,
+                  decoration: const InputDecoration(
+                    hintText: 'Paste MindVault archive JSON here',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FilledButton.tonalIcon(
+                  onPressed: _busy ? null : _import,
+                  icon: const Icon(Icons.file_download_outlined),
+                  label: const Text('Validate and import'),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Format v5 includes notes, categories, tags, note-tag links, linked tasks and '
+                  'note revisions. JSON-only transfer does not contain attachment '
+                  'bytes; use the full ZIP backup above when you need media files.',
+                ),
+              ],
+            ),
           ),
           if (_busy) ...[
             const SizedBox(height: 16),

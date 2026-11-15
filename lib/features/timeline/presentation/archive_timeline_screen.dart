@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -61,15 +62,41 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                   ),
               ]..sort((a, b) => b.date.compareTo(a.date));
               if (entries.isEmpty) {
-                return const _TimelineMessage(
-                  'Your timeline will appear here as you create notes and tasks.',
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+                  children: const [
+                    FeatureHero(
+                      icon: Icons.timeline_rounded,
+                      title: 'Your memory timeline',
+                      subtitle: 'Follow the notes and tasks that shape your archive.',
+                      compact: true,
+                    ),
+                    SizedBox(height: 18),
+                    NeoBrutalistPanel(
+                      padding: EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Icon(Icons.hourglass_empty_rounded, size: 48),
+                          SizedBox(height: 12),
+                          Text(
+                            'Nothing on your timeline yet',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                          ),
+                          SizedBox(height: 6),
+                          Text(
+                            'Your timeline will appear here as you create notes and tasks.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 );
               }
               return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
                 itemCount: entries.length + 1,
-                separatorBuilder: (_, __) =>
-                    const Divider(height: 1, indent: 54),
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return const Padding(
@@ -83,7 +110,8 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                     );
                   }
                   final entry = entries[index - 1];
-                  return ListTile(
+                  return NeoBrutalistPanel(
+                    child: ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: CircleAvatar(
                       backgroundColor: Theme.of(context)
@@ -108,6 +136,7 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                     onTap: entry.noteId == null
                         ? null
                         : () => context.push('/editor/${entry.noteId}'),
+                    ),
                   );
                 },
               );

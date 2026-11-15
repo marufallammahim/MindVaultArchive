@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -124,23 +125,35 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                   .toList()
                 ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
           if (snippets.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.code_rounded, size: 56),
-                    SizedBox(height: 12),
-                    Text('Your technical notebook is empty.'),
-                    SizedBox(height: 6),
-                    Text(
-                      'Save commands, code samples and debugging notes here.',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
+              children: const [
+                FeatureHero(
+                  icon: Icons.terminal_rounded,
+                  title: 'Developer notebook',
+                  subtitle: 'Keep reusable code, commands and technical notes together.',
+                  compact: true,
                 ),
-              ),
+                SizedBox(height: 18),
+                NeoBrutalistPanel(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Icon(Icons.code_rounded, size: 48),
+                      SizedBox(height: 12),
+                      Text(
+                        'Your technical notebook is empty',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Save commands, code samples and debugging notes here.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             );
           }
           return ListView.separated(
@@ -166,7 +179,7 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                     multiLine: true,
                   ).firstMatch(note.documentContent)?.group(1) ??
                   'text';
-              return Card(
+              return NeoBrutalistPanel(
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Theme.of(context)
