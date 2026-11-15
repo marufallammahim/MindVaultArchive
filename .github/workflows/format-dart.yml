@@ -2,7 +2,7 @@ name: Format Dart Sources
 
 on:
   push:
-    branches: ['main', 'feature/ultimate-all-in-one-mindvault']
+    branches: ['main']
   workflow_dispatch:
 
 permissions:

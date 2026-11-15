@@ -1,4 +1,4 @@
-# UI and Functionality Audit — 2026-11-14
+# UI and Functionality Audit — 2026-11-15
 
 Branch: `feature/ultimate-all-in-one-mindvault`
 
@@ -161,3 +161,20 @@ The following source-level UI work is committed on the existing feature branch:
 - 604b1d98fc2e32d2c1485c882ce9fa1745847ebc: Dart formatter commit for the editor changes.
 
 No Flutter regression tests were run because the all-routes UI implementation gate remains open. Device screenshots and accessibility/text-scaling QA remain outstanding.
+
+
+## Secondary-screen Neo-Brutalist panel pass — 2026-11-15
+
+Implementation commit: `299477616deb0f77b7afae45ee76e41613b4f76c`  
+Syntax/layout correction: `add9b448ae32f0bb85c3860d2497245a9ff642b3`  
+Dart formatter commit: `722fa155f3c0d6899b8db9c74ed56923d041c179`
+
+- Added `NeoBrutalistPanel`: theme-aware surface, high-contrast keyline, unblurred offset shadow, clipped Material interaction surface and caller-controlled padding.
+- Applied it to Archive Transfer operation groups, Search results and empty states, Tags, Revision History, Insights metric/health cards, Timeline entries, and Developer Notebook entries/empty state.
+- Search input now inherits the shared square, high-contrast input treatment rather than overriding it with a large rounded outline.
+- Tags deletion failures are now caught and surfaced with a SnackBar instead of escaping as an unhandled asynchronous error.
+- Existing GoRouter destinations, callbacks, Riverpod providers, Drift queries, backup/import services, revision restore and note-opening behavior were preserved. No database schema or migration was changed.
+- The formatting workflow caught one syntax issue in the Insights metric panel; it was corrected in `add9b448` and the formatter subsequently completed successfully, committing seven formatted Dart files as `722fa155`.
+- This is a source-level consistency milestone only. It is not a completed review of all routes, a device screenshot comparison, or proof of pixel-identical reproduction.
+- Remaining routed screens still need the same per-screen visual and control review, including Splash, Home, Editor, Tasks, Drawing, Settings, Protector, Trash, Templates and About, plus accessibility/text-scale/device checks.
+- Regression Tests remain intentionally manual while the routed-screen UI implementation is incomplete; no test pass is claimed for this milestone.

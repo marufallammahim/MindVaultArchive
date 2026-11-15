@@ -2,9 +2,9 @@
 
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
-Last reviewed: 2026-11-14  
+Last reviewed: 2026-11-15  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
-Latest source SHA reviewed: `604b1d98fc2e32d2c1485c882ce9fa1745847ebc`
+Latest source SHA reviewed: `722fa155f3c0d6899b8db9c74ed56923d041c179`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -389,3 +389,41 @@ Status reflects source review, not screenshot/device QA. A screen remains partia
 ### Feature-level blockers
 
 AI, cloud sync, collaboration, OCR/PDF extraction, biometric unlock, PIN recovery, encrypted database/files, reminders, recurrence, calendar and habits remain NOT IMPLEMENTED/BLOCKED pending actual provider, platform capability, credentials, privacy design or product decisions. The local foundation must remain usable without those integrations.
+
+
+## 2026-11-15 secondary-screen UI milestone and validation snapshot
+
+### Implementation commits
+- `299477616deb0f77b7afae45ee76e41613b4f76c`: introduced the shared `NeoBrutalistPanel` and applied it to Archive Transfer, Search, Tags, Revision History, Insights, Timeline and Developer Notebook. Empty states were brought into the same hero/panel hierarchy; Search input now uses the shared input radius. Tag deletion errors are presented to the user.
+- `add9b448ae32f0bb85c3860d2497245a9ff642b3`: corrected an extra closing delimiter in the Insights metric widget and removed duplicated archive-format guidance from Archive Transfer.
+- `722fa155f3c0d6899b8db9c74ed56923d041c179`: formatter-generated commit after `dart format lib test` changed seven Dart files. This is the source head reviewed before this roadmap update.
+
+### CI evidence and exact-SHA rules
+- Formatter run `43690087164` succeeded on parent SHA `add9b448ae32f0bb85c3860d2497245a9ff642b3`; it formatted seven files and committed the result as `722fa155f3c0d6899b8db9c74ed56923d041c179`.
+- Code Check run `43690087230` and Android APK run `43690087159` were started on `add9b448`, not on the formatter-created head `722fa155`; they do not validate the latest source SHA and must not be combined with results from another SHA.
+- No Code Check, Regression Tests, or Android APK Artifact success is recorded for `722fa155` at this snapshot.
+- Regression Tests were not dispatched because the routed-screen UI work remains incomplete and the workflow is intentionally manual. No test pass is claimed.
+- The older SHA `a91d069faff541ad58709ca443ff41174701be32` did have Code Check run `43575879817` and Android APK run `43575879729` pass, but those results do not validate later UI commits.
+
+### Verified older debug artifact
+The APK artifact from run `43575879729` was downloaded and inspected:
+- Artifact: `MindVaultArchive-debug-216-a91d069faff541ad58709ca443ff41174701be32`, ID `14106472916`, 100,764,366 bytes, not expired at inspection.
+- ZIP contents: `MindVaultArchive-debug.apk`, `SHA256SUMS.txt`, `build-info.txt`.
+- Build metadata: branch `feature/ultimate-all-in-one-mindvault`, commit `a91d069faff541ad58709ca443ff41174701be32`, version `1.0.0+1`, `build_type=debug`, `installable=true`.
+- APK size: 182,394,365 bytes. APK SHA-256: `632025d7887b5b7c5fef74f47ceecb832e7291e39d63d8cbdc387f4d148cc1b8`.
+- Artifact ZIP digest: `690e2babf345eab05c9c9ae8826ec628b8739a4d8427f90522fe2c1dd77d25f1`.
+- This artifact belongs to `a91d069f`, not the latest UI code.
+
+### Workflow and warning maintenance
+- The formatter workflow is now configured to auto-run only on `main`; feature-branch formatting is enforced by Code Check. This prevents a formatter bot commit from racing and invalidating the Code Check/APK runs on the preceding feature-branch SHA. Manual `workflow_dispatch` remains available.
+- On the older passing APK log, `tool/regenerate_platforms.sh` completed without the prior `cp -Rn` portability warning. The guarded copy helper remains in place.
+- No Node 20 deprecation warning was found in the inspected current Code Check/APK logs; workflows use checkout v5, setup-java v6 and upload-artifact v6.
+- The Riverpod generator warning remains: locked analyzer language version 3.4.0 versus Dart SDK language version 3.14.0. Do not upgrade analyzer alone; coordinate Riverpod generator/lint/analyzer compatibility.
+- The APK log still reports Kotlin Gradle Plugin usage by the app module, `file_picker` and `share_plus`. A coordinated built-in-Kotlin migration is deferred until the resolved plugin majors and Dart API changes can be upgraded and validated together.
+- Drift multiple-`AppDatabase` warnings were not re-evaluated on this latest UI source because Regression Tests were not run. The existing full-backup test creates separate in-memory executors for source/target and closes both in tearDown; keep this as a pending verification rather than marking the warning resolved.
+
+### Remaining acceptance
+- All 19 routed destinations still require final per-screen control/state review; the source-level inventory is not device visual QA.
+- Settings, Protector, Trash, Drawing and the primary Home/Editor/Tasks/Splash routes still need a final shared-panel/interaction-state review where applicable.
+- No emulator or physical-device screenshot comparison has been captured. Pixel-identical replication is not claimed.
+- Regression tests, full local-feature success/failure/persistence acceptance, and Android artifact verification on the same latest commit remain outstanding.
