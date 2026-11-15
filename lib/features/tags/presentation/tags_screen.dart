@@ -79,9 +79,9 @@ class TagsScreen extends ConsumerWidget {
       await ref.read(databaseProvider).deleteTag(tag.id);
     } catch (error) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not delete tag: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not delete tag: $error')));
     }
   }
 
@@ -120,7 +120,8 @@ class TagsScreen extends ConsumerWidget {
                 FeatureHero(
                   icon: Icons.sell_rounded,
                   title: 'Organize by tag',
-                  subtitle: 'Create lightweight labels to connect related notes.',
+                  subtitle:
+                      'Create lightweight labels to connect related notes.',
                   compact: true,
                 ),
                 SizedBox(height: 18),
@@ -132,7 +133,10 @@ class TagsScreen extends ConsumerWidget {
                       SizedBox(height: 12),
                       Text(
                         'No tags yet',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       SizedBox(height: 6),
                       Text(

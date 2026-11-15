@@ -75,7 +75,8 @@ class RevisionHistoryScreen extends ConsumerWidget {
                 FeatureHero(
                   icon: Icons.history_rounded,
                   title: 'Every edit remembered',
-                  subtitle: 'Review an earlier version and restore it when needed.',
+                  subtitle:
+                      'Review an earlier version and restore it when needed.',
                   compact: true,
                 ),
                 SizedBox(height: 18),
@@ -87,7 +88,10 @@ class RevisionHistoryScreen extends ConsumerWidget {
                       SizedBox(height: 12),
                       Text(
                         'No previous versions yet',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       SizedBox(height: 6),
                       Text(

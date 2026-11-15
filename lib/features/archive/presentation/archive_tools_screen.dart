@@ -211,9 +211,13 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Full device backup',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900, letterSpacing: -0.4)),
+                Text(
+                  'Full device backup',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.4,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'Create or restore a ZIP backup containing your archive data and '
@@ -242,9 +246,13 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Portable JSON transfer',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900, letterSpacing: -0.4)),
+                Text(
+                  'Portable JSON transfer',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.4,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'Export note, category, tag, task and revision data as versioned '
@@ -287,9 +295,13 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Import archive',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900, letterSpacing: -0.4)),
+                Text(
+                  'Import archive',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.4,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'Paste the complete JSON document. Existing notes and tasks are never '

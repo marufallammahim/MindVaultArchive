@@ -214,24 +214,24 @@ class _SearchHint extends StatelessWidget {
           child: NeoBrutalistPanel(
             padding: const EdgeInsets.all(24),
             child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.manage_search,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 14),
-            Text(
-              'Find what you remember',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Search note titles and content, category names, tags, and task details. Everything is searched locally on this device.',
-              textAlign: TextAlign.center,
-            ),
-          ],
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.manage_search,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Find what you remember',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Search note titles and content, category names, tags, and task details. Everything is searched locally on this device.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
         ),

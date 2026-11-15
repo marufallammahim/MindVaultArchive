@@ -143,7 +143,10 @@ class DeveloperNotebookScreen extends ConsumerWidget {
                       SizedBox(height: 12),
                       Text(
                         'Your technical notebook is empty',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                       SizedBox(height: 6),
                       Text(

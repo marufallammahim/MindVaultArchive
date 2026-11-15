@@ -68,7 +68,8 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                     FeatureHero(
                       icon: Icons.timeline_rounded,
                       title: 'Your memory timeline',
-                      subtitle: 'Follow the notes and tasks that shape your archive.',
+                      subtitle:
+                          'Follow the notes and tasks that shape your archive.',
                       compact: true,
                     ),
                     SizedBox(height: 18),
@@ -80,7 +81,10 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                           SizedBox(height: 12),
                           Text(
                             'Nothing on your timeline yet',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
                           SizedBox(height: 6),
                           Text(
@@ -112,30 +116,30 @@ class ArchiveTimelineScreen extends ConsumerWidget {
                   final entry = entries[index - 1];
                   return NeoBrutalistPanel(
                     child: ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .primaryContainer,
-                      foregroundColor: Theme.of(context)
-                          .colorScheme
-                          .onPrimaryContainer,
-                      child: Icon(entry.icon),
-                    ),
-                    title: Text(
-                      entry.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: Text(
-                      '${entry.detail} • ${MaterialLocalizations.of(context).formatMediumDate(entry.date)}',
-                    ),
-                    trailing: entry.noteId == null
-                        ? null
-                        : const Icon(Icons.chevron_right),
-                    onTap: entry.noteId == null
-                        ? null
-                        : () => context.push('/editor/${entry.noteId}'),
+                      contentPadding: EdgeInsets.zero,
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context)
+                            .colorScheme
+                            .primaryContainer,
+                        foregroundColor: Theme.of(context)
+                            .colorScheme
+                            .onPrimaryContainer,
+                        child: Icon(entry.icon),
+                      ),
+                      title: Text(
+                        entry.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        '${entry.detail} • ${MaterialLocalizations.of(context).formatMediumDate(entry.date)}',
+                      ),
+                      trailing: entry.noteId == null
+                          ? null
+                          : const Icon(Icons.chevron_right),
+                      onTap: entry.noteId == null
+                          ? null
+                          : () => context.push('/editor/${entry.noteId}'),
                     ),
                   );
                 },
