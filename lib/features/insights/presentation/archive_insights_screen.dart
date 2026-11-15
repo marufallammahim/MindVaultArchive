@@ -238,7 +238,6 @@ class _Metric extends StatelessWidget {
           ),
         ],
       ),
-    ),
   );
 }
 

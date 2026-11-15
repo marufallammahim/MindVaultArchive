@@ -205,6 +205,7 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             title: 'Your archive, protected',
             subtitle: 'Export, restore and move your local knowledge safely.',
           ),
+          const SizedBox(height: 18),
           NeoBrutalistPanel(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -328,12 +329,6 @@ class _ArchiveToolsScreenState extends ConsumerState<ArchiveToolsScreen> {
             const SizedBox(height: 16),
             const LinearProgressIndicator(),
           ],
-          const SizedBox(height: 20),
-          const Text(
-            'Format v5 includes notes, categories, tags, note-tag links, linked tasks and '
-            'note revisions. JSON-only transfer does not contain attachment '
-            'bytes; use the full ZIP backup above when you need media files.',
-          ),
         ],
       ),
     );
