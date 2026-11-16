@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:mindvault_archive/core/widgets/feature_hero.dart';
-
-import 'package:mindvault_archive/core/database/database.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +9,10 @@ import 'package:signature/signature.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/app/theme.dart';
+import 'package:mindvault_archive/core/database/database.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 
 class DrawingScreen extends ConsumerStatefulWidget {
   final String noteId;
@@ -24,8 +25,8 @@ class DrawingScreen extends ConsumerStatefulWidget {
 class _DrawingScreenState extends ConsumerState<DrawingScreen> {
   late final SignatureController _controller = SignatureController(
     penStrokeWidth: 3.2,
-    penColor: Colors.white,
-    exportBackgroundColor: Colors.white,
+    penColor: AppTheme.ink,
+    exportBackgroundColor: AppTheme.lightSurface,
   );
   bool _saving = false;
 
@@ -120,43 +121,78 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
           child: FeatureHero(
             icon: Icons.gesture_rounded,
             title: 'Sketch an idea',
-            subtitle: 'Draw freely. Your sketch is saved as an attachment to this note.',
+            subtitle:
+                'Draw freely. Your sketch is saved as an attachment to this note.',
             compact: true,
           ),
         ),
         Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(22),
-            child: Signature(
-              controller: _controller,
-              backgroundColor: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerLow,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 20, 12),
+            child: NeoBrutalistPanel(
+              color: AppTheme.lightSurface,
+              padding: EdgeInsets.zero,
+              child: Signature(
+                controller: _controller,
+                backgroundColor: AppTheme.lightSurface,
+              ),
             ),
           ),
         ),
       ],
     ),
-    bottomNavigationBar: BottomAppBar(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            tooltip: 'Undo',
-            icon: const Icon(Icons.undo),
-            onPressed: _controller.undo,
+    bottomNavigationBar: SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        child: NeoBrutalistPanel(
+          color: AppTheme.pink,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                tooltip: 'Undo',
+                style: IconButton.styleFrom(
+                  backgroundColor: AppTheme.secondary,
+                  foregroundColor: AppTheme.ink,
+                  side: const BorderSide(color: AppTheme.ink, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                icon: const Icon(Icons.undo),
+                onPressed: _controller.undo,
+              ),
+              IconButton(
+                tooltip: 'Redo',
+                style: IconButton.styleFrom(
+                  backgroundColor: AppTheme.secondary,
+                  foregroundColor: AppTheme.ink,
+                  side: const BorderSide(color: AppTheme.ink, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                icon: const Icon(Icons.redo),
+                onPressed: _controller.redo,
+              ),
+              IconButton(
+                tooltip: 'Clear',
+                style: IconButton.styleFrom(
+                  backgroundColor: AppTheme.primary,
+                  foregroundColor: AppTheme.ink,
+                  side: const BorderSide(color: AppTheme.ink, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+                icon: const Icon(Icons.clear),
+                onPressed: _controller.clear,
+              ),
+            ],
           ),
-          IconButton(
-            tooltip: 'Redo',
-            icon: const Icon(Icons.redo),
-            onPressed: _controller.redo,
-          ),
-          IconButton(
-            tooltip: 'Clear',
-            icon: const Icon(Icons.clear),
-            onPressed: _controller.clear,
-          ),
-        ],
+        ),
       ),
     ),
   );
