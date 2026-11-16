@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
 import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:mindvault_archive/features/drawing/presentation/drawing_screen.dart';
 import 'package:signature/signature.dart';
