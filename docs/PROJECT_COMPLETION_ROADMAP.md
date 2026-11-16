@@ -2,9 +2,9 @@
 
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
-Last reviewed: 2026-11-15  
+Last reviewed: 2026-11-16  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
-Latest source SHA reviewed: `722fa155f3c0d6899b8db9c74ed56923d041c179`
+Latest source SHA reviewed: `8c71bc6046a453c452c6a3ed57cca60f4ab72a85`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -427,3 +427,38 @@ The APK artifact from run `43575879729` was downloaded and inspected:
 - Settings, Protector, Trash, Drawing and the primary Home/Editor/Tasks/Splash routes still need a final shared-panel/interaction-state review where applicable.
 - No emulator or physical-device screenshot comparison has been captured. Pixel-identical replication is not claimed.
 - Regression tests, full local-feature success/failure/persistence acceptance, and Android artifact verification on the same latest commit remain outstanding.
+
+
+## 2026-11-16 About and Drawing visual pass
+
+### Source changes
+- `adfa1b56be9cf7793148c051c4a1c1550f31df21`: redesigned About and Drawing using the shared Neo-Brutalist language.
+- `0a087090637d3f54e35ada997aff3c2ec9a72e97`: added the missing FeatureHero test import before validation.
+- `7256072b73e342c3c1a239398ae3f7c8dddf22dc`: temporarily enabled the existing formatter on the feature branch so the three changed Dart files could be formatted.
+- Formatter run `43831982387` passed and created formatting commit `8c71bc6046a453c452c6a3ed57cca60f4ab72a85`. The formatter trigger is restored to main-only in the following documentation/CI maintenance commit to avoid permanent formatter-bot race conditions.
+
+### UI implementation evidence
+- **About**: the supplied app logo now sits in a yellow brand panel with a hard shadow; developer and GitHub details share an outlined information panel; privacy/local-storage messaging uses a cyan panel. The GitHub profile copy action now confirms success with a SnackBar. Static content remains local and no remote service is implied.
+- **Drawing**: the signature canvas now sits inside a hard-shadow NeoBrutalistPanel; undo/redo/clear controls use outlined palette buttons. The drawing canvas and exported PNG now consistently use a light surface with dark ink so marks remain visible in both app themes.
+- Drawing save behavior is unchanged: active-note validation -> PNG export -> app documents file -> Drift attachment row; a failed database insert removes the newly created file. Full ZIP backup already reads registered attachment files and stops if one is missing.
+- Added About visual/interaction-presence coverage and expanded Drawing screen visual assertions. These tests have not been executed because routed UI implementation remains incomplete.
+
+### Exact-SHA CI and artifact evidence
+- Baseline source SHA `0371ed562efb60aa0d1065f6aef9c6aa39e069e7`: Code Check run `43690233240` PASS; Android APK Artifact run `43690233332` PASS.
+- Artifact `MindVaultArchive-debug-219-0371ed562efb60aa0d1065f6aef9c6aa39e069e7`, ID `14151633313`, was downloaded and inspected. ZIP contains the debug APK, `build-info.txt`, and `SHA256SUMS.txt`. Metadata confirms branch `feature/ultimate-all-in-one-mindvault`, commit `0371ed562efb60aa0d1065f6aef9c6aa39e069e7`, version `1.0.0+1`, debug build, and `installable=true`. APK size is 182,396,341 bytes and SHA-256 is `93d10250e38dc269285b0ca6172be6d69e7c47ea3d827640ae6c5d2c9b37414f`.
+- Code Check run `43831530062` on `0a087090637d3f54e35ada997aff3c2ec9a72e97` failed only at the Dart formatting gate; analyzer was skipped. Formatter run `43831982387` formatted the three files and passed on parent `7256072b73e342c3c1a239398ae3f7c8dddf22dc`, producing `8c71bc6046a453c452c6a3ed57cca60f4ab72a85`.
+- Code Check/APK runs started on `7256072b73e342c3c1a239398ae3f7c8dddf22dc` do not validate the formatter-created SHA. A fresh Code Check and APK run on the post-roadmap latest SHA is required.
+- Regression Tests remain intentionally undispatched until routed UI implementation is complete. No test-suite pass is claimed.
+
+### Warning status
+- Latest inspected successful Code Check/APK logs on `0371ed56` showed no Node 20 deprecation, setup-java v4, or `cp -n` portability warning.
+- Riverpod generator still warns that locked analyzer 6.4.1 exposes language version 3.4.0 while the Flutter 3.50.0 SDK uses 3.14.0. Analyzer 14.7.0 is suggested, but a coordinated Riverpod generator/lint/analyzer compatibility upgrade is required; analyzer-only override is unsafe.
+- Android build still warns that the app module, `file_picker`, and `share_plus` apply the Kotlin Gradle Plugin. Built-in Kotlin migration remains deferred until plugin support and Gradle compatibility are verified together.
+- Drift multiple-database lifecycle warnings remain unverified because Regression Tests have not been run on the current UI state.
+
+### Route matrix update
+- About /about: **implemented static content; visual QA pending**. Branded panels, developer identity, privacy disclosure and GitHub copy feedback are present. Acceptance: run the new widget test, verify light/dark/text-scale rendering and inspect the copy SnackBar.
+- Drawing /drawing/:id: **partial**. Shared panel and palette controls are present; attachment persistence and cleanup remain source-verified. Acceptance: execute the new widget test, test successful PNG/file/row persistence, empty canvas, missing/deleted note, file-write failure, database failure cleanup, and ZIP backup restore.
+
+### Remaining UI work
+Settings, Protector, Templates, Trash, Quick Capture, Home, Editor, Tasks, Splash, Delete Confirmation and the remaining secondary routes still need the final shared-style/control-state pass and/or screenshot comparison. All 19 routes still require final responsive/accessibility review. No emulator or physical-device screenshot comparison has been performed; pixel identity is not claimed.

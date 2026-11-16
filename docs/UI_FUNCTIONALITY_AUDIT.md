@@ -178,3 +178,12 @@ Dart formatter commit: `722fa155f3c0d6899b8db9c74ed56923d041c179`
 - This is a source-level consistency milestone only. It is not a completed review of all routes, a device screenshot comparison, or proof of pixel-identical reproduction.
 - Remaining routed screens still need the same per-screen visual and control review, including Splash, Home, Editor, Tasks, Drawing, Settings, Protector, Trash, Templates and About, plus accessibility/text-scale/device checks.
 - Regression Tests remain intentionally manual while the routed-screen UI implementation is incomplete; no test pass is claimed for this milestone.
+
+
+## About and Drawing visual pass — 2026-11-16
+
+- **About** now uses a shared FeatureHero, a yellow logo/brand panel with black outline and hard shadow, a developer/GitHub information panel, and a cyan local-privacy panel. Tapping the GitHub row copies the profile URL and confirms the action with a SnackBar.
+- **Drawing** now uses a framed NeoBrutalistPanel for the sketch canvas and flat outlined palette controls for undo, redo and clear. The canvas/export background is consistently light with dark ink, avoiding white strokes on a light-theme canvas.
+- Drawing's existing persistence contract is unchanged: the screen validates an active note, exports PNG bytes, writes under the app documents directory, inserts attachment metadata into Drift, and deletes the newly created file if persistence fails. Full ZIP backup includes registered attachment bytes and refuses incomplete archives when a source file is missing.
+- Added About screen widget assertions and expanded Drawing screen style assertions. Tests are intentionally not run until all routed UI work is complete.
+- These are source-level visual changes. No emulator/physical-device screenshot comparison was performed, so pixel-identical matching is not claimed.
