@@ -121,8 +121,7 @@ class _DrawingScreenState extends ConsumerState<DrawingScreen> {
           child: FeatureHero(
             icon: Icons.gesture_rounded,
             title: 'Sketch an idea',
-            subtitle:
-                'Draw freely. Your sketch is saved as an attachment to this note.',
+            subtitle: 'Draw freely. Your sketch is saved as an attachment to this note.',
             compact: true,
           ),
         ),

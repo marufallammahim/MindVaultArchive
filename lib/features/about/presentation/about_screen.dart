@@ -74,10 +74,8 @@ class AboutScreen extends StatelessWidget {
               Text(
                 'A private space for your thoughts, ideas, and memories.',
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.ink,
-                  height: 1.45,
-                ),
+                style: Theme.of(context).textTheme.bodyMedium
+                    ?.copyWith(color: AppTheme.ink, height: 1.45),
               ),
             ],
           ),
@@ -159,10 +157,8 @@ class AboutScreen extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       'Notes and attachments stay on this device. No remote sync is configured.',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.ink,
-                        height: 1.4,
-                      ),
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(color: AppTheme.ink, height: 1.4),
                     ),
                   ],
                 ),

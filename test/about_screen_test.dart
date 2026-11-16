@@ -10,10 +10,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.lightTheme,
-        home: const AboutScreen(),
-      ),
+      MaterialApp(theme: AppTheme.lightTheme, home: const AboutScreen()),
     );
 
     expect(find.byType(FeatureHero), findsOneWidget);
@@ -28,10 +25,7 @@ void main() {
     );
 
     final githubTile = tester.widget<ListTile>(
-      find.ancestor(
-        of: find.text('GitHub'),
-        matching: find.byType(ListTile),
-      ),
+      find.ancestor(of: find.text('GitHub'), matching: find.byType(ListTile)),
     );
     expect(githubTile.onTap, isNotNull);
     expect(find.byTooltip('Copy GitHub profile link'), findsOneWidget);
