@@ -2,7 +2,9 @@ name: Format Dart Sources
 
 on:
   push:
-    branches: ['main']
+    branches:
+      - main
+      - feature/ultimate-all-in-one-mindvault
   workflow_dispatch:
 
 permissions:
@@ -24,7 +26,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.50.0'
           cache: true
 
       - name: Resolve package configuration
