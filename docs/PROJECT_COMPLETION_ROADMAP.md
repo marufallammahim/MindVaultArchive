@@ -2,9 +2,9 @@
 
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
-Last reviewed: 2026-11-16  
+Last reviewed: 2026-11-17  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
-Latest source SHA reviewed: `8c71bc6046a453c452c6a3ed57cca60f4ab72a85`
+Latest source SHA reviewed: `653f5699bd3ebee4361d78789c8cc64572670eb0`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -462,3 +462,40 @@ The APK artifact from run `43575879729` was downloaded and inspected:
 
 ### Remaining UI work
 Settings, Protector, Templates, Trash, Quick Capture, Home, Editor, Tasks, Splash, Delete Confirmation and the remaining secondary routes still need the final shared-style/control-state pass and/or screenshot comparison. All 19 routes still require final responsive/accessibility review. No emulator or physical-device screenshot comparison has been performed; pixel identity is not claimed.
+
+
+## 2026-11-17 Settings UI milestone and exact-SHA CI snapshot
+
+### Settings implementation
+- Source commit `d30f7f35791de9164f8a8666d4f05b15eac6cdd0`: added the shared FeatureHero and NeoBrutalistPanel surfaces to Settings profile, appearance, category management, archive navigation and storage information.
+- Accent palette controls now have 42px targets, accessible labels/tooltips, selected semantics and contrast-aware check marks.
+- Category list now exposes loading, error and empty states; add/rename/delete still call the existing Drift database methods.
+- Test commits `cff8da5057b6bdfc6baf681fa2b7c55f47d4e812` and `653f5699bd3ebee4361d78789c8cc64572670eb0` add `test/settings_screen_test.dart` for narrow-screen layout, panel presence, accent preference persistence and category create/rename/delete persistence. The test is not run until all routed UI implementation is complete.
+- No database schema, migration, route or provider contract changed.
+
+### Verified workflow state before this Settings milestone
+Exact source SHA: `f2fae00276536124128d2ddfa4a0269507513f06`.
+| Workflow | Run | Result | Evidence |
+|---|---:|---|---|
+| Feature Branch - Code Check | 43832286246 | PASS | All generation, generated-file checks, Dart format and `flutter analyze` steps completed successfully. |
+| Feature Branch - Regression Tests | — | NOT RUN | Manual-only workflow; routed UI completion gate remains open. |
+| Feature Branch - Android APK Artifact | 43832286259 | PASS | Debug APK build, metadata verification and upload all completed. |
+
+Verified artifact from run 43832286259:
+- Artifact: `MindVaultArchive-debug-223-f2fae00276536124128d2ddfa4a0269507513f06`, ID `14208684788`, ZIP size 100,767,273 bytes, not expired at inspection.
+- Downloaded ZIP contains `MindVaultArchive-debug.apk`, `build-info.txt`, and `SHA256SUMS.txt`.
+- Metadata confirms branch `feature/ultimate-all-in-one-mindvault`, commit `f2fae00276536124128d2ddfa4a0269507513f06`, version `1.0.0+1`, `build_type=debug`, `installable=true`.
+- APK size: 182,397,685 bytes. APK SHA-256: `d5e4fa67c311f87634ad4811f1e3ae9b6663c5aa0461fd274d6555d307ecc1ba`.
+- This artifact predates the Settings UI source and Settings test commits; it is not an artifact for the current branch head.
+
+### Actionable warning status from the inspected successful logs
+- No Node 20 deprecation, setup-java v4, or `cp -n` portability warning appeared in these two logs. Current workflows use checkout v5, setup-java v6 and upload-artifact v6.
+- Riverpod generator still reports locked analyzer 6.4.1 language version 3.4.0 against the Dart 3.14 SDK and recommends analyzer 14.7.0. Do not upgrade analyzer alone; coordinate Riverpod generator/lint/analyzer compatibility.
+- Android build still warns that the app module, `file_picker` and `share_plus` apply Kotlin Gradle Plugin. A coordinated built-in Kotlin migration remains pending plugin-major/Dart API compatibility review.
+- Drift multiple-database warnings remain unverified on the current source because Regression Tests have not been dispatched. The full-backup test's separate source/target in-memory executors and tearDown must be confirmed by a future regression log.
+
+### Current source and next validation
+- Settings implementation and its focused test are committed through source SHA `653f5699bd3ebee4361d78789c8cc64572670eb0`.
+- The documentation commits that follow this entry will change the branch head; Code Check and Android APK must be checked again against the final resulting SHA.
+- Regression Tests remain intentionally unrun until all routed UI work is complete. A skipped/manual workflow is not a pass.
+- Settings remains **partial** until the new test is executed, every visible control has success/failure/persistence coverage, and light/dark/text-scale/device visual QA is complete.
