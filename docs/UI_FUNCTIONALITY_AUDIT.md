@@ -187,3 +187,15 @@ Dart formatter commit: `722fa155f3c0d6899b8db9c74ed56923d041c179`
 - Drawing's existing persistence contract is unchanged: the screen validates an active note, exports PNG bytes, writes under the app documents directory, inserts attachment metadata into Drift, and deletes the newly created file if persistence fails. Full ZIP backup includes registered attachment bytes and refuses incomplete archives when a source file is missing.
 - Added About screen widget assertions and expanded Drawing screen style assertions. Tests are intentionally not run until all routed UI work is complete.
 - These are source-level visual changes. No emulator/physical-device screenshot comparison was performed, so pixel-identical matching is not claimed.
+
+
+## Settings Neo-Brutalist and accessibility pass — 2026-11-17
+
+Source milestone:
+- `d30f7f35791de9164f8a8666d4f05b15eac6cdd0`: Settings now starts with the shared FeatureHero and uses NeoBrutalistPanel surfaces for profile, appearance, category management, archive navigation and local-storage information.
+- Palette swatches now expose a tooltip and selected/button semantics, have a 42px hit target, and choose a contrast-aware check glyph for light/dark swatches.
+- Category management now renders explicit loading, error and empty states inside the shared panel. Category rows use outlined cyan icon tiles. Existing add/rename/delete callbacks and Drift saveCategory/deleteCategory operations remain unchanged.
+- `cff8da5057b6bdfc6baf681fa2b7c55f47d4e812` and `653f5699bd3ebee4361d78789c8cc64572670eb0`: added `test/settings_screen_test.dart` for narrow-screen rendering, shared panel presence, accent preference persistence, and category create/rename/delete persistence.
+- User profile, theme mode, AMOLED and accent state continue to flow through their existing Riverpod notifiers and SharedPreferences. Category state continues through the existing Drift stream and database methods. No schema, migration or route changes were made.
+- The test is intentionally not executed yet because the routed-screen UI completion gate remains open. Static analysis will still compile/analyze the test source in Code Check.
+- This is source-level UI/accessibility work; no emulator or physical-device screenshot comparison was performed.
