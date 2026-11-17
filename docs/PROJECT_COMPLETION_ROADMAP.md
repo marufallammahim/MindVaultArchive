@@ -4,7 +4,7 @@ Repository: `marufallammahim/MindVaultArchive`
 Target branch: `feature/ultimate-all-in-one-mindvault`  
 Last reviewed: 2026-11-17  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
-Latest source SHA reviewed: `653f5699bd3ebee4361d78789c8cc64572670eb0`
+Latest source SHA reviewed: `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -499,3 +499,30 @@ Verified artifact from run 43832286259:
 - The documentation commits that follow this entry will change the branch head; Code Check and Android APK must be checked again against the final resulting SHA.
 - Regression Tests remain intentionally unrun until all routed UI work is complete. A skipped/manual workflow is not a pass.
 - Settings remains **partial** until the new test is executed, every visible control has success/failure/persistence coverage, and light/dark/text-scale/device visual QA is complete.
+
+
+## 2026-11-17 Settings implementation, formatting correction and validation follow-up
+
+### Source milestone
+- `d30f7f35791de9164f8a8666d4f05b15eac6cdd0`: Settings FeatureHero/NeoBrutalistPanel redesign, accessible palette swatches, category loading/error/empty states, and preserved profile/theme/category actions.
+- `cff8da5057b6bdfc6baf681fa2b7c55f47d4e812` plus `653f5699bd3ebee4361d78789c8cc64572670eb0`: added the Settings widget test for 320×640 rendering, panel presence, accent preference persistence, and category create/rename/delete persistence.
+- Formatter run `44041214704` formatted the two changed Dart files and committed them as `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`.
+- The temporary feature formatter trigger was restored to main-only in commit `3ae6198d9871702b179aca02e4e543345ff491f2`. The formatter remains pinned to Flutter 3.50.0.
+
+### CI failure and correction
+- Code Check run `44040904050` on `118469b5eaf7646794be10aa0f8e6711b1380875` failed only at `dart format --output=none --set-exit-if-changed lib test`; `settings_screen.dart` and `settings_screen_test.dart` were the two files changed by the formatter. Analyzer was skipped.
+- Android APK run `44040904104` on the same SHA failed at its generated-source/formatting gate; APK packaging and upload were skipped.
+- Formatter run `44041214704` passed on `49fb569e2703a6b2dc3479a10cbda9822ef9235c` and produced the formatted commit `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`.
+- The workflow restoration commit and this roadmap/audit update produce a newer head; fresh Code Check and APK runs must be checked against the final resulting SHA before recording success.
+- Regression Tests were not dispatched because the routed UI implementation gate is still open. The new Settings test is added but not executed.
+
+### Current warning status
+- Previous successful Code Check/APK logs on `f2fae00276536124128d2ddfa4a0269507513f06` show no Node 20 deprecation, setup-java v4, or `cp -n` portability warning. Checkout v5, setup-java v6 and upload-artifact v6 are in use.
+- Riverpod generator/analyzer compatibility warning remains (locked analyzer 6.4.1, language version 3.4.0 vs SDK 3.14.0); coordinated dependency upgrade required.
+- Kotlin Gradle Plugin warnings remain for app module, `file_picker`, and `share_plus`; coordinated built-in Kotlin migration remains pending.
+- Drift multiple-database warnings remain unverified until Regression Tests are run after UI completion.
+
+### UI and reference review
+- Re-opened `Mind Vault UI.zip`; verified the six files and the Home, Editor, Tasks and Delete Confirmation references. No emulator/physical-device screenshot comparison is available, so no pixel-identity claim is made.
+- Settings remains **partial**: source redesign and focused test source exist, but test execution, complete interaction/failure acceptance, and light/dark/text-scale/device visual QA remain.
+- All other route statuses remain as recorded in the routed-screen matrix; UI implementation is not complete.
