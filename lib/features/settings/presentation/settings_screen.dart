@@ -348,7 +348,9 @@ class SettingsScreen extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: accent.toARGB32() == color.toARGB32()
-                                        ? Theme.of(context).colorScheme.onSurface
+                                        ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
                                         : Colors.transparent,
                                     width: 2.5,
                                   ),
@@ -441,10 +443,9 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 StreamBuilder<List<Category>>(
                   stream:
-                      (db.select(db.categories)
-                            ..orderBy([
-                              (category) => OrderingTerm.asc(category.name),
-                            ]))
+                      (db.select(db.categories)..orderBy([
+                            (category) => OrderingTerm.asc(category.name),
+                          ]))
                           .watch(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting &&

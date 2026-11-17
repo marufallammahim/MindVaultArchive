@@ -65,9 +65,7 @@ void main() {
       await tester.tap(cyanAccent);
       await tester.pump();
 
-      final preferences = await tester.runAsync(
-        SharedPreferences.getInstance,
-      );
+      final preferences = await tester.runAsync(SharedPreferences.getInstance);
       expect(preferences?.getInt('primary_accent_color'), 0xFFC0F7FE);
 
       final addCategory = find.byTooltip('Add category');
