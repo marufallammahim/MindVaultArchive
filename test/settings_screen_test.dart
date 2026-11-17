@@ -100,7 +100,7 @@ void main() {
         final categories = await tester.runAsync(
           () => database.select(database.categories).get(),
         );
-        return categories?.singleOrNull?.name == 'Reading';
+        return categories?.length == 1 && categories!.single.name == 'Reading';
       });
       expect(find.text('Reading'), findsOneWidget);
 
@@ -120,7 +120,10 @@ void main() {
         return categories?.isEmpty ?? false;
       });
 
-      expect(find.text('No categories yet. Add one to organize notes.'), findsOneWidget);
+      expect(
+        find.text('No categories yet. Add one to organize notes.'),
+        findsOneWidget,
+      );
       expect(tester.takeException(), isNull);
     },
   );
