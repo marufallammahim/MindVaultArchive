@@ -199,3 +199,15 @@ Source milestone:
 - User profile, theme mode, AMOLED and accent state continue to flow through their existing Riverpod notifiers and SharedPreferences. Category state continues through the existing Drift stream and database methods. No schema, migration or route changes were made.
 - The test is intentionally not executed yet because the routed-screen UI completion gate remains open. Static analysis will still compile/analyze the test source in Code Check.
 - This is source-level UI/accessibility work; no emulator or physical-device screenshot comparison was performed.
+
+
+## Settings UI implementation and formatting follow-up — 2026-11-17
+
+- Settings source milestone: `d30f7f35791de9164f8a8666d4f05b15eac6cdd0`.
+- Focused Settings widget coverage: `cff8da5057b6bdfc6baf681fa2b7c55f47d4e812` and `653f5699bd3ebee4361d78789c8cc64572670eb0`.
+- Code Check run `44040904050` on SHA `118469b5eaf7646794be10aa0f8e6711b1380875` stopped at the Dart formatting gate; analyzer was skipped. The log identified only `settings_screen.dart` and `settings_screen_test.dart` as unformatted.
+- APK run `44040904104` on the same SHA stopped at the generated-source/formatting gate; APK build and upload were skipped.
+- Formatter run `44041214704` succeeded on trigger commit `49fb569e2703a6b2dc3479a10cbda9822ef9235c` and committed the two formatting changes as `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`.
+- The temporary feature-branch formatter trigger was restored to main-only in `3ae6198d9871702b179aca02e4e543345ff491f2`. Feature-branch Code Check remains the authoritative formatting gate.
+- Fresh Code Check and Android APK validation on the post-formatter/restored-workflow latest SHA are required. Regression Tests remain intentionally manual and unrun while routed UI work is incomplete.
+- The uploaded archive was re-opened: it contains the Home, Editor, Tasks, Delete Confirmation and two app-logo references. The Tasks reference includes habits/calendar elements; the current feature specification does not implement those capabilities, so no false habit/calendar controls are added.
