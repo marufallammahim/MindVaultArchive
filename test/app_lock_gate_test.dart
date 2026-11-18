@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:mindvault_archive/features/security/presentation/app_lock_gate.dart';
 
 class _MemorySecureStore implements SecureValueStore {
@@ -55,6 +57,13 @@ void main() {
     await _pumpUntilVisible(tester, find.text('MindVault is locked'));
 
     expect(find.text('MindVault is locked'), findsOneWidget);
+    expect(find.byType(FeatureHero), findsOneWidget);
+    expect(find.byType(NeoBrutalistPanel), findsOneWidget);
+    await tester.enterText(find.byType(TextField), 'abc4829157');
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      '482915',
+    );
     await tester.enterText(find.byType(TextField), '482915');
     await tester.tap(find.text('Unlock'));
     await _pumpUntilVisible(tester, find.text('Vault home'));
@@ -83,10 +92,18 @@ void main() {
     );
 
     expect(
-      find.textContaining('Could not verify secure app-lock settings'),
+      find.textContaining('Secure storage unavailable'),
       findsOneWidget,
     );
+    expect(find.byType(FeatureHero), findsOneWidget);
+    expect(find.byType(NeoBrutalistPanel), findsOneWidget);
     expect(find.text('Vault home'), findsNothing);
+
+    store.failReads = false;
+    await tester.tap(find.text('Retry'));
+    await _pumpUntilVisible(tester, find.text('Vault home'));
+
+    expect(find.text('Vault home'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
