@@ -211,3 +211,12 @@ Source milestone:
 - The temporary feature-branch formatter trigger was restored to main-only in `3ae6198d9871702b179aca02e4e543345ff491f2`. Feature-branch Code Check remains the authoritative formatting gate.
 - Fresh Code Check and Android APK validation on the post-formatter/restored-workflow latest SHA are required. Regression Tests remain intentionally manual and unrun while routed UI work is incomplete.
 - The uploaded archive was re-opened: it contains the Home, Editor, Tasks, Delete Confirmation and two app-logo references. The Tasks reference includes habits/calendar elements; the current feature specification does not implement those capabilities, so no false habit/calendar controls are added.
+
+
+## Global app-lock gate Neo-Brutalist pass — 2026-11-18
+
+- The app-entry lock overlay now uses the shared FeatureHero and NeoBrutalistPanel components for the locked and secure-storage-unavailable states.
+- Both states use scroll-safe layouts for short screens and the on-screen keyboard. The PIN field filters non-digits and caps input at six characters; existing PIN verification, failed-attempt delay and fail-closed storage behavior are unchanged.
+- Secure-storage retry remains explicit: the archive stays blocked until the settings read succeeds.
+- Focused widget assertions were added for component presence, PIN filtering, incorrect PIN, valid unlock and retry after a transient secure-storage read failure. These tests are intentionally not run until the routed-screen UI completion gate is closed.
+- This is a source-level UI/accessibility change. Emulator/physical-device screenshot comparison remains outstanding; no pixel-identical claim is made.
