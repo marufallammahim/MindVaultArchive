@@ -526,3 +526,30 @@ Verified artifact from run 43832286259:
 - Re-opened `Mind Vault UI.zip`; verified the six files and the Home, Editor, Tasks and Delete Confirmation references. No emulator/physical-device screenshot comparison is available, so no pixel-identity claim is made.
 - Settings remains **partial**: source redesign and focused test source exist, but test execution, complete interaction/failure acceptance, and light/dark/text-scale/device visual QA remain.
 - All other route statuses remain as recorded in the routed-screen matrix; UI implementation is not complete.
+
+
+## 2026-11-18 App-lock gate visual/accessibility milestone
+
+### Source and test changes
+- `58141f375dc0bddb4e8d218ba89ec4f5114cabc7`: aligned the global `AppLockGate` unlock and secure-storage failure screens with the shared `FeatureHero` and `NeoBrutalistPanel` components. Both states are scroll-safe on short screens and retain the existing fail-closed behavior.
+- The PIN field now accepts digits only and limits input to six characters before verification; busy state disables the field and unlock action.
+- `cc5c7127c8cad87d9ce2137b769b75a9435ad7fb`: added widget assertions for the shared panels, six-digit filtering, and secure-storage retry. The retry test confirms that access stays blocked on a storage error and only reveals the child after secure storage becomes readable.
+- No database schema, migration, PIN hashing, lockout policy, or route behavior changed.
+
+### User-action trace and acceptance
+- Unlock action -> PIN TextField formatter -> `AppLockGate._unlock` -> `AppLockService.verifyPin` -> secure value store -> success unlocks child; wrong PIN retains the gate and shows the existing error/lockout state.
+- Secure-storage failure -> fail-closed gate -> Retry -> `AppLockGate._load` -> secure value store -> child is revealed only after a successful settings read.
+- Focused coverage: `test/app_lock_gate_test.dart` now checks valid PIN unlock, filtered six-digit input, wrong PIN, visual component presence, and recovery after a transient secure-storage read failure. Tests have not been executed because the routed-screen UI completion gate remains open.
+
+### Exact-SHA validation snapshot
+- Prior baseline SHA `c0d454adb5d281165441061b722466460afd3f51`: Code Check run `44041444711` PASS; `flutter analyze` reported `No issues found!`; Dart format reported 56 files with 0 changes.
+- The same baseline SHA: Android APK Artifact run `44041444663` PASS; debug APK built, metadata generated, and artifact `14309094295` uploaded.
+- Baseline artifact `MindVaultArchive-debug-232-c0d454adb5d281165441061b722466460afd3f51`, ZIP digest `b5d1b8bb0efa72235b757d2d6773a10378d7ba3fe790ff64e0b8af96af8da6ca`, 100,763,226 bytes. Downloaded ZIP contains the APK, `build-info.txt`, and `SHA256SUMS.txt`. Metadata confirms branch `feature/ultimate-all-in-one-mindvault`, commit `c0d454adb5d281165441061b722466460afd3f51`, version `1.0.0+1`, debug build and `installable=true`. APK size 182,398,909 bytes; APK SHA-256 `81a24d0dc5d5470af245716176349aa3b7fa9ceff158a197430f68b5ed8f2ab3`.
+- New source/test SHA `cc5c7127c8cad87d9ce2137b769b75a9435ad7fb`: Code Check run `44262696842` and Android APK run `44262696761` were in progress at the time of this entry. They are not recorded as passes. Regression Tests were not dispatched because UI work remains incomplete.
+
+### Warning status and remaining work
+- No Node 20 deprecation, setup-java v4, or `cp -n` warning appeared in the inspected baseline logs. Workflows use checkout v5, setup-java v6 and upload-artifact v6.
+- Riverpod generator/analyzer language-version mismatch remains; resolve only with a coordinated compatible generator/lint/analyzer update.
+- Android KGP warning remains for the app module, `file_picker` and `share_plus`; built-in Kotlin migration needs a coordinated plugin/Gradle compatibility change.
+- Drift database lifecycle warnings remain unverified until the full regression suite runs after UI completion.
+- Remaining UI acceptance: finish per-screen control/state and responsive/text-scale/focus review for all 19 routes, capture emulator/physical-device screenshots for reference comparison, and complete remaining local feature success/failure/persistence coverage. No pixel-identical claim is made. External AI, cloud sync, collaboration, OCR, biometrics, PIN recovery, encryption, reminders, recurrence, calendar and habits remain not implemented/blocked pending real providers, platform support, credentials or product/privacy decisions.
