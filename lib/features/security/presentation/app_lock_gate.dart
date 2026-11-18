@@ -1,4 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:mindvault_archive/features/security/data/app_lock_service.dart';
 
 class AppLockGate extends StatefulWidget {
@@ -99,28 +102,53 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
     }
     if (_storageError) {
       return Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.security_update_warning_outlined, size: 52),
-                const SizedBox(height: 12),
-                const Text(
-                  'Could not verify secure app-lock settings. Access is paused '
-                  'until secure storage is available.',
-                  textAlign: TextAlign.center,
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const FeatureHero(
+                      icon: Icons.shield_outlined,
+                      title: 'Secure storage unavailable',
+                      subtitle:
+                          'MindVault keeps the archive locked until app-lock settings can be verified.',
+                    ),
+                    const SizedBox(height: 18),
+                    NeoBrutalistPanel(
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                        children: [
+                          const Icon(
+                            Icons.security_update_warning_outlined,
+                            size: 42,
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'Access is paused. Check that secure storage is available, then retry.',
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 18),
+                          SizedBox(
+                            width: double.infinity,
+                            child: FilledButton.icon(
+                              onPressed: () {
+                                setState(() => _loading = true);
+                                _load();
+                              },
+                              icon: const Icon(Icons.refresh_rounded),
+                              label: const Text('Retry'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                FilledButton(
-                  onPressed: () {
-                    setState(() => _loading = true);
-                    _load();
-                  },
-                  child: const Text('Retry'),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -211,56 +239,60 @@ class _UnlockScreenState extends State<_UnlockScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 360),
-            child: Padding(
-              padding: const EdgeInsets.all(28),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.lock_outline_rounded,
-                    size: 64,
-                    color: Theme.of(context).colorScheme.primary,
+                  const FeatureHero(
+                    icon: Icons.lock_rounded,
+                    title: 'MindVault is locked',
+                    subtitle: 'Enter your six-digit app PIN to continue.',
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'MindVault is locked',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Enter your six-digit app PIN to continue.',
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  TextField(
-                    controller: _controller,
-                    autofocus: true,
-                    obscureText: true,
-                    keyboardType: TextInputType.number,
-                    maxLength: 6,
-                    textAlign: TextAlign.center,
-                    onSubmitted: (_) => _submit(),
-                    decoration: InputDecoration(
-                      labelText: 'App PIN',
-                      errorText: _error,
-                      border: const OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _busy ? null : _submit,
-                      child: _busy
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Text('Unlock'),
+                  const SizedBox(height: 18),
+                  NeoBrutalistPanel(
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextField(
+                          controller: _controller,
+                          autofocus: true,
+                          enabled: !_busy,
+                          obscureText: true,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.done,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(6),
+                          ],
+                          maxLength: 6,
+                          textAlign: TextAlign.center,
+                          onSubmitted: (_) => _submit(),
+                          decoration: InputDecoration(
+                            labelText: 'App PIN',
+                            errorText: _error,
+                            counterText: '',
+                            prefixIcon: const Icon(Icons.password_rounded),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FilledButton(
+                          onPressed: _busy ? null : _submit,
+                          child: _busy
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text('Unlock'),
+                        ),
+                      ],
                     ),
                   ),
                 ],
