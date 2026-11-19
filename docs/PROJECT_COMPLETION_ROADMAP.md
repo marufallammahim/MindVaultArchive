@@ -2,7 +2,7 @@
 
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
-Last reviewed: 2026-11-17  
+Last reviewed: 2026-11-19  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
 Latest source SHA reviewed: `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`
 
@@ -553,3 +553,14 @@ Verified artifact from run 43832286259:
 - Android KGP warning remains for the app module, `file_picker` and `share_plus`; built-in Kotlin migration needs a coordinated plugin/Gradle compatibility change.
 - Drift database lifecycle warnings remain unverified until the full regression suite runs after UI completion.
 - Remaining UI acceptance: finish per-screen control/state and responsive/text-scale/focus review for all 19 routes, capture emulator/physical-device screenshots for reference comparison, and complete remaining local feature success/failure/persistence coverage. No pixel-identical claim is made. External AI, cloud sync, collaboration, OCR, biometrics, PIN recovery, encryption, reminders, recurrence, calendar and habits remain not implemented/blocked pending real providers, platform support, credentials or product/privacy decisions.
+
+
+## 2026-11-19 app-lock test finder and formatting correction
+
+- The previous Code Check run **44262874153** and APK run **44262874171**, both on SHA `95a09ae7060d4f3bb0cb21a4ea10f0f2cb2fb98e`, failed at the Dart formatting gate. Analyzer and APK packaging were skipped; this was not a source compile/build failure.
+- Formatting was required in `lib/features/security/presentation/app_lock_gate.dart` and `test/app_lock_gate_test.dart`. The focused secure-storage retry test also used an incorrect finder (`Could not verify secure app-lock settings`) that did not match the screen's actual `Secure storage unavailable` title. Corrected it in `72f07675fa527a2d1cb4eea2808109e020fcd52b`.
+- Temporarily enabled the feature branch on the existing formatter workflow; run **44482062847** completed successfully and generated formatter commit **207ff4aa19b7c1bc109234aea21869848b47bcf6**. Only the long FeatureHero subtitle and two test finder/expect lines were reformatted. Restored automatic formatting to main-only in **a5938f579d8c3cdbe82db25795e74443f112a620** to avoid recurring bot commits/races.
+- Code Check **44482169331** and Android APK Artifact **44482169347** were queued for SHA `a5938f579d8c3cdbe82db25795e74443f112a620` at this snapshot. They are not passes until completed. The regression workflow `code-quality.yml` remains manual-only and was not dispatched because the routed-screen UI completion gate is still open.
+- The secure-storage failure widget test now waits for the actual screen title and asserts the child remains blocked until retry succeeds. This test has **not been executed**. No regression pass is claimed.
+- UI completion remains **PARTIAL**: all 19 routes are inventoried, but per-screen interaction/visual acceptance and emulator/physical-device screenshot comparison remain. The source feature specification continues to identify cloud/AI/OCR/biometric encryption/reminders/recurrence/calendar/habits as not implemented or externally blocked.
+- Current actionable warnings: Riverpod generator/analyzer SDK language-version mismatch; Kotlin Gradle Plugin usage by app, `file_picker`, and `share_plus`; Drift database lifecycle warning not re-evaluated because the regression suite has not run.
