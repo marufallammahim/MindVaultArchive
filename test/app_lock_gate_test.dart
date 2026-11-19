@@ -88,7 +88,7 @@ void main() {
     );
     await _pumpUntilVisible(
       tester,
-      find.textContaining('Could not verify secure app-lock settings'),
+      find.text('Secure storage unavailable'),
     );
 
     expect(
