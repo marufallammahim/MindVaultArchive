@@ -86,15 +86,9 @@ void main() {
         ),
       ),
     );
-    await _pumpUntilVisible(
-      tester,
-      find.text('Secure storage unavailable'),
-    );
+    await _pumpUntilVisible(tester, find.text('Secure storage unavailable'));
 
-    expect(
-      find.textContaining('Secure storage unavailable'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('Secure storage unavailable'), findsOneWidget);
     expect(find.byType(FeatureHero), findsOneWidget);
     expect(find.byType(NeoBrutalistPanel), findsOneWidget);
     expect(find.text('Vault home'), findsNothing);

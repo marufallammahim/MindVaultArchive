@@ -114,8 +114,7 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
                     const FeatureHero(
                       icon: Icons.shield_outlined,
                       title: 'Secure storage unavailable',
-                      subtitle:
-                          'MindVault keeps the archive locked until app-lock settings can be verified.',
+                      subtitle: 'MindVault keeps the archive locked until app-lock settings can be verified.',
                     ),
                     const SizedBox(height: 18),
                     NeoBrutalistPanel(
