@@ -2,12 +2,20 @@ import 'package:drift/drift.dart' hide Column;
 import 'package:material_ui/material_ui.dart';
 import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 
 class TrashScreen extends ConsumerWidget {
   const TrashScreen({super.key});
+
+  void _showActionError(BuildContext context, String action) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Could not $action. Please try again.')),
+    );
+  }
 
   Future<void> _permanentlyDelete(
     BuildContext context,
@@ -43,8 +51,11 @@ class TrashScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed == true) {
+    if (confirmed != true) return;
+    try {
       await ref.read(databaseProvider).permanentlyDeleteNote(note.id);
+    } catch (_) {
+      _showActionError(context, 'delete this note permanently');
     }
   }
 
@@ -79,7 +90,10 @@ class TrashScreen extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text('Could not load Trash: ${snapshot.error}'),
+              child: NeoBrutalistPanel(
+                padding: const EdgeInsets.all(18),
+                child: Text('Could not load Trash: ${snapshot.error}'),
+              ),
             );
           }
           if (!snapshot.hasData) {
@@ -97,17 +111,22 @@ class TrashScreen extends ConsumerWidget {
                       'Notes you move here can be restored or deleted forever.',
                   compact: true,
                 ),
-                SizedBox(height: 28),
-                Icon(
-                  Icons.delete_sweep_outlined,
-                  size: 64,
-                  color: AppTheme.primary,
-                ),
-                SizedBox(height: 12),
-                Center(
-                  child: Text(
-                    'Nothing to clean up right now.',
-                    textAlign: TextAlign.center,
+                SizedBox(height: 24),
+                NeoBrutalistPanel(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.delete_sweep_outlined,
+                        size: 64,
+                        color: AppTheme.primary,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'Nothing to clean up right now.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -124,62 +143,65 @@ class TrashScreen extends ConsumerWidget {
                   child: FeatureHero(
                     icon: Icons.delete_outline_rounded,
                     title: 'Recently removed',
-                    subtitle: 'Restore a note to your archive or remove it permanently.',
+                    subtitle:
+                        'Restore a note to your archive or remove it permanently.',
                     compact: true,
                   ),
                 );
               }
               final note = notes[index - 1];
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: AppTheme.pink,
-                      foregroundColor: AppTheme.ink,
-                      child: Icon(Icons.delete_outline_rounded),
-                    ),
-                    title: Text(
-                      note.title.trim().isEmpty ? 'Untitled note' : note.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    subtitle: Text(
-                      note.documentContent.trim().isEmpty
-                          ? 'No additional content'
-                          : note.documentContent.trim(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      tooltip: 'Trash actions',
-                      onSelected: (value) async {
-                        if (value == 'restore') {
+              return NeoBrutalistPanel(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppTheme.pink,
+                    foregroundColor: AppTheme.ink,
+                    child: Icon(Icons.delete_outline_rounded),
+                  ),
+                  title: Text(
+                    note.title.trim().isEmpty ? 'Untitled note' : note.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  subtitle: Text(
+                    note.documentContent.trim().isEmpty
+                        ? 'No additional content'
+                        : note.documentContent.trim(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: PopupMenuButton<String>(
+                    tooltip: 'Trash actions',
+                    onSelected: (value) async {
+                      if (value == 'restore') {
+                        try {
                           await db.setDeleted(note.id, false);
-                        } else if (value == 'delete') {
-                          await _permanentlyDelete(context, ref, note);
+                        } catch (_) {
+                          _showActionError(context, 'restore this note');
                         }
-                      },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(
-                          value: 'restore',
-                          child: ListTile(
-                            dense: true,
-                            leading: Icon(Icons.restore_rounded),
-                            title: Text('Restore'),
-                          ),
+                      } else if (value == 'delete') {
+                        await _permanentlyDelete(context, ref, note);
+                      }
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(
+                        value: 'restore',
+                        child: ListTile(
+                          dense: true,
+                          leading: Icon(Icons.restore_rounded),
+                          title: Text('Restore'),
                         ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: ListTile(
-                            dense: true,
-                            leading: Icon(Icons.delete_forever_rounded),
-                            title: Text('Delete forever'),
-                          ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: ListTile(
+                          dense: true,
+                          leading: Icon(Icons.delete_forever_rounded),
+                          title: Text('Delete forever'),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );
