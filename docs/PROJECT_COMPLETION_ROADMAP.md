@@ -564,3 +564,21 @@ Verified artifact from run 43832286259:
 - The secure-storage failure widget test now waits for the actual screen title and asserts the child remains blocked until retry succeeds. This test has **not been executed**. No regression pass is claimed.
 - UI completion remains **PARTIAL**: all 19 routes are inventoried, but per-screen interaction/visual acceptance and emulator/physical-device screenshot comparison remain. The source feature specification continues to identify cloud/AI/OCR/biometric encryption/reminders/recurrence/calendar/habits as not implemented or externally blocked.
 - Current actionable warnings: Riverpod generator/analyzer SDK language-version mismatch; Kotlin Gradle Plugin usage by app, `file_picker`, and `share_plus`; Drift database lifecycle warning not re-evaluated because the regression suite has not run.
+
+
+## 2026-11-20 Trash UI consistency and action-safety milestone
+
+### Source/test commits
+- `b8b734e53fd46a9cdbcd47e58ec0cecfd137b46a`: Trash note cards and empty-state content use the reusable `NeoBrutalistPanel`. Restore and permanent-delete failures now show user feedback rather than an uncaught async error.
+- `d4dd53cc1576c67709964fd8734a6432cc7877d8` and `0a5e5ab8046ce770b17dc2ff86dc1563677a5f29`: new `test/trash_screen_test.dart` covers empty state, restore persistence, confirmation cancellation, and permanent deletion cleanup of attachments metadata, note-tag links and revisions while detaching linked tasks. Test source has not been executed.
+- Formatter run **44697750897** PASS generated `ca0f45ff0a37679795bdede4cd9893d3dced40e3`; automatic formatter was restored to main-only in `b084489a947f0805d4fbd3bf759760a943165040`.
+
+### Verified CI and artifact snapshot
+- SHA `d7b84891e00912b3d42a4086a49c86c7f40e28cd`: Code Check **44482220777** PASS; all formatting/analyzer steps successful, `flutter analyze` reported `No issues found!`.
+- Same SHA: Android APK Artifact **44482220755** PASS. Artifact **14509431335** downloaded and inspected; contains APK, `build-info.txt`, and `SHA256SUMS.txt`. Metadata branch and commit match, version `1.0.0+1`, debug, installable. APK is 182,398,933 bytes; SHA-256 `40db0a03808698e852364849aaaacbbad2cf247f2789247ef8512539696d9423`.
+- Latest code commits after this verified snapshot require fresh exact-SHA Code Check and APK validation. Regression Tests remain manual-only and intentionally undispatched because UI completion is not verified.
+
+### Remaining
+- Trash: test execution and visual QA pending. Permanent deletion removes database attachment metadata; filesystem cleanup is outside this screen's current service behavior and must not be implied.
+- All 19 routes remain partial for final visual/interaction acceptance; no emulator/physical screenshot comparisons have been captured.
+- Riverpod generator/analyzer language-version warning and Kotlin Gradle Plugin warnings for app module, `file_picker`, `share_plus` remain. Drift lifecycle warning is not re-evaluated until regression tests are run. No Node 20 deprecation, setup-java v4, or `cp -n` portability warning was seen in inspected logs.
