@@ -21,9 +21,12 @@ Future<void> _pumpUntil(
   fail('Timed out waiting for Trash to update.');
 }
 
-Future<List<Note>> _readNotes(WidgetTester tester, AppDatabase database) =>
-    tester.runAsync(() => database.select(database.notes).get()) ??
-    Future.value(<Note>[]);
+Future<List<Note>> _readNotes(
+  WidgetTester tester,
+  AppDatabase database,
+) async =>
+    await tester.runAsync(() => database.select(database.notes).get()) ??
+    <Note>[];
 
 Future<void> _openTrashActions(WidgetTester tester) async {
   await tester.tap(find.byTooltip('Trash actions'));
