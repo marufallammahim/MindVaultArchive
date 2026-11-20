@@ -46,7 +46,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(database)],
-        child: MaterialApp(theme: AppTheme.lightTheme, home: const TrashScreen()),
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const TrashScreen(),
+        ),
       ),
     );
     await tester.pump();
@@ -73,7 +76,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(database)],
-        child: MaterialApp(theme: AppTheme.lightTheme, home: const TrashScreen()),
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const TrashScreen(),
+        ),
       ),
     );
     await tester.pump();
@@ -109,7 +115,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(database)],
-        child: MaterialApp(theme: AppTheme.lightTheme, home: const TrashScreen()),
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const TrashScreen(),
+        ),
       ),
     );
     await tester.pump();
@@ -147,15 +156,17 @@ void main() {
       priority: 1,
       noteId: 'delete-note',
     );
-    await database.into(database.attachments).insert(
-      AttachmentsCompanion.insert(
-        id: 'linked-attachment',
-        noteId: 'delete-note',
-        type: 'drawing',
-        localPath: '/missing/test/drawing.png',
-        filename: 'drawing.png',
-      ),
-    );
+    await database
+        .into(database.attachments)
+        .insert(
+          AttachmentsCompanion.insert(
+            id: 'linked-attachment',
+            noteId: 'delete-note',
+            type: 'drawing',
+            localPath: '/missing/test/drawing.png',
+            filename: 'drawing.png',
+          ),
+        );
     await database.setDeleted('delete-note', true);
     addTearDown(() async {
       await tester.pumpWidget(const SizedBox.shrink());
@@ -166,7 +177,10 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [databaseProvider.overrideWithValue(database)],
-        child: MaterialApp(theme: AppTheme.lightTheme, home: const TrashScreen()),
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const TrashScreen(),
+        ),
       ),
     );
     await tester.pump();
@@ -183,12 +197,28 @@ void main() {
     });
 
     expect(await _readNotes(tester, database), isEmpty);
-    expect(await tester.runAsync(() => database.select(database.attachments).get()), isEmpty);
-    expect(await tester.runAsync(() => database.select(database.noteTags).get()), isEmpty);
-    expect(await tester.runAsync(() => database.select(database.noteRevisions).get()), isEmpty);
-    final tasks = await tester.runAsync(() => database.select(database.tasks).get());
+    expect(
+      await tester.runAsync(() => database.select(database.attachments).get()),
+      isEmpty,
+    );
+    expect(
+      await tester.runAsync(() => database.select(database.noteTags).get()),
+      isEmpty,
+    );
+    expect(
+      await tester.runAsync(
+        () => database.select(database.noteRevisions).get(),
+      ),
+      isEmpty,
+    );
+    final tasks = await tester.runAsync(
+      () => database.select(database.tasks).get(),
+    );
     expect(tasks?.single.noteId, isNull);
-    expect(await tester.runAsync(() => database.select(database.tags).get()), hasLength(1));
+    expect(
+      await tester.runAsync(() => database.select(database.tags).get()),
+      hasLength(1),
+    );
     expect(tester.takeException(), isNull);
   });
 }
