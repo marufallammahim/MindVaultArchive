@@ -51,10 +51,11 @@ class TrashScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed != true) return;
+    if (confirmed != true || !context.mounted) return;
     try {
       await ref.read(databaseProvider).permanentlyDeleteNote(note.id);
     } catch (_) {
+      if (!context.mounted) return;
       _showActionError(context, 'delete this note permanently');
     }
   }
@@ -177,6 +178,7 @@ class TrashScreen extends ConsumerWidget {
                         try {
                           await db.setDeleted(note.id, false);
                         } catch (_) {
+                          if (!context.mounted) return;
                           _showActionError(context, 'restore this note');
                         }
                       } else if (value == 'delete') {
