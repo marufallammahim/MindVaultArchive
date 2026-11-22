@@ -243,10 +243,8 @@ class _QuickCaptureScreenState extends ConsumerState<QuickCaptureScreen> {
                     label: 'Your idea',
                     hint: 'Capture an idea before it disappears…',
                   ),
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppTheme.ink,
-                    height: 1.45,
-                  ),
+                  style: Theme.of(context).textTheme.bodyLarge
+                      ?.copyWith(color: AppTheme.ink, height: 1.45),
                   keyboardType: TextInputType.multiline,
                 ),
               ],

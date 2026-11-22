@@ -214,9 +214,9 @@ void main() {
     expect(find.text('Thought title'), findsOneWidget);
     expect(find.text('Your idea'), findsOneWidget);
     expect(
-      tester.widget<TextField>(
-        find.byKey(const ValueKey('quick-capture-title')),
-      ).enabled,
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('quick-capture-title')))
+          .enabled,
       isTrue,
     );
     await tester.tap(find.byKey(const ValueKey('quick-capture-save')));
