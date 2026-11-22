@@ -636,3 +636,17 @@ Verified artifact from run 43832286259:
 
 
 - Trigger note: the workflow/audit/roadmap bundle commit `ba4d907aa83a4d496e7aa272d624f8aebd75b0c7` was created through Git Data API; no workflow runs were visible immediately. This follow-up contents commit is intended to produce the normal push event and is the validation target. The latest SHA and run IDs will be rechecked before reporting.
+
+
+## Full-project repair request / latest CI checkpoint — 2026-11-22
+
+User requested a complete source audit, repair, synchronization, feature review and completion. Work remains in progress; no 100% completion claim.
+
+- Latest reviewed source SHA: `73c703d10a071f9fd9cd7f1d530110cc3cde6ab4`.
+- Quick Capture reviewed at blob `80e480232729dd4879d21ab0e7caedb0db60d5a8`: restore gate disables editing/saving while SharedPreferences restoration runs; queued draft writes use generation guards; capture saves locally through Drift and clears draft. Widget workflow test file blob `173bd44f8ea639d442f5c7f0f4a078aaf0ea32ed` includes local persistence, editor-route, draft remount and narrow-screen coverage. No source edit made in this checkpoint.
+- Router source blob `7340f09bf2e3b78692acc9adbb97433ec0a7f8c8` lists the routed screens; feature specification and UI audit were read at this SHA.
+- **Code Check** run 44997343046: PASS on SHA 73c703d1. Formatting passed; `flutter analyze` reports `No issues found!` (log inspected).
+- **Android APK Artifact** run 44997343020: PASS on SHA 73c703d1. Debug build, APK metadata verification and upload passed. Artifact ID 14744835632; size 100,770,953 bytes; artifact name `MindVaultArchive-debug-259-73c703d10a071f9fd9cd7f1d530110cc3cde6ab4`; digest `sha256:562f361faecdeb8d35e38ced74c2d75d81f704c85cfaf588222ffc3ed522de08`; expires 2026-12-22. These are exact-SHA results.
+- **Regression Tests** run 44997343001 on SHA 73c703d1: still in progress at last check; Flutter setup, dependencies, codegen, generated-file verification and formatting passed; `Run all Flutter tests` remains in progress. No conclusion yet. Logs unavailable while running.
+- The commit SHA for this roadmap-only update will require fresh workflow validation; prior results must not be represented as validating the new SHA.
+- Remaining work: run/inspect full tests; review and fix failures; feature-by-feature persistence/error/edge tests; inspect warnings; route-level runtime UI acceptance; emulator screenshots and physical-device QA; validate all three workflows against the final same SHA. Known partial/external features remain per FEATURE_SPECIFICATION (e.g. encryption, biometrics, reminders/recurrence/calendar, OCR, cloud sync/collaboration/AI) and must not be misrepresented as implemented.
