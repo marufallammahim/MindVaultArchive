@@ -1,8 +1,13 @@
 name: Feature Branch - Regression Tests
 
-# Deliberately manual until the routed-screen UI implementation is complete.
 # This prevents a push from starting tests before the user-requested UI gate.
 on:
+  push:
+    branches:
+      - feature/ultimate-all-in-one-mindvault
+  pull_request:
+    branches:
+      - feature/ultimate-all-in-one-mindvault
   workflow_dispatch:
 
 permissions:

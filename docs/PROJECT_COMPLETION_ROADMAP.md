@@ -623,3 +623,13 @@ Verified artifact from run 43832286259:
 - Quick Capture remains **partial** until focused tests execute, visual checks are completed in light/dark themes with text scaling and keyboard/focus, and screenshots are compared on emulator/device.
 - All 19 routes remain under final per-screen control-state/responsive QA. No emulator/physical-device screenshot comparison is available; pixel-identical replication is not claimed.
 - External AI/cloud sync/collaboration/OCR/biometrics/encryption/reminders/recurrence/calendar/habits remain blocked or not implemented unless real providers/platform capability and consent are added.
+
+
+## 2026-11-22 Quick Capture source UI gate closure and regression workflow activation
+
+- Formatter trigger temporarily enabled for the feature branch in commit `038d7ddae6a103b5e734e98b731f64124f6a5433`; formatter run **44997131979** succeeded and committed Dart formatting as `484fc2651ba4f14f6bbaa6b3e1618091e2935483` (two files, formatting-only). Restored formatter to main-only in `d5bef19ea67ef0b20a2a7a772c0a9408e361f3d1`.
+- Code Check **44997131953** on pre-format SHA `8c2c7c88254918ea515c8cea7efb978cb367c6dc` failed at Dart formatting; source and test were formatted by run 44997131979. Analyzer was skipped on that SHA. The APK workflow 44997132051 on that SHA was still in progress when superseded; it is not counted as success.
+- Latest pre-activation SHA `d5bef19ea67ef0b20a2a7a772c0a9408e361f3d1`: Code Check **44997234454** and APK **44997234363** were queued/in-progress at inspection; not counted as passes.
+- Source-level UI review across all 19 route files found no TODO/FIXME, placeholder, inert-null callback or unlabelled disabled-control patterns. Protector biometric, PIN recovery and encryption remain explicitly unavailable. This closes the source UI implementation gate for running the regression suite; screenshot/device QA remains a separately disclosed limitation.
+- Activated Regression Tests on feature-branch pushes and pull requests while retaining manual dispatch. This will run the existing full suite `flutter test --concurrency=1 --reporter expanded`; no tests were weakened or removed.
+- Current warning status: Riverpod generator analyzer language version 3.4.0 vs Dart SDK 3.14.0; app module, `file_picker`, and `share_plus` Kotlin Gradle Plugin warnings; package resolution reports 64 packages newer but incompatible with current constraints. These upgrades need a coordinated compatibility review. No Node 20 deprecation, setup-java v4, or `cp -n` portability warning appeared in latest logs. Drift lifecycle warning remains to be assessed by the newly activated regression suite.

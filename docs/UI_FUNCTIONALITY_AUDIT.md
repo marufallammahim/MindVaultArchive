@@ -243,3 +243,11 @@ Source milestone:
 - Existing workflow tests already cover local capture persistence, canonical editor navigation and draft restoration after remount. All tests remain source-only/unexecuted until the UI gate is closed.
 - No database/provider/service schema changed. User action still calls `databaseProvider.read().saveNoteContent`; draft storage remains local SharedPreferences.
 - Device screenshots, text-scale/focus QA and CI execution remain pending; no pixel-identity claim is made.
+
+
+## Source-level routed UI implementation gate — 2026-11-22
+
+- Reviewed the 19 GoRouter destination files at branch commit `8c2c7c88254918ea515c8cea7efb978cb367c6dc` for shared reference palette/panel usage, visible callbacks, disabled states, TODO/FIXME/placeholder patterns, and unavailable feature claims. No dead callback/TODO/placeholder patterns were found; the only “Not implemented” UI match is the explicit Protector status for biometric unlock, which is unavailable.
+- Bespoke reference screens (Splash, Home, Editor, Tasks and Delete Confirmation) retain their custom layouts; secondary feature screens use FeatureHero/NeoBrutalistPanel or explicit palette/keyline/shadow cards. Source-level UI implementation is considered complete enough to begin regression testing; individual runtime interaction acceptance and device screenshot QA remain separate gates.
+- Physical-device/emulator screenshots are unavailable in this run. Pixel-identical reference matching is not claimed. Responsive/text-scale/focus and route-specific action tests remain outstanding.
+- Quick Capture now prevents editing/saving until draft restore finishes, eliminating the restore-vs-user-input startup race. The focused widget test is committed but not yet executed.
