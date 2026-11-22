@@ -591,3 +591,35 @@ Verified artifact from run 43832286259:
 - Fresh Code Check **44879767543** and Android APK Artifact **44879767535** started for the import-fix SHA `9b8e8a166ba3f76c92c9b5a3712e322b01c244b4`; both were in progress at the latest inspection, so neither is recorded as pass.
 - Regression Tests have no run on the latest SHA. The workflow is manual-only; this runtime does not expose a workflow-dispatch action. It remains intentionally not run until routed UI completion is verified. The Trash widget tests, including restore/persistence, cancel-delete and linked-record cleanup, remain source-only/unexecuted.
 - Current blockers/partial status unchanged: 19 routed screens still need individual visual/control-state acceptance and screenshot comparison; physical-device QA is unavailable. Riverpod analyzer compatibility and Android KGP warnings remain; Drift lifecycle warning remains unverified without the regression suite. No external functionality is claimed.
+
+
+## 2026-11-22 Quick Capture redesign and draft-restoration race guard
+
+### Source milestone
+- Temporary formatter feature trigger: `038d7ddae6a103b5e734e98b731f64124f6a5433` (main-only trigger must be restored after formatting validation).
+- UI commit: `ee2b1cfa693e58370ba2d994b093ea15d1558da2` — Quick Capture title/body moved into a shared cream Neo-Brutalist writing panel with black input borders and high-contrast text; green status panel communicates local draft state.
+- Focused test commit: `7cdf48ed98d544f46b67d0923980c39c676ceafe` — test source checks the shared panel count, 320×640 layout, fields enabled after restoration, empty-save feedback, and no database note inserted.
+- Restore guard: inputs and both Save actions remain disabled while SharedPreferences restoration is in flight; `_capture` exits if restoration is not complete. This closes the startup overwrite race where a user could type or save before draft restoration completed.
+- Existing save, save-and-open-editor, draft restoration/remount, and generation-queue clearing behavior remains. No database/provider/migration changes.
+
+### User-action/data-flow evidence
+- Title/body input -> generation-queued SharedPreferences draft writes -> save -> `databaseProvider` -> `AppDatabase.saveNoteContent` transactional insert -> local archive; success clears the draft and either shows confirmation or navigates to `/editor/:id`.
+- Empty capture remains rejected with SnackBar feedback and no insert.
+- Existing workflow tests cover successful persistence, editor route transition, and draft restore after remount. The new focused test is not executed yet.
+
+### CI and artifact snapshot at the start of this milestone
+- Branch head `a1411f5d6d41e1b856ad19c4356e74525c4c8e63`: Code Check run **44879870769** PASS; all steps including `flutter analyze` succeeded, which reported `No issues found!`.
+- Same SHA: Android APK run **44879870704** PASS; debug build, metadata verification and artifact upload succeeded. Artifact **14697640764**, `MindVaultArchive-debug-251-a1411f5d6d41e1b856ad19c4356e74525c4c8e63`, ZIP digest `137a4ee0e3b422af7cb4f541ed36dd4824ceb8790573da2886a7a54281613d33`, size 100,762,993 bytes. Metadata: branch matches, commit matches, version `1.0.0+1`, `build_type=debug`, `installable=true`. Regression workflow was not run (manual-only; UI gate not complete).
+- These PASS results apply to the pre-Quick-Capture SHA only. Fresh Code Check/APK results must be inspected after final formatting and formatter-workflow restoration; pending/cancelled runs do not count.
+
+### Warnings
+- Code Check logs show Riverpod generator warning: analyzer language version 3.4.0 vs SDK 3.14.0. Coordinated Riverpod generator/annotation/lint/analyzer upgrade required; analyzer-only override is not safe.
+- APK logs warn the app module, `file_picker`, and `share_plus` apply Kotlin Gradle Plugin, which future Flutter releases will reject. Coordinated Flutter/plugin/Kotlin migration remains unresolved.
+- Package-resolution output reports 64 packages with newer versions incompatible with current constraints; do not broad-upgrade without compatibility review.
+- No Node 20 deprecation, setup-java v4, or `cp -n` warning appeared in these logs; workflows use checkout v5, setup-java v6 and upload-artifact v6.
+- Drift test database lifecycle warnings are unverified because the Regression Tests workflow has not run.
+
+### UI acceptance
+- Quick Capture remains **partial** until focused tests execute, visual checks are completed in light/dark themes with text scaling and keyboard/focus, and screenshots are compared on emulator/device.
+- All 19 routes remain under final per-screen control-state/responsive QA. No emulator/physical-device screenshot comparison is available; pixel-identical replication is not claimed.
+- External AI/cloud sync/collaboration/OCR/biometrics/encryption/reminders/recurrence/calendar/habits remain blocked or not implemented unless real providers/platform capability and consent are added.
