@@ -15,8 +15,7 @@ import 'package:uuid/uuid.dart';
 /// Local absolute paths are never exported. Each attachment is restored to a
 /// new app-private path and its SHA-256 checksum is verified before import.
 class FullBackupService {
-  FullBackupService(this._database, {Directory? restoreDirectory})
-    : _restoreDirectory = restoreDirectory;
+  FullBackupService(this._database, {this.restoreDirectory});
 
   static const backupFormat = 'mindvault-full-backup';
   static const backupVersion = 1;
@@ -24,7 +23,7 @@ class FullBackupService {
   static const maxAttachments = 1000;
 
   final AppDatabase _database;
-  final Directory? _restoreDirectory;
+  final Directory? restoreDirectory;
 
   Future<Uint8List> exportZip() async {
     final zip = Archive();
@@ -103,6 +102,7 @@ class FullBackupService {
       throw const FormatException('Backup exceeds the 250 MB safety limit.');
     }
 
+    _preflightZip(zipBytes);
     final decoded = ZipDecoder().decodeBytes(zipBytes);
     final files = <String, ArchiveFile>{};
     var uncompressedBytes = 0;
@@ -264,9 +264,93 @@ class FullBackupService {
     }
   }
 
+  /// Checks central-directory size metadata before the ZIP decoder expands
+  /// entries. This rejects ZIP bombs whose declared output exceeds our limit.
+  void _preflightZip(Uint8List bytes) {
+    if (bytes.length < 22) {
+      throw const FormatException('Backup is not a valid ZIP archive.');
+    }
+    final data = ByteData.sublistView(bytes);
+    final lowerBound = (bytes.length - 22 - 0xffff).clamp(0, bytes.length - 22);
+    var endRecord = -1;
+    for (var offset = bytes.length - 22; offset >= lowerBound; offset--) {
+      if (data.getUint32(offset, Endian.little) != 0x06054b50) continue;
+      final commentLength = data.getUint16(offset + 20, Endian.little);
+      if (offset + 22 + commentLength == bytes.length) {
+        endRecord = offset;
+        break;
+      }
+    }
+    if (endRecord < 0) {
+      throw const FormatException('Backup is missing its ZIP directory.');
+    }
+
+    final disk = data.getUint16(endRecord + 4, Endian.little);
+    final directoryDisk = data.getUint16(endRecord + 6, Endian.little);
+    final entriesOnDisk = data.getUint16(endRecord + 8, Endian.little);
+    final entryCount = data.getUint16(endRecord + 10, Endian.little);
+    final directorySize = data.getUint32(endRecord + 12, Endian.little);
+    final directoryOffset = data.getUint32(endRecord + 16, Endian.little);
+    if (disk != 0 ||
+        directoryDisk != 0 ||
+        entriesOnDisk != entryCount ||
+        entryCount == 0xffff ||
+        directorySize == 0xffffffff ||
+        directoryOffset == 0xffffffff) {
+      throw const FormatException(
+        'Multi-disk and ZIP64 backups are not supported.',
+      );
+    }
+    if (entryCount > maxAttachments + 2) {
+      throw const FormatException('Backup contains too many ZIP entries.');
+    }
+
+    final directoryEnd = directoryOffset + directorySize;
+    if (directoryOffset < 0 ||
+        directoryEnd > endRecord ||
+        directoryEnd > bytes.length) {
+      throw const FormatException('Backup ZIP directory is invalid.');
+    }
+
+    var cursor = directoryOffset;
+    var totalUncompressed = 0;
+    for (var index = 0; index < entryCount; index++) {
+      if (cursor + 46 > directoryEnd ||
+          data.getUint32(cursor, Endian.little) != 0x02014b50) {
+        throw const FormatException('Backup ZIP entry is invalid.');
+      }
+      final compressedSize = data.getUint32(cursor + 20, Endian.little);
+      final uncompressedSize = data.getUint32(cursor + 24, Endian.little);
+      final nameLength = data.getUint16(cursor + 28, Endian.little);
+      final extraLength = data.getUint16(cursor + 30, Endian.little);
+      final commentLength = data.getUint16(cursor + 32, Endian.little);
+      final diskStart = data.getUint16(cursor + 34, Endian.little);
+      if (compressedSize == 0xffffffff ||
+          uncompressedSize == 0xffffffff ||
+          diskStart != 0) {
+        throw const FormatException(
+          'ZIP64 and multi-disk entries are not supported.',
+        );
+      }
+      if (uncompressedSize > maxBackupBytes - totalUncompressed) {
+        throw const FormatException(
+          'Uncompressed backup exceeds the 250 MB safety limit.',
+        );
+      }
+      totalUncompressed += uncompressedSize;
+      cursor += 46 + nameLength + extraLength + commentLength;
+      if (cursor > directoryEnd) {
+        throw const FormatException('Backup ZIP directory is truncated.');
+      }
+    }
+    if (cursor != directoryEnd) {
+      throw const FormatException('Backup ZIP directory size is inconsistent.');
+    }
+  }
+
   Future<Directory> _attachmentsDirectory() async {
     final root =
-        _restoreDirectory ??
+        restoreDirectory ??
         Directory(
           p.join(
             (await getApplicationDocumentsDirectory()).path,

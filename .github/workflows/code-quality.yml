@@ -1,5 +1,6 @@
 name: Feature Branch - Regression Tests
 
+# This prevents a push from starting tests before the user-requested UI gate.
 on:
   push:
     branches:
@@ -23,24 +24,36 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout exact branch commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.sha }}
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: stable
+          flutter-version: '3.50.0'
           cache: true
+
+      - name: Generate missing native platform scaffolding
+        run: bash tool/regenerate_platforms.sh
 
       - name: Resolve dependencies
         run: flutter pub get
 
-      - name: Migrate to standalone Material UI
-        run: dart fix --apply --code=migrate_design_widgets
+      - name: Verify analyzer and dependency files are committed
+        run: git diff --exit-code -- analysis_options.yaml pubspec.lock
 
       - name: Generate Drift and Riverpod sources
         run: dart run build_runner build --delete-conflicting-outputs
 
+      - name: Normalize generated Drift binding
+        run: dart format lib/core/database/database.g.dart
+
+      - name: Verify generated sources are committed
+        run: git diff --exit-code -- lib
+
+      - name: Verify Dart formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
       - name: Run all Flutter tests
-        run: flutter test --reporter expanded
+        run: flutter test --concurrency=1 --reporter expanded

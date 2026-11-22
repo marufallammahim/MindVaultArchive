@@ -10,6 +10,7 @@ import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:mindvault_archive/features/editor/providers/editor_provider.dart';
 import 'package:mindvault_archive/features/editor/presentation/markdown_toolbar.dart';
+import 'package:mindvault_archive/features/editor/presentation/markdown_preview_editing_controller.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path/path.dart' as p;
@@ -26,15 +27,16 @@ class EditorScreen extends ConsumerStatefulWidget {
 
 class _EditorScreenState extends ConsumerState<EditorScreen> {
   late final TextEditingController _titleController;
-  late final TextEditingController _contentController;
+  late final MarkdownPreviewEditingController _contentController;
   bool _initialized = false;
   bool _previewMode = false;
+  bool _leaving = false;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController();
-    _contentController = TextEditingController();
+    _contentController = MarkdownPreviewEditingController();
   }
 
   @override
@@ -103,19 +105,29 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
     File? target;
     try {
+      // Read metadata first so an oversized selection is rejected before
+      // loading its bytes into memory.
       final selection = await FilePicker.platform.pickFiles(
         type: FileType.any,
-        withData: true,
+        withData: false,
       );
       if (selection == null || selection.files.isEmpty) {
         return;
       }
       final picked = selection.files.single;
-      final bytes = picked.bytes;
-      if (bytes == null || bytes.isEmpty) {
-        throw StateError('The selected file could not be read.');
+      final sourcePath = picked.path;
+      if (sourcePath == null || sourcePath.isEmpty) {
+        throw StateError('The selected file path is unavailable.');
       }
-      if (bytes.length > 25 * 1024 * 1024) {
+      final source = File(sourcePath);
+      if (!await source.exists()) {
+        throw StateError('The selected file could not be found.');
+      }
+      final fileSize = await source.length();
+      if (fileSize == 0) {
+        throw StateError('The selected file is empty.');
+      }
+      if (fileSize > 25 * 1024 * 1024) {
         throw StateError('Files larger than 25 MB are not supported yet.');
       }
       final documents = await getApplicationDocumentsDirectory();
@@ -129,7 +141,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
       final filename = '${id}_${safeName.isEmpty ? 'attachment' : safeName}';
       target = File(p.join(directory.path, filename));
-      await target.writeAsBytes(bytes, flush: true);
+      await source.copy(target.path);
       final extension = p.extension(picked.name).toLowerCase();
       final type =
           {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp'}.contains(extension)
@@ -259,6 +271,39 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     }
   }
 
+  Future<void> _openHistory() async {
+    final notifier = ref.read(editorProvider(widget.noteId).notifier);
+    final saved = await notifier.forceSave();
+    if (!mounted) return;
+    if (!saved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Save the current note before restoring a revision.'),
+        ),
+      );
+      return;
+    }
+
+    final restored = await context.push<bool>('/history/${widget.noteId}');
+    if (restored != true || !mounted) return;
+    await notifier.reloadFromDatabase();
+    if (!mounted) return;
+    final refreshed = ref.read(editorProvider(widget.noteId));
+    _titleController.text = refreshed.title;
+    _contentController.text = refreshed.content;
+  }
+
+  Future<void> _moveToTrash() async {
+    final saved = await ref
+        .read(editorProvider(widget.noteId).notifier)
+        .forceSave();
+    if (!mounted || !saved) return;
+    final confirmed = await context.push<bool>('/delete/${widget.noteId}');
+    if (confirmed != true || !mounted) return;
+    await ref.read(databaseProvider).setDeleted(widget.noteId, true);
+    if (mounted) context.pop();
+  }
+
   IconData _attachmentIcon(Attachment item) {
     switch (item.type) {
       case 'image':
@@ -296,27 +341,47 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     return PopScope(
       canPop: !state.isSaving,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (didPop || _leaving) return;
+        _leaving = true;
         final router = GoRouter.of(context);
-        final saved = await ref
-            .read(editorProvider(widget.noteId).notifier)
-            .forceSave();
-        if (!mounted) return;
-        if (saved) router.pop();
+        var saved = false;
+        try {
+          saved = await ref
+              .read(editorProvider(widget.noteId).notifier)
+              .forceSave();
+        } catch (error, stack) {
+          debugPrint('Editor exit save failed: $error');
+          debugPrintStack(stackTrace: stack);
+        }
+        if (!context.mounted) return;
+        if (saved) {
+          router.pop();
+        } else {
+          _leaving = false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Your note could not be saved. Please try again.'),
+            ),
+          );
+        }
       },
       child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
+          surfaceTintColor: Colors.transparent,
           title: Text(
-            state.saveError != null
-                ? 'Save failed'
-                : state.isSaving
-                ? 'Saving…'
-                : 'Saved',
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: state.saveError != null
-                  ? Theme.of(context).colorScheme.error
-                  : null,
+            'Create a Note',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: Theme.of(context).appBarTheme.foregroundColor,
             ),
+          ),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: Colors.transparent),
           ),
           actions: [
             IconButton(
@@ -325,535 +390,277 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               onPressed: _attachFile,
             ),
             IconButton(
-              tooltip: 'Export or share Markdown',
-              icon: const Icon(Icons.ios_share_outlined),
-              onPressed: _shareMarkdown,
-            ),
-            IconButton(
               tooltip: _previewMode ? 'Edit Markdown' : 'Preview Markdown',
               icon: Icon(
                 _previewMode ? Icons.edit_outlined : Icons.visibility_outlined,
               ),
               onPressed: () => setState(() => _previewMode = !_previewMode),
             ),
-            IconButton(
-              tooltip: 'Tasks linked to this note',
-              icon: const Icon(Icons.task_alt_outlined),
-              onPressed: () => context.push('/tasks?noteId=${widget.noteId}'),
-            ),
-            IconButton(
-              tooltip: 'Version history',
-              icon: const Icon(Icons.history),
-              onPressed: () async {
-                final notifier = ref.read(
-                  editorProvider(widget.noteId).notifier,
-                );
-                final saved = await notifier.forceSave();
-                if (!context.mounted) return;
-                if (!saved) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Save the current note before restoring a revision.',
-                      ),
-                    ),
-                  );
-                  return;
-                }
-
-                final restored = await context.push<bool>(
-                  '/history/${widget.noteId}',
-                );
-                if (restored != true || !mounted) return;
-                await notifier.reloadFromDatabase();
-                if (!mounted) return;
-                final refreshed = ref.read(editorProvider(widget.noteId));
-                _titleController.text = refreshed.title;
-                _contentController.text = refreshed.content;
-              },
-            ),
-            IconButton(
-              tooltip: 'Move note to Trash',
-              icon: const Icon(Icons.delete_outline_rounded),
-              onPressed: () async {
-                final saved = await ref
-                    .read(editorProvider(widget.noteId).notifier)
-                    .forceSave();
-                if (!context.mounted || !saved) return;
-                final confirmed = await context.push<bool>(
-                  '/delete/${widget.noteId}',
-                );
-                if (confirmed == true && context.mounted) {
-                  await db.setDeleted(widget.noteId, true);
-                  if (context.mounted) context.pop();
-                }
-              },
-            ),
             PopupMenuButton<int>(
               tooltip: 'Note color',
               icon: const Icon(Icons.palette_outlined),
               onSelected: (value) async {
-                await db.setNoteColor(
-                  widget.noteId,
-                  value == -1 ? null : value,
-                );
+                await ref
+                    .read(databaseProvider)
+                    .setNoteColor(widget.noteId, value == -1 ? null : value);
               },
               itemBuilder: (context) => const [
                 PopupMenuItem(value: -1, child: Text('Default color')),
-                PopupMenuItem(value: 0xFFFFF0D8, child: Text('Warm cream')),
-                PopupMenuItem(value: 0xFFE1F2E5, child: Text('Soft green')),
-                PopupMenuItem(value: 0xFFE2ECFF, child: Text('Soft blue')),
-                PopupMenuItem(value: 0xFFF4E4F4, child: Text('Soft lavender')),
-                PopupMenuItem(value: 0xFFFFE5E5, child: Text('Soft rose')),
+                PopupMenuItem(
+                  value: 0xFFF7CB46,
+                  child: Text('Sunflower yellow'),
+                ),
+                PopupMenuItem(value: 0xFFC0F7FE, child: Text('Sky cyan')),
+                PopupMenuItem(value: 0xFF99E885, child: Text('Pixel green')),
+                PopupMenuItem(value: 0xFFE9E0E8, child: Text('Soft pink')),
+                PopupMenuItem(value: 0xFFFFDC8B, child: Text('Warm cream')),
               ],
             ),
-            IconButton(
-              tooltip: 'Draw',
-              icon: const Icon(Icons.brush),
-              onPressed: () => context.push('/drawing/${widget.noteId}'),
-            ),
-            IconButton(
-              tooltip: 'Save',
-              icon: const Icon(Icons.check),
-              onPressed: () async {
-                final saved = await ref
-                    .read(editorProvider(widget.noteId).notifier)
-                    .forceSave();
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      saved ? 'Note saved.' : 'Could not save note.',
-                    ),
-                  ),
-                );
+            PopupMenuButton<String>(
+              tooltip: 'More note actions',
+              icon: const Icon(Icons.more_vert_rounded),
+              onSelected: (action) async {
+                switch (action) {
+                  case 'share':
+                    await _shareMarkdown();
+                    break;
+                  case 'tasks':
+                    if (context.mounted) {
+                      context.push('/tasks?noteId=${widget.noteId}');
+                    }
+                    break;
+                  case 'history':
+                    await _openHistory();
+                    break;
+                  case 'trash':
+                    await _moveToTrash();
+                    break;
+                  case 'draw':
+                    if (context.mounted) {
+                      context.push('/drawing/${widget.noteId}');
+                    }
+                    break;
+                }
               },
+              itemBuilder: (context) => const [
+                PopupMenuItem(
+                  value: 'share',
+                  child: Text('Export or share Markdown'),
+                ),
+                PopupMenuItem(
+                  value: 'tasks',
+                  child: Text('Tasks linked to this note'),
+                ),
+                PopupMenuItem(value: 'history', child: Text('Version history')),
+                PopupMenuItem(value: 'draw', child: Text('Add drawing')),
+                PopupMenuItem(
+                  value: 'trash',
+                  child: Text('Move note to Trash'),
+                ),
+              ],
             ),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-          child: Column(
-            children: [
-              if (state.saveError != null)
-                MaterialBanner(
-                  content: Text(state.saveError!),
-                  leading: const Icon(Icons.error_outline),
-                  actions: [
-                    TextButton(
-                      onPressed: () async {
-                        final saved = await ref
-                            .read(editorProvider(widget.noteId).notifier)
-                            .forceSave();
-                        if (!context.mounted) return;
-                        if (saved) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Note saved.')),
-                          );
-                        }
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
+        body: CustomPaint(
+          painter: _PixelDotPainter(
+            dotColor: Theme.of(context).colorScheme.outlineVariant
+                .withValues(alpha: 0.28),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            child: Column(
+              children: [
+                if (state.saveError != null)
+                  MaterialBanner(
+                    content: Text(state.saveError!),
+                    leading: const Icon(Icons.error_outline),
+                    actions: [
+                      TextButton(
+                        onPressed: () async {
+                          final saved = await ref
+                              .read(editorProvider(widget.noteId).notifier)
+                              .forceSave();
+                          if (!context.mounted) return;
+                          if (saved) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Note saved.')),
+                            );
+                          }
+                        },
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                TextField(
+                  controller: _titleController,
+                  onChanged: (_) => _onTextChanged(),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                    height: 1.12,
+                  ),
+                  decoration: const InputDecoration(
+                    filled: false,
+                    hintText: 'Give this note a title',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  maxLines: null,
                 ),
-              TextField(
-                controller: _titleController,
-                onChanged: (_) => _onTextChanged(),
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.8,
-                  height: 1.12,
-                ),
-                decoration: const InputDecoration(
-                  hintText: 'Give this note a title',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12),
-                ),
-                maxLines: null,
-              ),
-              StreamBuilder<List<Category>>(
-                stream:
-                    (db.select(db.categories)..orderBy([
-                          (category) => OrderingTerm.asc(category.name),
-                        ]))
-                        .watch(),
-                builder: (context, categoriesSnapshot) {
-                  final categories = categoriesSnapshot.data ?? [];
-                  return StreamBuilder<Note?>(
-                    stream:
-                        (db.select(db.notes)
-                              ..where((note) => note.id.equals(widget.noteId)))
-                            .watchSingleOrNull(),
-                    builder: (context, noteSnapshot) {
-                      final selectedId = noteSnapshot.data?.categoryId;
-                      return DropdownButtonFormField<String?>(
-                        initialValue:
-                            categories.any((item) => item.id == selectedId)
-                            ? selectedId
-                            : null,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          prefixIcon: Icon(Icons.folder_outlined),
-                          hintText: 'Add a category',
+                AnimatedBuilder(
+                  animation: _contentController,
+                  builder: (context, child) {
+                    final text = _contentController.text;
+                    final words = RegExp(r'\S+').allMatches(text).length;
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 2, bottom: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '$words words  •  ${text.length} characters',
                         ),
-                        items: [
-                          const DropdownMenuItem<String?>(
-                            value: null,
-                            child: Text('Uncategorized'),
-                          ),
-                          for (final category in categories)
-                            DropdownMenuItem<String?>(
-                              value: category.id,
-                              child: Text(category.name),
-                            ),
-                        ],
-                        onChanged: categoriesSnapshot.hasError
-                            ? null
-                            : (value) async {
-                                try {
-                                  await db.setNoteCategory(
-                                    widget.noteId,
-                                    value,
-                                  );
-                                } catch (error) {
-                                  if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Could not assign category: $error',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                      );
-                    },
-                  );
-                },
-              ),
-              StreamBuilder<List<Tag>>(
-                stream: (db.select(
-                  db.tags,
-                )..orderBy([(tag) => OrderingTerm.asc(tag.name)])).watch(),
-                builder: (context, tagsSnapshot) {
-                  final tags = tagsSnapshot.data ?? [];
-                  return StreamBuilder<List<NoteTag>>(
-                    stream:
-                        (db.select(db.noteTags)..where(
-                              (item) => item.noteId.equals(widget.noteId),
-                            ))
-                            .watch(),
-                    builder: (context, selectedSnapshot) {
-                      final selectedIds = (selectedSnapshot.data ?? [])
-                          .map((item) => item.tagId)
-                          .toSet();
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                      ),
+                    );
+                  },
+                ),
+                Expanded(
+                  child: _previewMode
+                      ? SingleChildScrollView(
+                          padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
+                          child: _contentController.text.trim().isEmpty
+                              ? const Center(
+                                  child: Text('Nothing to preview yet.'),
+                                )
+                              : MarkdownBody(
+                                  data: _contentController.text,
+                                  selectable: true,
+                                  styleSheet: MarkdownStyleSheet(),
+                                ),
+                        )
+                      : Column(
                           children: [
                             Expanded(
-                              child: tags.isEmpty
-                                  ? const Text('No tags yet')
-                                  : Wrap(
-                                      spacing: 8,
-                                      runSpacing: 4,
-                                      children: [
-                                        for (final tag in tags)
-                                          FilterChip(
-                                            label: Text(tag.name),
-                                            selected: selectedIds.contains(
-                                              tag.id,
-                                            ),
-                                            onSelected: (selected) async {
-                                              final next = {...selectedIds};
-                                              if (selected) {
-                                                next.add(tag.id);
-                                              } else {
-                                                next.remove(tag.id);
-                                              }
-                                              try {
-                                                await db.setNoteTags(
-                                                  widget.noteId,
-                                                  next.toList(),
-                                                );
-                                              } catch (error) {
-                                                if (!context.mounted) return;
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                      'Could not update tags: $error',
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                      ],
+                              child: TextField(
+                                controller: _contentController,
+                                onChanged: (_) => _onTextChanged(),
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(
+                                      height: 1.65,
+                                      fontSize: 16,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
                                     ),
-                            ),
-                            IconButton(
-                              tooltip: 'Manage tags',
-                              icon: const Icon(Icons.settings_outlined),
-                              onPressed: () => context.push('/tags'),
+                                cursorColor: Theme.of(context)
+                                    .colorScheme
+                                    .primary,
+                                decoration: InputDecoration(
+                                  hintText: 'Start writing your note…',
+                                  hintStyle: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                                  filled: false,
+                                  contentPadding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    18,
+                                    16,
+                                    18,
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                ),
+                                maxLines: null,
+                                expands: true,
+                                textAlignVertical: TextAlignVertical.top,
+                                keyboardType: TextInputType.multiline,
+                              ),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  );
-                },
-              ),
-              StreamBuilder<List<VaultTask>>(
-                stream:
-                    (db.select(db.tasks)
-                          ..where((task) => task.noteId.equals(widget.noteId))
-                          ..orderBy([
-                            (task) => OrderingTerm.asc(task.dueAt),
-                            (task) => OrderingTerm.desc(task.updatedAt),
-                          ]))
-                        .watch(),
-                builder: (context, taskSnapshot) {
-                  final tasks = taskSnapshot.data ?? [];
-                  if (tasks.isEmpty) return const SizedBox.shrink();
-                  return Card(
-                    child: ExpansionTile(
-                      leading: const Icon(Icons.task_alt_outlined),
-                      title: Text('Linked tasks (${tasks.length})'),
-                      children: [
-                        for (final task in tasks)
-                          ListTile(
-                            leading: Checkbox(
-                              value: task.isCompleted,
-                              onChanged: (value) =>
-                                  db.setTaskCompleted(task.id, value ?? false),
-                            ),
-                            title: Text(
-                              task.title,
-                              style: task.isCompleted
-                                  ? const TextStyle(
-                                      decoration: TextDecoration.lineThrough,
-                                    )
-                                  : null,
-                            ),
-                            subtitle: task.dueAt == null
-                                ? null
-                                : Text(
-                                    'Due ${MaterialLocalizations.of(context).formatShortDate(task.dueAt!)}',
-                                  ),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              StreamBuilder<List<Note>>(
-                stream: db.select(db.notes).watch(),
-                builder: (context, notesSnapshot) {
-                  final allNotes = notesSnapshot.data ?? [];
-                  final currentTitle = state.title.trim();
-                  final matches = RegExp(r'\[\[([^\]]+)\]\]')
-                      .allMatches(state.content)
-                      .map((match) => match.group(1)!.trim())
-                      .where((title) => title.isNotEmpty)
-                      .toSet();
-                  final linkedNotes = allNotes
-                      .where(
-                        (note) =>
-                            note.id != widget.noteId &&
-                            matches.any(
-                              (title) =>
-                                  note.title.trim().toLowerCase() ==
-                                  title.toLowerCase(),
-                            ),
-                      )
-                      .toList();
-                  final backlinks = currentTitle.isEmpty
-                      ? <Note>[]
-                      : allNotes
-                            .where(
-                              (note) =>
-                                  note.id != widget.noteId &&
-                                  note.documentContent.toLowerCase().contains(
-                                    '[[${currentTitle.toLowerCase()}]]',
-                                  ),
-                            )
-                            .toList();
-                  if (linkedNotes.isEmpty && backlinks.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return Card(
-                    child: ExpansionTile(
-                      leading: const Icon(Icons.account_tree_outlined),
-                      title: Text(
-                        'Links and backlinks (${linkedNotes.length + backlinks.length})',
-                      ),
-                      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                      children: [
-                        if (linkedNotes.isNotEmpty) ...[
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text('Linked notes'),
-                          ),
-                          Wrap(
-                            spacing: 8,
-                            children: [
-                              for (final note in linkedNotes)
-                                ActionChip(
-                                  avatar: const Icon(Icons.link, size: 16),
-                                  label: Text(note.title),
-                                  onPressed: () =>
-                                      context.push('/editor/${note.id}'),
-                                ),
-                            ],
-                          ),
-                        ],
-                        if (backlinks.isNotEmpty) ...[
-                          const Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text('Backlinks to this note'),
-                          ),
-                          Wrap(
-                            spacing: 8,
-                            children: [
-                              for (final note in backlinks)
-                                ActionChip(
-                                  avatar: const Icon(Icons.reply, size: 16),
-                                  label: Text(
-                                    note.title.isEmpty
-                                        ? 'Untitled'
-                                        : note.title,
-                                  ),
-                                  onPressed: () =>
-                                      context.push('/editor/${note.id}'),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                },
-              ),
-              Expanded(
-                child: _previewMode
-                    ? SingleChildScrollView(
-                        padding: const EdgeInsets.fromLTRB(4, 12, 4, 24),
-                        child: _contentController.text.trim().isEmpty
-                            ? const Center(
-                                child: Text('Nothing to preview yet.'),
-                              )
-                            : MarkdownBody(
-                                data: _contentController.text,
-                                selectable: true,
-                                styleSheet: MarkdownStyleSheet.fromTheme(
-                                  Theme.of(context),
-                                ),
-                              ),
-                      )
-                    : Column(
-                        children: [
-                          MarkdownToolbar(
-                            controller: _contentController,
-                            onChanged: _onTextChanged,
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: _contentController,
-                              onChanged: (_) => _onTextChanged(),
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              decoration: const InputDecoration(
-                                hintText: 'Write with Markdown…',
-                              ),
-                              maxLines: null,
-                              expands: true,
-                              textAlignVertical: TextAlignVertical.top,
-                              keyboardType: TextInputType.multiline,
-                            ),
-                          ),
-                        ],
-                      ),
-              ),
-              AnimatedBuilder(
-                animation: _contentController,
-                builder: (context, child) {
-                  final text = _contentController.text;
-                  final words = RegExp(r'\S+').allMatches(text).length;
-                  final readingMinutes = (words / 200).ceil();
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(4, 4, 4, 12),
-                    child: Row(
-                      children: [
-                        Text('$words words'),
-                        const SizedBox(width: 12),
-                        Text('${text.length} characters'),
-                        const Spacer(),
-                        Text(
-                          readingMinutes == 0
-                              ? 'Less than 1 min'
-                              : '$readingMinutes min read',
+                ),
+                StreamBuilder<List<Attachment>>(
+                  stream: attachmentQuery.watch(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Text(
+                          'Could not load attachments: ${snapshot.error}',
                         ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              StreamBuilder<List<Attachment>>(
-                stream: attachmentQuery.watch(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Text(
-                        'Could not load attachments: ${snapshot.error}',
+                      );
+                    }
+                    final attachments = snapshot.data ?? [];
+                    if (attachments.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return SizedBox(
+                      height: 88,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.only(bottom: 12),
+                        itemCount: attachments.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final item = attachments[index];
+                          return SizedBox(
+                            width: 240,
+                            child: Card(
+                              child: ListTile(
+                                dense: true,
+                                leading: Icon(_attachmentIcon(item)),
+                                title: Text(
+                                  item.filename,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                subtitle: Text(item.type.toUpperCase()),
+                                onTap: () => _openAttachment(item),
+                                trailing: IconButton(
+                                  tooltip: 'Remove attachment',
+                                  icon: const Icon(Icons.close, size: 18),
+                                  onPressed: () => _removeAttachment(item),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     );
-                  }
-                  final attachments = snapshot.data ?? [];
-                  if (attachments.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return SizedBox(
-                    height: 88,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.only(bottom: 12),
-                      itemCount: attachments.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final item = attachments[index];
-                        return SizedBox(
-                          width: 240,
-                          child: Card(
-                            child: ListTile(
-                              dense: true,
-                              leading: Icon(_attachmentIcon(item)),
-                              title: Text(
-                                item.filename,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(item.type.toUpperCase()),
-                              onTap: () => _openAttachment(item),
-                              trailing: IconButton(
-                                tooltip: 'Remove attachment',
-                                icon: const Icon(Icons.close, size: 18),
-                                onPressed: () => _removeAttachment(item),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ],
+                  },
+                ),
+                MarkdownToolbar(
+                  controller: _contentController,
+                  onChanged: _onTextChanged,
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+class _PixelDotPainter extends CustomPainter {
+  const _PixelDotPainter({required this.dotColor});
+
+  final Color dotColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = dotColor;
+    const step = 16.0;
+    for (double y = 8; y < size.height; y += step) {
+      for (double x = 8; x < size.width; x += step) {
+        canvas.drawCircle(Offset(x, y), 0.8, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PixelDotPainter oldDelegate) =>
+      oldDelegate.dotColor != dotColor;
 }

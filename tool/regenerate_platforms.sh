@@ -38,11 +38,28 @@ if [[ "$needs_native_scaffold" == "true" ]]; then
     --project-name "$PROJECT" \
     "$tmp_dir/scaffold"
 
-  mkdir -p android ios
-  # -n preserves every existing app-specific native file and only adds files
-  # that are absent (Gradle wrapper, settings, Xcode project, etc.).
-  cp -Rn "$tmp_dir/scaffold/android/." android/
-  cp -Rn "$tmp_dir/scaffold/ios/." ios/
+  # Copy only missing files without relying on non-portable "cp -n".
+  # The generated Flutter scaffold must never overwrite app-specific files.
+  copy_missing_tree() {
+    local source_root="${1%/}"
+    local destination_root="${2%/}"
+    local source_path relative destination_path
+
+    mkdir -p "$destination_root"
+    while IFS= read -r -d '' source_path; do
+      relative="${source_path#"$source_root"/}"
+      destination_path="$destination_root/$relative"
+      if [[ -d "$source_path" && ! -L "$source_path" ]]; then
+        mkdir -p "$destination_path"
+      elif [[ ! -e "$destination_path" && ! -L "$destination_path" ]]; then
+        mkdir -p "$(dirname "$destination_path")"
+        cp -pP "$source_path" "$destination_path"
+      fi
+    done < <(find "$source_root" -mindepth 1 -print0)
+  }
+
+  copy_missing_tree "$tmp_dir/scaffold/android" android
+  copy_missing_tree "$tmp_dir/scaffold/ios" ios
 
   # Never leave two competing Gradle DSL files in the same project directory.
   if [[ -f android/app/build.gradle && -f android/app/build.gradle.kts ]]; then

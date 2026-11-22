@@ -1,10 +1,10 @@
-# UI and Functionality Audit — 2026-11-11
+# UI and Functionality Audit — 2026-11-15
 
 Branch: `feature/ultimate-all-in-one-mindvault`
 
 ## Design direction
-- AMOLED black is the default dark surface; burgundy is the default accent.
-- Use compact, rounded cards, expressive but restrained color, strong text contrast, and thumb-reachable primary actions.
+- Follow the uploaded Neo-Brutalist references: cream/dotted canvas, black outlines, flat yellow/cyan/green/pink/warm-cream blocks, bold typography and hard unblurred shadows.
+- Keep compact, readable content hierarchy, strong contrast and thumb-reachable primary actions; dark/AMOLED mode must retain readable foreground colors.
 - Keep layouts content-first; avoid decorative blur on large scrolling surfaces to preserve performance on mid-range Android devices.
 - Preserve Material 3 semantics, scalable text, visible focus/pressed states, and accessible contrast.
 - Use brief state transitions and provide reduced-motion-friendly behavior.
@@ -65,3 +65,189 @@ The following presentation files received screen-level compactness and visual hi
 - GitHub Actions formatter workflow committed the Dart formatting corrections in commit `aac57b6ea24bbf3188f47685889b4f7b3fd54a0e`.
 - The earlier Code Quality and Android CI failures were caused by the formatter check detecting those pending style changes before the formatter workflow's commit landed. They did not reach analyzer, tests, APK build, or artifact upload.
 - A new source commit is being used to trigger fresh validation against the formatted branch head.
+
+
+## Uploaded-reference Neo-Brutalist pass — 2026-11-13
+
+Committed on `feature/ultimate-all-in-one-mindvault`:
+- Shared Material theme now uses the reference palette and 2–3px black outlines for cards, inputs, dialogs, bottom sheets, menus and buttons.
+- Dark app-bar foregrounds now follow the dark ColorScheme rather than using black text on a dark surface.
+- Settings accent presets and editor note-color choices use the six reference colors.
+- Home note cards and bottom dock use flat color blocks, black outlines and zero-blur offset shadows.
+- Editor writing area remains borderless with its dotted canvas; redundant manual Save action was removed while autosave and save-before-exit remain.
+
+## Remaining verification and implementation boundaries
+
+- On source SHA c3630a3b1c23bd43c9e4319061415ffb4d0472e4, Code Check run 43574945899 and Android APK run 43574945830 both stopped at the formatting gate; neither reached analyzer or APK packaging. Formatter run 43574945773 passed and committed the two required Dart formatting changes as 604b1d98fc2e32d2c1485c882ce9fa1745847ebc. That formatter-created SHA has no Code Check/APK run yet because the bot commit did not trigger downstream workflows.
+- No emulator/physical-device screenshot comparison was run, so exact pixel identity is not claimed.
+- This visual pass does not complete every feature in the master specification. AI, cloud sync and collaboration remain unimplemented without configured providers; notebooks/folders, OCR, reminders/recurrence, calendar/habits and advanced editor workflows remain partial or pending.
+- A complete feature-by-feature source audit and runtime acceptance pass is still required before release readiness can be claimed.
+
+
+## Reference archive review — 2026-11-14
+
+The supplied `Mind Vault UI.zip` was opened and inspected. It contains six files:
+- `Home Screen.jpg` (382×512): dark archive home with profile greeting, search/settings actions, category chips, bright colored note cards, add action and floating bottom dock.
+- `Note Editor, Main Editor.jpg` (512×382): split editor states with title/body, metadata chips, top actions and a compact formatting toolbar.
+- `to do list screen.jpg` (512×382): date selector, task list, calendar/progress view, colored task rows and bottom navigation.
+- `delete screen .jpg` (382×512): dark confirmation page, app mark, large editorial heading, yellow hand/cable illustration, coral destructive action and a keep-note action.
+- `app logo.jpg` (2048×2048) and `app in Animation logo.jpg` (512×512): supplied brand references.
+
+### Source-level visual gap findings
+
+These are code comparisons, not emulator screenshot measurements:
+- **Home:** the route now uses the bright reference palette for note cards in both brightness modes, black card keylines, and a cyan hard-shadow dock. Profile, search, filters and create actions remain connected. Side-by-side emulator comparison and narrow-screen visual QA remain.
+- **Tasks:** the route now includes the compact date strip, bright palette task rows, date-aware CRUD, completion filtering, note links and a local progress/calendar view. The monthly calendar and progress layout still need screenshot comparison and date-boundary interaction QA.
+- **Editor:** title/body autosave, Markdown preview/formatting, attachments, linked tasks, revisions, note colors, drawing and Trash remain connected. The app bar now groups secondary actions in an overflow menu and the Markdown toolbar uses cyan/yellow palette blocks with hard outlines. Narrow-screen screenshot and menu-action tests remain.
+- **Delete confirmation:** the route retains the dark background, brand mark, editorial heading, coral destructive action and keep-note action. Its custom painter now draws mirrored yellow hands around a white tangled cable. The drawing is source-level reference work; screenshot comparison remains outstanding.
+- **Shared secondary-screen hero:** FeatureHero now uses a flat sunflower-yellow block, cyan outlined icon tile, 2.5px black keyline and zero-blur offset shadow. Templates and Trash now use it; Protector uses the same palette/block language. Routes with custom writing or dashboard layouts still require individual review.
+- **Palette:** AppTheme now exposes the reference values: yellow #F7CB46, cyan #C0F7FE, green #99E885, pink #E9E0E8, cream canvas #FCEFE8, warm cream #FFDC8B, and black ink. Screen-specific colors remain in a few custom layouts and must be audited.
+- No Android emulator or physical-device screenshots were captured during this review. Pixel-identical replication is not claimed.
+
+### Routed-screen status inventory
+
+All 19 GoRouter destinations in `lib/app/router.dart` were enumerated. A route existing is not proof that its full workflow or reference styling is complete.
+
+| Screen | Current status | Evidence / remaining acceptance |
+|---|---|---|
+| Splash | Partial | Startup/branding route exists; first-run, contrast and screenshot QA remain |
+| Home | Partial | Note stream, filters, profile, actions and dock exist; responsive widget test is pending CI verification |
+| Editor | Partial | Autosave, Markdown, attachments and all note actions remain connected; overflow menu and toolbar were redesigned; narrow-screen/menu interaction tests remain |
+| Tasks | Partial | Local CRUD, due date, priority, completion, linked notes and progress view exist; end-to-end widget workflow test is pending |
+| Delete confirmation | Partial | Confirm/cancel route and custom two-hand/cable painter exist; emulator screenshot comparison and route test remain |
+| Drawing | Partial | PNG attachment flow exists; save/error/undo/redo/clear and backup lifecycle need complete tests |
+| Quick Capture | Partial | Shared reference-style writing panel, restore-before-edit guard, local draft persistence, save/open-editor workflows; focused widget coverage added but not executed; responsive and screenshot QA pending |
+| Search | Partial | Local FTS5 note/task search and category/tag filters exist; empty/error/open-result widget coverage remains |
+| Tags | Partial | Local create/rename/delete exists; assignment/filtering and widget persistence coverage remain |
+| Templates | Partial | Five built-ins and local custom templates exist; palette cards and FeatureHero added; malformed preference and full CRUD acceptance remains |
+| Archive tools | Partial | JSON and ZIP transfer paths exist; rollback/collision/missing-file acceptance remains |
+| Revision history | Partial | Local snapshots and restore exist; route/editor reload edge cases remain |
+| Trash | Partial | Shared Neo-Brutalist panels, empty/list states, restore/permanent-delete actions, action-failure feedback; focused widget tests added but not executed |
+| Settings | Partial | Theme, AMOLED, accent, profile and organization routes exist; persistence/accessibility matrix remains |
+| App lock settings | Partial | PIN gate remains; Protector panel and status rows now use reference palette; not encryption, no biometric unlock or recovery |
+| Insights | Partial | Local archive metrics exist; empty/populated and date-boundary UI tests remain |
+| Timeline | Partial | Local chronology and note navigation exist; boundary/empty-state tests remain |
+| Developer notebook | Partial | Local snippet create/open flow exists; complete edit/delete and empty/error acceptance remains |
+| About | Implemented static | Static information and links exist; shared visual/accessibility QA remains |
+
+External AI, cloud sync, collaboration, OCR/PDF indexing, biometrics, encrypted database storage, reminders, recurrence, calendar and habits remain not implemented or blocked by provider/platform/product decisions. No mock success state should be added for these features.
+
+
+## Home, Tasks and Splash reference alignment — 2026-11-14
+
+Source-level updates on the existing feature branch:
+- Home now uses the same bright yellow, soft-pink, cyan, green and cream note-card palette in dark and light modes. Note cards keep black outlines, and the bottom dock is a cyan flat block with a hard black shadow in both themes.
+- Home's selected Home dock item now navigates explicitly to `/home` instead of exposing an inert tap target.
+- Tasks now uses the reference palette for task rows, black keylines and compact square geometry. Date selection and task completion/edit/delete callbacks are preserved. The task dock now uses the shared cyan/yellow visual language and its Home action navigates to `/home`.
+- Task progress surfaces use flat palette blocks and hard unblurred shadows; due-date labels explicitly distinguish overdue tasks.
+- Splash now uses the canonical cream canvas and a flat sunflower logo frame with a dark outline and hard shadow instead of a blue blurred glow.
+- The feature APK artifact name now includes the run number and SHA only; it no longer includes the slash-containing branch name that GitHub rejects. The Flutter SDK is pinned to 3.50.0 for reproducible code-check and APK jobs.
+- The legacy `android-build.yml` workflow was restored to its original non-feature triggers. The dedicated `feature-branch-apk.yml` is the sole feature-branch debug APK workflow.
+
+Verification limits:
+- Source changes are not device screenshot comparisons. The Home, Tasks, Editor and Delete Confirmation reference screenshots still need side-by-side emulator/device QA.
+- Regression tests remain manual-only until all routed UI work is complete. No Flutter test suite was run during this milestone.
+
+
+## UI integration pass — 2026-11-14
+
+The following source-level UI work is committed on the existing feature branch:
+- d19340bc40f7e7a67dbeaec9cc133472afca6c9e: Home, Tasks and Splash reference palette alignment.
+- 391f300dea5ccb946ad0be7f8a8867e1550052d9: Templates grid moved to palette blocks, black outlines and hard offset shadows; shared FeatureHero added.
+- 3e807f890f7d9bdc60b9a21a6b3666a3797e355e: Protector panel and status rows restyled while PIN/security behavior was preserved.
+- 8bd30621e932da821d613cc0a8e6600aec65c949: Trash empty/list states now use FeatureHero and the reference palette.
+- 00074681925072483ffa4e6c695fd8b97e338395: Delete confirmation painter now draws mirrored yellow hands and a white tangled cable.
+- d8ae881dd5cc347407d64b6c7bb170de0b08bfd0 and a6e7b60cbfc885bd68b9cb90caf8a9bc9f76e275: Editor actions grouped into an overflow menu; Markdown toolbar restyled with cyan/yellow blocks and hard outlines.
+- 604b1d98fc2e32d2c1485c882ce9fa1745847ebc: Dart formatter commit for the editor changes.
+
+No Flutter regression tests were run because the all-routes UI implementation gate remains open. Device screenshots and accessibility/text-scaling QA remain outstanding.
+
+
+## Secondary-screen Neo-Brutalist panel pass — 2026-11-15
+
+Implementation commit: `299477616deb0f77b7afae45ee76e41613b4f76c`  
+Syntax/layout correction: `add9b448ae32f0bb85c3860d2497245a9ff642b3`  
+Dart formatter commit: `722fa155f3c0d6899b8db9c74ed56923d041c179`
+
+- Added `NeoBrutalistPanel`: theme-aware surface, high-contrast keyline, unblurred offset shadow, clipped Material interaction surface and caller-controlled padding.
+- Applied it to Archive Transfer operation groups, Search results and empty states, Tags, Revision History, Insights metric/health cards, Timeline entries, and Developer Notebook entries/empty state.
+- Search input now inherits the shared square, high-contrast input treatment rather than overriding it with a large rounded outline.
+- Tags deletion failures are now caught and surfaced with a SnackBar instead of escaping as an unhandled asynchronous error.
+- Existing GoRouter destinations, callbacks, Riverpod providers, Drift queries, backup/import services, revision restore and note-opening behavior were preserved. No database schema or migration was changed.
+- The formatting workflow caught one syntax issue in the Insights metric panel; it was corrected in `add9b448` and the formatter subsequently completed successfully, committing seven formatted Dart files as `722fa155`.
+- This is a source-level consistency milestone only. It is not a completed review of all routes, a device screenshot comparison, or proof of pixel-identical reproduction.
+- Remaining routed screens still need the same per-screen visual and control review, including Splash, Home, Editor, Tasks, Drawing, Settings, Protector, Trash, Templates and About, plus accessibility/text-scale/device checks.
+- Regression Tests remain intentionally manual while the routed-screen UI implementation is incomplete; no test pass is claimed for this milestone.
+
+
+## About and Drawing visual pass — 2026-11-16
+
+- **About** now uses a shared FeatureHero, a yellow logo/brand panel with black outline and hard shadow, a developer/GitHub information panel, and a cyan local-privacy panel. Tapping the GitHub row copies the profile URL and confirms the action with a SnackBar.
+- **Drawing** now uses a framed NeoBrutalistPanel for the sketch canvas and flat outlined palette controls for undo, redo and clear. The canvas/export background is consistently light with dark ink, avoiding white strokes on a light-theme canvas.
+- Drawing's existing persistence contract is unchanged: the screen validates an active note, exports PNG bytes, writes under the app documents directory, inserts attachment metadata into Drift, and deletes the newly created file if persistence fails. Full ZIP backup includes registered attachment bytes and refuses incomplete archives when a source file is missing.
+- Added About screen widget assertions and expanded Drawing screen style assertions. Tests are intentionally not run until all routed UI work is complete.
+- These are source-level visual changes. No emulator/physical-device screenshot comparison was performed, so pixel-identical matching is not claimed.
+
+
+## Settings Neo-Brutalist and accessibility pass — 2026-11-17
+
+Source milestone:
+- `d30f7f35791de9164f8a8666d4f05b15eac6cdd0`: Settings now starts with the shared FeatureHero and uses NeoBrutalistPanel surfaces for profile, appearance, category management, archive navigation and local-storage information.
+- Palette swatches now expose a tooltip and selected/button semantics, have a 42px hit target, and choose a contrast-aware check glyph for light/dark swatches.
+- Category management now renders explicit loading, error and empty states inside the shared panel. Category rows use outlined cyan icon tiles. Existing add/rename/delete callbacks and Drift saveCategory/deleteCategory operations remain unchanged.
+- `cff8da5057b6bdfc6baf681fa2b7c55f47d4e812` and `653f5699bd3ebee4361d78789c8cc64572670eb0`: added `test/settings_screen_test.dart` for narrow-screen rendering, shared panel presence, accent preference persistence, and category create/rename/delete persistence.
+- User profile, theme mode, AMOLED and accent state continue to flow through their existing Riverpod notifiers and SharedPreferences. Category state continues through the existing Drift stream and database methods. No schema, migration or route changes were made.
+- The test is intentionally not executed yet because the routed-screen UI completion gate remains open. Static analysis will still compile/analyze the test source in Code Check.
+- This is source-level UI/accessibility work; no emulator or physical-device screenshot comparison was performed.
+
+
+## Settings UI implementation and formatting follow-up — 2026-11-17
+
+- Settings source milestone: `d30f7f35791de9164f8a8666d4f05b15eac6cdd0`.
+- Focused Settings widget coverage: `cff8da5057b6bdfc6baf681fa2b7c55f47d4e812` and `653f5699bd3ebee4361d78789c8cc64572670eb0`.
+- Code Check run `44040904050` on SHA `118469b5eaf7646794be10aa0f8e6711b1380875` stopped at the Dart formatting gate; analyzer was skipped. The log identified only `settings_screen.dart` and `settings_screen_test.dart` as unformatted.
+- APK run `44040904104` on the same SHA stopped at the generated-source/formatting gate; APK build and upload were skipped.
+- Formatter run `44041214704` succeeded on trigger commit `49fb569e2703a6b2dc3479a10cbda9822ef9235c` and committed the two formatting changes as `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`.
+- The temporary feature-branch formatter trigger was restored to main-only in `3ae6198d9871702b179aca02e4e543345ff491f2`. Feature-branch Code Check remains the authoritative formatting gate.
+- Fresh Code Check and Android APK validation on the post-formatter/restored-workflow latest SHA are required. Regression Tests remain intentionally manual and unrun while routed UI work is incomplete.
+- The uploaded archive was re-opened: it contains the Home, Editor, Tasks, Delete Confirmation and two app-logo references. The Tasks reference includes habits/calendar elements; the current feature specification does not implement those capabilities, so no false habit/calendar controls are added.
+
+
+## Global app-lock gate Neo-Brutalist pass — 2026-11-18
+
+- The app-entry lock overlay now uses the shared FeatureHero and NeoBrutalistPanel components for the locked and secure-storage-unavailable states.
+- Both states use scroll-safe layouts for short screens and the on-screen keyboard. The PIN field filters non-digits and caps input at six characters; existing PIN verification, failed-attempt delay and fail-closed storage behavior are unchanged.
+- Secure-storage retry remains explicit: the archive stays blocked until the settings read succeeds.
+- Focused widget assertions were added for component presence, PIN filtering, incorrect PIN, valid unlock and retry after a transient secure-storage read failure. These tests are intentionally not run until the routed-screen UI completion gate is closed.
+- This is a source-level UI/accessibility change. Emulator/physical-device screenshot comparison remains outstanding; no pixel-identical claim is made.
+
+
+## 2026-11-20 Trash UI consistency and destructive-action feedback
+
+- Replaced generic Trash note cards with the shared `NeoBrutalistPanel`; the empty state now has an outlined panel as well. The list/empty-state layouts continue to use theme surfaces and text colors.
+- Restore and permanent-delete database failures are caught and shown through a SnackBar instead of escaping the popup action callback.
+- Added `test/trash_screen_test.dart`: empty state/panel, restore persistence, cancel permanent deletion, and confirmed permanent deletion cleanup for attachment metadata, note-tag links, revisions, and linked-task detachment. These tests have **not been executed** because the overall UI completion gate remains open.
+- Source review traced Trash query -> popup action -> Drift `setDeleted` or confirmation -> `permanentlyDeleteNote` transaction. No database schema change or filesystem deletion was added; permanent deletion continues to remove DB attachment metadata only, consistent with the existing service contract.
+- CI baseline SHA `d7b84891e00912b3d42a4086a49c86c7f40e28cd`: Code Check run **44482220777** PASS (format and analyzer); Android APK run **44482220755** PASS (debug build, metadata and upload). Artifact ID **14509431335** was downloaded and inspected; metadata matches the branch and SHA, version `1.0.0+1`, debug, installable. APK size 182,398,933 bytes; SHA-256 `40db0a03808698e852364849aaaacbbad2cf247f2789247ef8512539696d9423`.
+- Subsequent Trash source/test commits are `b8b734e5` and `0a5e5ab8`; formatter commit `ca0f45ff` was generated by run **44697750897** PASS; automatic formatter trigger was restored to main-only in `b084489a`. Code Check/APK validation on the resulting latest SHA must be verified separately.
+- No screenshot/device QA was captured; the Trash screen remains partial pending widget-test execution and light/dark, text-scale, narrow-width and visual review.
+
+
+## Quick Capture reference-panel and draft-restore guard — 2026-11-22
+
+- Updated `lib/features/capture/presentation/quick_capture_screen.dart` to wrap the title/body editor in the shared `NeoBrutalistPanel` using the cream reference surface, black input keylines, square geometry and hard offset shadow. Inputs use contrast-safe ink on cream fields in both light and dark themes.
+- Added a green local-draft status panel that distinguishes restoration, a restored draft, and new local draft autosave. No remote/cloud save claim is shown.
+- Fixed a startup race: title/body fields and both Save actions are disabled until SharedPreferences draft restoration completes; `_capture` also guards the restoration state. This prevents a user edit or save from racing with restoration and being overwritten.
+- Existing save-to-archive, save-and-open-editor, draft restore and clear-draft generation queue remain intact.
+- Added a focused widget test in `test/feature_ui_workflow_test.dart` for the shared panels, narrow 320×640 layout, enabled controls after restoration, empty-save feedback, and no accidental database write.
+- Existing workflow tests already cover local capture persistence, canonical editor navigation and draft restoration after remount. All tests remain source-only/unexecuted until the UI gate is closed.
+- No database/provider/service schema changed. User action still calls `databaseProvider.read().saveNoteContent`; draft storage remains local SharedPreferences.
+- Device screenshots, text-scale/focus QA and CI execution remain pending; no pixel-identity claim is made.
+
+
+## Source-level routed UI implementation gate — 2026-11-22
+
+- Reviewed the 19 GoRouter destination files at branch commit `8c2c7c88254918ea515c8cea7efb978cb367c6dc` for shared reference palette/panel usage, visible callbacks, disabled states, TODO/FIXME/placeholder patterns, and unavailable feature claims. No dead callback/TODO/placeholder patterns were found; the only “Not implemented” UI match is the explicit Protector status for biometric unlock, which is unavailable.
+- Bespoke reference screens (Splash, Home, Editor, Tasks and Delete Confirmation) retain their custom layouts; secondary feature screens use FeatureHero/NeoBrutalistPanel or explicit palette/keyline/shadow cards. Source-level UI implementation is considered complete enough to begin regression testing; individual runtime interaction acceptance and device screenshot QA remain separate gates.
+- Physical-device/emulator screenshots are unavailable in this run. Pixel-identical reference matching is not claimed. Responsive/text-scale/focus and route-specific action tests remain outstanding.
+- Quick Capture now prevents editing/saving until draft restore finishes, eliminating the restore-vs-user-input startup race. The focused widget test is committed but not yet executed.

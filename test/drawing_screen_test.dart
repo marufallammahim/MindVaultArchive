@@ -1,0 +1,85 @@
+import 'package:drift/native.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/app/theme.dart';
+import 'package:mindvault_archive/core/database/database.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
+import 'package:mindvault_archive/features/drawing/presentation/drawing_screen.dart';
+import 'package:signature/signature.dart';
+
+void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('drawing canvas and tools use the shared Neo-Brutalist style', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await database.close();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(database)],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const DrawingScreen(noteId: 'missing-note'),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(FeatureHero), findsOneWidget);
+    expect(find.byType(NeoBrutalistPanel), findsNWidgets(2));
+    expect(find.byType(Signature), findsOneWidget);
+    expect(find.byTooltip('Undo'), findsOneWidget);
+    expect(find.byTooltip('Redo'), findsOneWidget);
+    expect(find.byTooltip('Clear'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('drawing refuses missing notes without creating a ghost note', (
+    tester,
+  ) async {
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await database.close();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(database)],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const DrawingScreen(noteId: 'missing-note'),
+        ),
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Save drawing'));
+    var errorVisible = false;
+    for (var attempt = 0; attempt < 20; attempt++) {
+      await tester.pump(const Duration(milliseconds: 50));
+      if (find.textContaining('active note').evaluate().isNotEmpty) {
+        errorVisible = true;
+        break;
+      }
+    }
+
+    final notes =
+        await tester.runAsync(() => database.select(database.notes).get()) ??
+        <Note>[];
+    expect(notes, isEmpty);
+    expect(errorVisible, isTrue);
+    expect(find.textContaining('active note'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}

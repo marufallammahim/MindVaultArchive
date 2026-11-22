@@ -23,18 +23,24 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
       final preferences = await SharedPreferences.getInstance();
       final stored = preferences.getString(_storageKey);
       if (!mounted || stored == null) return;
-      state = ThemeMode.values.firstWhere(
+      final restored = ThemeMode.values.firstWhere(
         (mode) => mode.name == stored,
         orElse: () => ThemeMode.dark,
       );
+      // System mode follows the phone and is intentionally not supported.
+      state = restored == ThemeMode.system ? ThemeMode.dark : restored;
+      if (restored == ThemeMode.system) {
+        await preferences.setString(_storageKey, ThemeMode.dark.name);
+      }
     } catch (_) {}
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
-    state = mode;
+    final fixedMode = mode == ThemeMode.system ? ThemeMode.dark : mode;
+    state = fixedMode;
     try {
       final preferences = await SharedPreferences.getInstance();
-      await preferences.setString(_storageKey, mode.name);
+      await preferences.setString(_storageKey, fixedMode.name);
     } catch (_) {}
   }
 }
@@ -72,7 +78,7 @@ final amoledThemeProvider = StateNotifierProvider<AmoledThemeNotifier, bool>(
 );
 
 class AccentColorNotifier extends StateNotifier<Color> {
-  AccentColorNotifier() : super(const Color(0xFF5A0719)) {
+  AccentColorNotifier() : super(const Color(0xFFF7CB46)) {
     _load();
   }
 

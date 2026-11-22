@@ -1,11 +1,21 @@
 import 'package:drift/drift.dart' hide Column;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/theme.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 
 class TrashScreen extends ConsumerWidget {
   const TrashScreen({super.key});
+
+  void _showActionError(BuildContext context, String action) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Could not $action. Please try again.')),
+    );
+  }
 
   Future<void> _permanentlyDelete(
     BuildContext context,
@@ -41,8 +51,12 @@ class TrashScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (confirmed == true) {
+    if (confirmed != true || !context.mounted) return;
+    try {
       await ref.read(databaseProvider).permanentlyDeleteNote(note.id);
+    } catch (_) {
+      if (!context.mounted) return;
+      _showActionError(context, 'delete this note permanently');
     }
   }
 
@@ -110,12 +124,12 @@ class TrashScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-              ),
+              ],
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
-            itemCount: notes.length,
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+            itemCount: notes.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final note = notes[index];
@@ -150,29 +164,32 @@ class TrashScreen extends ConsumerWidget {
                       onSelected: (value) async {
                         if (value == 'restore') {
                           await db.setDeleted(note.id, false);
-                        } else if (value == 'delete') {
-                          await _permanentlyDelete(context, ref, note);
+                        } catch (_) {
+                          if (!context.mounted) return;
+                          _showActionError(context, 'restore this note');
                         }
-                      },
-                      itemBuilder: (_) => const [
-                        PopupMenuItem(
-                          value: 'restore',
-                          child: ListTile(
-                            dense: true,
-                            leading: Icon(Icons.restore_rounded),
-                            title: Text('Restore'),
-                          ),
+                      } else if (value == 'delete') {
+                        await _permanentlyDelete(context, ref, note);
+                      }
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(
+                        value: 'restore',
+                        child: ListTile(
+                          dense: true,
+                          leading: Icon(Icons.restore_rounded),
+                          title: Text('Restore'),
                         ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: ListTile(
-                            dense: true,
-                            leading: Icon(Icons.delete_forever_rounded),
-                            title: Text('Delete forever'),
-                          ),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: ListTile(
+                          dense: true,
+                          leading: Icon(Icons.delete_forever_rounded),
+                          title: Text('Delete forever'),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               );

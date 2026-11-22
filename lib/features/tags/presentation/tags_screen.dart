@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show OrderingTerm;
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/app/providers.dart';
@@ -11,7 +12,7 @@ class TagsScreen extends ConsumerWidget {
 
   Future<void> _addTag(BuildContext context, WidgetRef ref, {Tag? tag}) async {
     final controller = TextEditingController(text: tag?.name ?? '');
-    final name = await showDialog<String>(
+    final route = DialogRoute<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text(tag == null ? 'New tag' : 'Rename tag'),
@@ -38,6 +39,8 @@ class TagsScreen extends ConsumerWidget {
         ],
       ),
     );
+    final name = await Navigator.of(context, rootNavigator: true).push(route);
+    await route.completed;
     controller.dispose();
     if (name == null || name.trim().isEmpty || !context.mounted) return;
     try {
@@ -72,7 +75,14 @@ class TagsScreen extends ConsumerWidget {
       ),
     );
     if (confirmed != true) return;
-    await ref.read(databaseProvider).deleteTag(tag.id);
+    try {
+      await ref.read(databaseProvider).deleteTag(tag.id);
+    } catch (error) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not delete tag: $error')));
+    }
   }
 
   @override
@@ -104,14 +114,39 @@ class TagsScreen extends ConsumerWidget {
           }
           final tags = snapshot.data!;
           if (tags.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'No tags yet. Create tags to add another layer of organization to your notes.',
-                  textAlign: TextAlign.center,
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 96),
+              children: const [
+                FeatureHero(
+                  icon: Icons.sell_rounded,
+                  title: 'Organize by tag',
+                  subtitle:
+                      'Create lightweight labels to connect related notes.',
+                  compact: true,
                 ),
-              ),
+                SizedBox(height: 18),
+                NeoBrutalistPanel(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Icon(Icons.sell_outlined, size: 48),
+                      SizedBox(height: 12),
+                      Text(
+                        'No tags yet',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Create a tag to add another layer of organization to your notes.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             );
           }
           return ListView.separated(
@@ -132,7 +167,7 @@ class TagsScreen extends ConsumerWidget {
                 );
               }
               final tag = tags[index - 1];
-              return Card(
+              return NeoBrutalistPanel(
                 child: ListTile(
                   leading: const Icon(Icons.sell_outlined),
                   title: Text(tag.name),

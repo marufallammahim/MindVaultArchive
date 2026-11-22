@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:mindvault_archive/app/theme.dart';
 
-/// Small Markdown authoring toolbar for the plain-text note editor.
+/// Compact formatting controls for the live Markdown note editor.
 class MarkdownToolbar extends StatelessWidget {
   const MarkdownToolbar({
     super.key,
@@ -39,12 +40,23 @@ class MarkdownToolbar extends StatelessWidget {
     onChanged();
   }
 
-  Widget _tool(String tooltip, IconData icon, VoidCallback action) {
+  Widget _tool(
+    BuildContext context,
+    String tooltip,
+    IconData icon,
+    VoidCallback action,
+  ) {
     return IconButton(
       tooltip: tooltip,
       visualDensity: VisualDensity.compact,
+      style: IconButton.styleFrom(
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.ink,
+        side: const BorderSide(color: AppTheme.ink, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      ),
       onPressed: action,
-      icon: Icon(icon),
+      icon: Icon(icon, color: AppTheme.ink),
     );
   }
 
@@ -52,38 +64,51 @@ class MarkdownToolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     final tick = String.fromCharCode(96);
     final tripleTick = List.filled(3, tick).join();
-    final scheme = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: scheme.outlineVariant.withValues(alpha: 0.45),
-        ),
+        color: AppTheme.secondary,
+        borderRadius: BorderRadius.circular(7),
+        border: Border.all(color: AppTheme.ink, width: 2.5),
+        boxShadow: const [
+          BoxShadow(color: AppTheme.ink, offset: Offset(4, 4), blurRadius: 0),
+        ],
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            _tool('Bold', Icons.format_bold, () => _wrap('**', '**')),
-            _tool('Italic', Icons.format_italic, () => _wrap('_', '_')),
-            _tool('Inline code', Icons.code, () => _wrap(tick, tick)),
-            _tool('Heading', Icons.title, () => _prefixLine('## ')),
+            _tool(context, 'Bold', Icons.format_bold, () => _wrap('**', '**')),
             _tool(
+              context,
+              'Italic',
+              Icons.format_italic,
+              () => _wrap('_', '_'),
+            ),
+            _tool(context, 'Inline code', Icons.code, () => _wrap(tick, tick)),
+            _tool(context, 'Heading', Icons.title, () => _prefixLine('## ')),
+            _tool(
+              context,
               'Bullet list',
               Icons.format_list_bulleted,
               () => _prefixLine('- '),
             ),
             _tool(
+              context,
               'Checklist',
               Icons.check_box_outlined,
               () => _prefixLine('- [ ] '),
             ),
-            _tool('Quote', Icons.format_quote, () => _prefixLine('> ')),
-            _tool('Link', Icons.link, () => _wrap('[', '](url)')),
             _tool(
+              context,
+              'Quote',
+              Icons.format_quote,
+              () => _prefixLine('> '),
+            ),
+            _tool(context, 'Link', Icons.link, () => _wrap('[', '](url)')),
+            _tool(
+              context,
               'Code block',
               Icons.data_object,
               () => _wrap('$tripleTick\n', '\n$tripleTick'),

@@ -307,13 +307,17 @@ class AppDatabase extends _$AppDatabase {
     if (available.length != uniqueIds.length) {
       throw ArgumentError('One or more selected tags do not exist.');
     }
+    final existingNote = await (select(
+      notes,
+    )..where((note) => note.id.equals(noteId))).getSingleOrNull();
+    if (existingNote == null || existingNote.isDeleted) {
+      throw ArgumentError.value(
+        noteId,
+        'noteId',
+        'Tags can only be assigned to an existing, active note.',
+      );
+    }
     await transaction(() async {
-      final existingNote = await (select(
-        notes,
-      )..where((note) => note.id.equals(noteId))).getSingleOrNull();
-      if (existingNote == null) {
-        await into(notes).insert(NotesCompanion.insert(id: noteId));
-      }
       await (delete(
         noteTags,
       )..where((item) => item.noteId.equals(noteId))).go();

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -116,9 +117,6 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                   },
                   icon: const Icon(Icons.close),
                 ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
               ),
             ),
           ),
@@ -147,7 +145,7 @@ class _ArchiveSearchScreenState extends ConsumerState<ArchiveSearchScreen> {
                         if (item.category != null) item.category!,
                         ...item.tags,
                       ];
-                      return Card(
+                      return NeoBrutalistPanel(
                         child: ListTile(
                           leading: CircleAvatar(
                             child: Icon(
@@ -210,26 +208,32 @@ class _SearchHint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.manage_search,
-              size: 64,
-              color: Theme.of(context).colorScheme.primary,
+        padding: const EdgeInsets.all(24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: NeoBrutalistPanel(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.manage_search,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Find what you remember',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Search note titles and content, category names, tags, and task details. Everything is searched locally on this device.',
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            const SizedBox(height: 14),
-            Text(
-              'Find what you remember',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Search note titles and content, category names, tags, and task details. Everything is searched locally on this device.',
-              textAlign: TextAlign.center,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -244,9 +248,12 @@ class _NoResults extends StatelessWidget {
     return const Center(
       child: Padding(
         padding: EdgeInsets.all(24),
-        child: Text(
-          'No results found. Try another keyword.',
-          textAlign: TextAlign.center,
+        child: NeoBrutalistPanel(
+          padding: EdgeInsets.all(24),
+          child: Text(
+            'No results found. Try another keyword.',
+            textAlign: TextAlign.center,
+          ),
         ),
       ),
     );

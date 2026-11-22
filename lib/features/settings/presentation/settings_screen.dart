@@ -6,23 +6,22 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mindvault_archive/app/providers.dart';
+import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
+import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:uuid/uuid.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   static const _palette = <Color>[
-    Color(0xFF5A0719),
-    Color(0xFFB64D69),
-    Color(0xFFE97855),
-    Color(0xFFFFC94A),
-    Color(0xFFA8D76D),
-    Color(0xFF4D91F0),
-    Color(0xFF9270D8),
-    Color(0xFF24A89A),
-    Color(0xFF64748B),
-    Color(0xFF202124),
+    Color(0xFFF7CB46),
+    Color(0xFFC0F7FE),
+    Color(0xFF99E885),
+    Color(0xFFE9E0E8),
+    Color(0xFFFFDC8B),
+    Color(0xFF000000),
   ];
 
   Future<void> _editProfile(BuildContext context, WidgetRef ref) async {
@@ -204,6 +203,12 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 32),
         children: [
+          const FeatureHero(
+            icon: Icons.tune_rounded,
+            title: 'Your archive, your way',
+            subtitle: 'Personalize your space, appearance and organization.',
+          ),
+          const SizedBox(height: 26),
           Text(
             'PERSONAL SPACE',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -213,7 +218,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Card(
+          NeoBrutalistPanel(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             child: ListTile(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -245,9 +251,10 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Card(
+          NeoBrutalistPanel(
+            padding: const EdgeInsets.all(16),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -259,11 +266,6 @@ class SettingsScreen extends ConsumerWidget {
                   SegmentedButton<ThemeMode>(
                     showSelectedIcon: false,
                     segments: const [
-                      ButtonSegment(
-                        value: ThemeMode.system,
-                        label: Text('System'),
-                        icon: Icon(Icons.settings_suggest_outlined),
-                      ),
                       ButtonSegment(
                         value: ThemeMode.light,
                         label: Text('Light'),
@@ -324,32 +326,46 @@ class SettingsScreen extends ConsumerWidget {
                     runSpacing: 13,
                     children: [
                       for (final color in _palette)
-                        InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: () => ref
-                              .read(accentColorProvider.notifier)
-                              .setColor(color),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 160),
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              color: color,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: accent.toARGB32() == color.toARGB32()
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Colors.transparent,
-                                width: 2.5,
+                        Tooltip(
+                          message:
+                              'Use accent color #${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                          child: Semantics(
+                            button: true,
+                            selected: accent.toARGB32() == color.toARGB32(),
+                            label:
+                                'Accent color #${color.toARGB32().toRadixString(16).substring(2).toUpperCase()}',
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () => ref
+                                  .read(accentColorProvider.notifier)
+                                  .setColor(color),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 160),
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: accent.toARGB32() == color.toARGB32()
+                                        ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                        : Colors.transparent,
+                                    width: 2.5,
+                                  ),
+                                ),
+                                child: accent.toARGB32() == color.toARGB32()
+                                    ? Icon(
+                                        Icons.check,
+                                        size: 19,
+                                        color: color.computeLuminance() > 0.45
+                                            ? AppTheme.ink
+                                            : Colors.white,
+                                      )
+                                    : null,
                               ),
                             ),
-                            child: accent.toARGB32() == color.toARGB32()
-                                ? const Icon(
-                                    Icons.check,
-                                    size: 19,
-                                    color: Colors.white,
-                                  )
-                                : null,
                           ),
                         ),
                     ],
@@ -406,56 +422,123 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           const Divider(),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Categories'),
-            subtitle: const Text('Create, rename and organize note categories'),
-            trailing: IconButton(
-              tooltip: 'Add category',
-              icon: const Icon(Icons.add),
-              onPressed: () => _editCategory(context, ref),
+          NeoBrutalistPanel(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              children: [
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    'Categories',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  subtitle: const Text(
+                    'Create, rename and organize note categories',
+                  ),
+                  trailing: IconButton(
+                    tooltip: 'Add category',
+                    icon: const Icon(Icons.add),
+                    onPressed: () => _editCategory(context, ref),
+                  ),
+                ),
+                StreamBuilder<List<Category>>(
+                  stream:
+                      (db.select(db.categories)..orderBy([
+                            (category) => OrderingTerm.asc(category.name),
+                          ]))
+                          .watch(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting &&
+                        !snapshot.hasData) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 18),
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(
+                          'Could not load categories: ${snapshot.error}',
+                        ),
+                      );
+                    }
+                    final categories = snapshot.data ?? [];
+                    if (categories.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.inbox_outlined),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'No categories yet. Add one to organize notes.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: [
+                        for (final category in categories)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: AppTheme.secondary,
+                                border: Border.all(
+                                  color: AppTheme.ink,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: const Icon(
+                                Icons.label_outline,
+                                color: AppTheme.ink,
+                              ),
+                            ),
+                            title: Text(
+                              category.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            trailing: PopupMenuButton<String>(
+                              tooltip: 'Manage ${category.name}',
+                              onSelected: (action) {
+                                if (action == 'rename') {
+                                  _editCategory(
+                                    context,
+                                    ref,
+                                    category: category,
+                                  );
+                                } else if (action == 'delete') {
+                                  _deleteCategory(context, ref, category);
+                                }
+                              },
+                              itemBuilder: (context) => const [
+                                PopupMenuItem(
+                                  value: 'rename',
+                                  child: Text('Rename'),
+                                ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
-          ),
-          StreamBuilder<List<Category>>(
-            stream:
-                (db.select(
-                      db.categories,
-                    )..orderBy([(category) => OrderingTerm.asc(category.name)]))
-                    .watch(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Text('Could not load categories: ${snapshot.error}');
-              }
-              final categories = snapshot.data ?? [];
-              if (categories.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Text('No categories yet. Add one to organize notes.'),
-                );
-              }
-              return Column(
-                children: [
-                  for (final category in categories)
-                    ListTile(
-                      leading: const Icon(Icons.label_outline),
-                      title: Text(category.name),
-                      trailing: PopupMenuButton<String>(
-                        onSelected: (action) {
-                          if (action == 'rename') {
-                            _editCategory(context, ref, category: category);
-                          } else if (action == 'delete') {
-                            _deleteCategory(context, ref, category);
-                          }
-                        },
-                        itemBuilder: (context) => const [
-                          PopupMenuItem(value: 'rename', child: Text('Rename')),
-                          PopupMenuItem(value: 'delete', child: Text('Delete')),
-                        ],
-                      ),
-                    ),
-                ],
-              );
-            },
           ),
           const SizedBox(height: 18),
           const Divider(),
@@ -480,11 +563,17 @@ class SettingsScreen extends ConsumerWidget {
             'Export or import a portable JSON archive',
             '/archive-tools',
           ),
-          const ListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text('Storage'),
-            subtitle: Text('Notes are stored locally on this device'),
-            leading: Icon(Icons.storage_outlined),
+          const NeoBrutalistPanel(
+            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 8),
+              title: Text(
+                'Storage',
+                style: TextStyle(fontWeight: FontWeight.w800),
+              ),
+              subtitle: Text('Notes are stored locally on this device'),
+              leading: Icon(Icons.storage_outlined),
+            ),
           ),
         ],
       ),
@@ -498,13 +587,31 @@ class SettingsScreen extends ConsumerWidget {
     String subtitle,
     String route,
   ) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon),
-      title: Text(title),
-      subtitle: Text(subtitle),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () => context.push(route),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: NeoBrutalistPanel(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+          leading: Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppTheme.secondary,
+              border: Border.all(color: AppTheme.ink, width: 2),
+              borderRadius: BorderRadius.circular(5),
+            ),
+            child: Icon(icon, color: AppTheme.ink, size: 20),
+          ),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          subtitle: Text(subtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => context.push(route),
+        ),
+      ),
     );
   }
 }

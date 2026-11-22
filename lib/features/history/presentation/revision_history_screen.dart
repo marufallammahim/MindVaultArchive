@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart' show OrderingTerm;
 import 'package:mindvault_archive/core/widgets/feature_hero.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -68,14 +69,39 @@ class RevisionHistoryScreen extends ConsumerWidget {
           }
           final revisions = snapshot.data!;
           if (revisions.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'No previous versions yet. MindVault keeps up to 30 earlier versions as you edit a note.',
-                  textAlign: TextAlign.center,
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+              children: const [
+                FeatureHero(
+                  icon: Icons.history_rounded,
+                  title: 'Every edit remembered',
+                  subtitle:
+                      'Review an earlier version and restore it when needed.',
+                  compact: true,
                 ),
-              ),
+                SizedBox(height: 18),
+                NeoBrutalistPanel(
+                  padding: EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Icon(Icons.history_toggle_off_rounded, size: 48),
+                      SizedBox(height: 12),
+                      Text(
+                        'No previous versions yet',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'MindVault keeps up to 30 earlier versions as you edit a note.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             );
           }
           return ListView.separated(
@@ -96,7 +122,7 @@ class RevisionHistoryScreen extends ConsumerWidget {
                 );
               }
               final revision = revisions[index - 1];
-              return Card(
+              return NeoBrutalistPanel(
                 child: ListTile(
                   title: Text(
                     revision.title.isEmpty ? 'Untitled' : revision.title,

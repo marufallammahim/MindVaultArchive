@@ -16,7 +16,7 @@ void main() {
     });
 
     test('decodes valid base64 avatar data', () {
-      final profile = const UserProfile(name: 'Test', avatarBase64: 'AQIDBA==');
+      const profile = UserProfile(name: 'Test', avatarBase64: 'AQIDBA==');
 
       expect(profile.avatar, isNotNull);
     });
