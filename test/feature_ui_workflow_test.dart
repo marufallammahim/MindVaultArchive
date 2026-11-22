@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mindvault_archive/app/providers.dart';
 import 'package:mindvault_archive/app/theme.dart';
 import 'package:mindvault_archive/core/database/database.dart';
+import 'package:mindvault_archive/core/widgets/neo_brutalist_panel.dart';
 import 'package:mindvault_archive/features/capture/presentation/quick_capture_screen.dart';
 import 'package:mindvault_archive/features/editor/presentation/editor_screen.dart';
 import 'package:mindvault_archive/features/tags/presentation/tags_screen.dart';
@@ -177,6 +178,58 @@ void main() {
 
     expect(find.text('Recovered thought'), findsOneWidget);
     expect(find.text('Draft body'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Quick Capture uses a reference panel and guards empty saves', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final database = AppDatabase(NativeDatabase.memory());
+    tester.view
+      ..physicalSize = const Size(320, 640)
+      ..devicePixelRatio = 1;
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
+      await database.close();
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(database)],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const QuickCaptureScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.byType(NeoBrutalistPanel), findsNWidgets(2));
+    expect(find.text('Thought title'), findsOneWidget);
+    expect(find.text('Your idea'), findsOneWidget);
+    expect(
+      tester.widget<TextField>(
+        find.byKey(const ValueKey('quick-capture-title')),
+      ).enabled,
+      isTrue,
+    );
+    await tester.tap(find.byKey(const ValueKey('quick-capture-save')));
+    await tester.pump();
+
+    expect(
+      find.text('Write a title or capture an idea first.'),
+      findsOneWidget,
+    );
+    final notes =
+        await tester.runAsync(() => database.select(database.notes).get()) ??
+        <Note>[];
+    expect(notes, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
