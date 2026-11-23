@@ -2,9 +2,9 @@
 
 Repository: `marufallammahim/MindVaultArchive`  
 Target branch: `feature/ultimate-all-in-one-mindvault`  
-Last reviewed: 2026-11-19  
+Last reviewed: 2026-11-23  
 Baseline validation commit: `a89a4a18074a72ceb6a0d0404a8b370af3e69955`  
-Latest source SHA reviewed: `ce7bd6a8eb60d4b8fd98354b4a54eb2a794e97a6`
+Latest source SHA reviewed: `0dbd7e5bbbc27413fb90534d0fb0bcd06483740f`
 
 This roadmap is evidence-based. A feature is not complete merely because a screen or button exists. Completion requires a working UI-to-provider/service-to-storage flow, user-visible loading/empty/error states, and focused tests.
 
@@ -659,3 +659,28 @@ User selected exactly four appearance presets, in order: **Light**, **Dark (norm
 User also requests Kotlin alongside Dart as a main-engine technology. Architecture decision: Flutter/Dart stays the UI and shared cross-platform logic; Kotlin should be integrated as a native Android engine/platform layer only for measured, meaningful Android-only capabilities (native APIs, background/platform services, performance-sensitive implementation). Avoid duplicate business logic or arbitrary language mixing. Inspect Android source structure, establish a typed MethodChannel boundary only for justified functionality, test platform integration, and benchmark before claiming performance gains. No unsupported “100%” claim.
 
 These requirements have been added to the recurring implementation task. Current branch head at this checkpoint: `afbd27acd2e317a8356f028c4b6818ae8da25a4f` (roadmap-only checkpoint; source not yet changed for theme work). Theme implementation and tests remain pending; do not report them as complete.
+
+
+## Automation review — 2026-11-23
+
+### Current branch checkpoint
+- Latest source SHA before this documentation checkpoint: `0dbd7e5bbbc27413fb90534d0fb0bcd06483740f` (`style: simplify formatted widget test queries`). Branch remains `feature/ultimate-all-in-one-mindvault`; no new branch or main-branch merge was created by this run.
+- Read the current `docs/FEATURE_SPECIFICATION.md`, `docs/UI_FUNCTIONALITY_AUDIT.md`, theme/provider/app/settings source and the relevant tests at this SHA.
+- The four appearance presets are implemented in source: Light, Dark, AMOLED, Monochrome OLED. A single selector persists `theme_preset`; legacy mode/AMOLED preferences migrate. Dark uses conventional dark surfaces; AMOLED is OLED-black; Monochrome OLED uses grayscale and ignores the stored accent. `AppTheme._build` uses brightness-appropriate typography.
+- Test-source evidence: `test/app_theme_test.dart` checks preset/brightness mapping, semantic contrast, OLED black/card surfaces and grayscale/accent independence; `test/theme_preset_provider_test.dart` checks migration/default/persistence/restoration; `test/settings_screen_test.dart` checks the one selector, all four options, no legacy mode/AMOLED control, monochrome selection persistence and accent-ignore text. **Execution on the current SHA is not verified.**
+
+### CI evidence and limitation
+- `fetch_commit_workflow_runs` and combined commit status returned no PR runs/status contexts for current SHA `0dbd7e5...`. The available GitHub connector exposes PR-associated runs but not a list of push-triggered workflow runs; therefore this run could not verify the required Code Check, Regression Tests or Android APK Artifact results for the exact current SHA. Do not treat empty results as PASS.
+- Prior verified results remain tied to SHA `73c703d10a071f9fd9cd7f1d530110cc3cde6ab4` only: Code Check run `44997343046` PASS and APK run `44997343020` PASS/artifact `14744835632`; Regression run `44997343001` was still in progress at the recorded snapshot. They do not validate the latest source.
+- Investigated Android Build run `44999917064` (job `137138969014`): failed during dependency/code generation before release APK/AAB build or upload. The log identifies checkout commit `b8a594ea514ff44cadb5342986c68b1eac6e22ed` and parser errors in `trash_screen.dart` (including an invalid `catch` token context). The commit SHA was not resolvable through the GitHub connector. The current branch source `lib/features/trash/presentation/trash_screen.dart` blob `ed86a9552335a049f03bc7211d2c081840081bbd` has a proper try/catch around restore, but a fresh exact-SHA run is needed to verify the correction.
+- The Regression Tests workflow currently has push, pull-request and manual triggers. Its latest push-run ID/log is not accessible through the current connector; tests remain unverified for the latest SHA.
+
+### Native Kotlin assessment
+- Android Gradle applies `kotlin-android`, but repository search did not find a tracked app-owned `MainActivity.kt` or `FlutterActivity` source. `tool/regenerate_platforms.sh` generates native scaffolding in a temporary Flutter project and copies missing files; it is scaffolding, not a Kotlin application engine.
+- No Android-only feature with a clear performance/native benefit was selected or integrated. Dart/Flutter remains the UI and local domain/database engine. Do not duplicate business logic in Kotlin or claim speed improvements. Kotlin platform integration remains pending a justified Android capability, boundary, tests and benchmark.
+
+### Warning and acceptance status
+- Known actionable warnings: Riverpod generator/analyzer language-version mismatch (3.4.0 vs Dart 3.14.0), app/plugin Kotlin Gradle Plugin warnings (`file_picker`, `share_plus`), and Drift multi-database lifecycle warning not confirmed by the full regression suite. No Node 20, setup-java v4 or `cp -n` warning was found in previously inspected logs; workflow references were upgraded but latest-SHA validation is missing.
+- All 19 routes remain partial for runtime control/state, accessibility/text-scale, responsive and screenshot acceptance. No emulator/physical-device screenshots were captured; pixel-identical UI is not claimed.
+- External cloud sync, AI, collaboration, OCR, biometrics, encryption, reminders, recurrence, calendar and habits remain not implemented/blocked until real providers/platform capability, consent and product decisions exist.
+- This checkpoint is documentation-only and does not close completion criteria. Latest exact-SHA validation and full regression evidence remain outstanding.
