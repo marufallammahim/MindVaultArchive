@@ -34,10 +34,19 @@ only called implemented when the repository contains a usable local workflow.
 ### App foundation and access
 - Flutter, Riverpod, GoRouter and Drift/SQLite architecture.
 - Optional salted six-digit app PIN using Android secure storage.
-- Persistent system/light/dark theme preference.
-- Material 3 burgundy brand seed.
+- Persistent four-preset appearance selector: Light, Dark, AMOLED and Monochrome OLED.
+- Legacy `theme_mode` and `amoled_theme_enabled` preferences migrate into `theme_preset`.
+- Monochrome OLED uses grayscale semantic colors and a black canvas; saved accents are ignored in this preset.
+- Material 3 theme with an editable accent color in the three color presets.
 - Android CI workflow for dependency resolution, Drift code generation,
   formatting, static analysis, tests and debug APK build.
+
+## Theme verification evidence
+
+- `test/app_theme_test.dart` checks four-preset mapping, brightness, semantic foreground contrast, AMOLED black surfaces and grayscale/accent independence.
+- `test/theme_preset_provider_test.dart` checks legacy preference migration and persisted preset restoration.
+- `test/settings_screen_test.dart` checks the single preset selector, absence of the old mode/AMOLED toggle, all four options, Monochrome OLED persistence and the accent-ignored explanation.
+- These are source-level test assertions; execution on the current branch head is not verified.
 
 ## Partial
 
@@ -51,7 +60,7 @@ only called implemented when the repository contains a usable local workflow.
   attachment preview lifecycle remain incomplete.
 - Task due dates are stored and displayed, but scheduled notifications,
   recurrence and calendar views are absent.
-- Theme supports system/light/dark, not user-defined palettes, fonts or layout.
+- User-defined fonts, layout customization and Bengali localization are not available.
 - Bengali localization is not complete.
 
 ## Not implemented
