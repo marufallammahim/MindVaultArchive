@@ -385,7 +385,7 @@ class SettingsScreen extends ConsumerWidget {
                     label: const Text('Custom color (HEX)'),
                   ),
                 ],
-              ),
+              ],
             ),
           ),
           const SizedBox(height: 28),
