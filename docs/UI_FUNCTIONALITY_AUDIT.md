@@ -1,4 +1,4 @@
-# UI and Functionality Audit — 2026-11-15
+# UI and Functionality Audit — 2026-11-23
 
 Branch: `feature/ultimate-all-in-one-mindvault`
 
@@ -14,7 +14,7 @@ Branch: `feature/ultimate-all-in-one-mindvault`
 - Tasks: task creation/editing, due date, priority, linked note, completed filter.
 - Templates: five built-in Markdown starters, custom template persistence, create note from template, custom deletion.
 - Protector/App lock: six-digit PIN, salted SHA-256 hash, Android secure storage, five-attempt/30-second lockout, app lifecycle gate.
-- Settings: theme mode, AMOLED toggle, accent presets/custom HEX, categories, tags, archive tools, Protector route.
+- Settings: unified Light/Dark/AMOLED/Monochrome OLED selector, accent presets/custom HEX (ignored in Monochrome OLED), categories, tags, archive tools, Protector route.
 - Other routed screens: editor, drawing, capture, tags, search, revision history, archive transfer, insights, timeline, developer notebook, about.
 
 ## Findings and limitations
@@ -23,6 +23,7 @@ Branch: `feature/ultimate-all-in-one-mindvault`
 3. Templates support five built-in starters and local custom Markdown templates. Template variables, import/export, folders, and cloud sync are not implemented.
 4. The feature-screen map marks AI, sync, collaboration, and workspace as not implemented; multimedia/OCR and productivity subfeatures are partial.
 5. Task screen supports CRUD, completion state, priority, due date, and linked notes; no Kanban/calendar/habit planner is present in the current route inventory.
+6. Theme selection is a single persisted four-preset selector. The old separate mode and AMOLED controls are absent. Monochrome OLED uses grayscale colors and an OLED-black canvas. Source tests cover preset mapping, brightness, contrast, legacy migration, persistence and selector behavior, but current-head CI execution is unverified.
 
 ## Cross-screen visual consistency pass (2026-11-11)
 - Updated the shared Material 3 theme consumed by every routed screen: pure-black AMOLED canvas, consistent charcoal cards, compact app bars, rounded dense inputs, dialog/bottom-sheet surfaces, popup menus, list tiles, navigation bar, chips, buttons, dividers, and progress indicators.
@@ -251,3 +252,12 @@ Source milestone:
 - Bespoke reference screens (Splash, Home, Editor, Tasks and Delete Confirmation) retain their custom layouts; secondary feature screens use FeatureHero/NeoBrutalistPanel or explicit palette/keyline/shadow cards. Source-level UI implementation is considered complete enough to begin regression testing; individual runtime interaction acceptance and device screenshot QA remain separate gates.
 - Physical-device/emulator screenshots are unavailable in this run. Pixel-identical reference matching is not claimed. Responsive/text-scale/focus and route-specific action tests remain outstanding.
 - Quick Capture now prevents editing/saving until draft restore finishes, eliminating the restore-vs-user-input startup race. The focused widget test is committed but not yet executed.
+
+
+## Four-theme implementation review — 2026-11-23
+
+- `AppThemePreset` exposes Light, Dark, AMOLED and Monochrome OLED; `ThemePresetNotifier` persists `theme_preset` and migrates the legacy mode/AMOLED keys.
+- `MindVaultArchiveApp` uses one selected `ThemeData`; the Settings screen has one preset dropdown and no high-contrast mode or separate AMOLED switch.
+- The shared theme uses brightness-appropriate Material typography. Monochrome OLED ignores the saved accent and applies grayscale to the app while retaining OLED-black surfaces.
+- Source test evidence: `test/app_theme_test.dart`, `test/theme_preset_provider_test.dart`, and the Settings preset-selector test in `test/settings_screen_test.dart`.
+- The implementation and test sources are present, but CI execution on the latest branch SHA and emulator/physical-device visual verification are not confirmed. The global grayscale filter also affects image/avatar content; this behavior is source-observed and has not been visually acceptance-tested.
