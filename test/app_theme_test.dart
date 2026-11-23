@@ -65,39 +65,40 @@ void main() {
     test(
       'semantic text has contrast on surface, card and accent containers',
       () {
-      for (final preset in AppThemePreset.values) {
-        final theme = AppTheme.themeFor(preset, AppTheme.primary);
-        final scheme = theme.colorScheme;
-        expect(
-          _contrast(scheme.onPrimary, scheme.primary),
-          greaterThanOrEqualTo(4.5),
-          reason: preset.label,
-        );
-        expect(
-          _contrast(scheme.onSecondary, scheme.secondary),
-          greaterThanOrEqualTo(4.5),
-          reason: preset.label,
-        );
-        expect(
-          _contrast(scheme.onPrimaryContainer, scheme.primaryContainer),
-          greaterThanOrEqualTo(4.5),
-          reason: preset.label,
-        );
-        expect(
-          _contrast(scheme.onSecondaryContainer, scheme.secondaryContainer),
-          greaterThanOrEqualTo(4.5),
-          reason: preset.label,
-        );
-        expect(
-          _contrast(scheme.onSurface, scheme.surface),
-          greaterThanOrEqualTo(4.5),
-          reason: preset.label,
-        );
-        expect(
-          _contrast(scheme.onSurface, theme.cardTheme.color!),
-          greaterThanOrEqualTo(4.5),
-          reason: preset.label,
-        );
+        for (final preset in AppThemePreset.values) {
+          final theme = AppTheme.themeFor(preset, AppTheme.primary);
+          final scheme = theme.colorScheme;
+          expect(
+            _contrast(scheme.onPrimary, scheme.primary),
+            greaterThanOrEqualTo(4.5),
+            reason: preset.label,
+          );
+          expect(
+            _contrast(scheme.onSecondary, scheme.secondary),
+            greaterThanOrEqualTo(4.5),
+            reason: preset.label,
+          );
+          expect(
+            _contrast(scheme.onPrimaryContainer, scheme.primaryContainer),
+            greaterThanOrEqualTo(4.5),
+            reason: preset.label,
+          );
+          expect(
+            _contrast(scheme.onSecondaryContainer, scheme.secondaryContainer),
+            greaterThanOrEqualTo(4.5),
+            reason: preset.label,
+          );
+          expect(
+            _contrast(scheme.onSurface, scheme.surface),
+            greaterThanOrEqualTo(4.5),
+            reason: preset.label,
+          );
+          expect(
+            _contrast(scheme.onSurface, theme.cardTheme.color!),
+            greaterThanOrEqualTo(4.5),
+            reason: preset.label,
+          );
+        }
       },
     );
 
