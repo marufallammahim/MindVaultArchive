@@ -91,7 +91,10 @@ class TrashScreen extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text('Could not load Trash: ${snapshot.error}'),
+              child: NeoBrutalistPanel(
+                padding: const EdgeInsets.all(18),
+                child: Text('Could not load Trash: ${snapshot.error}'),
+              ),
             );
           }
           if (!snapshot.hasData) {
@@ -99,30 +102,33 @@ class TrashScreen extends ConsumerWidget {
           }
           final notes = snapshot.data!;
           if (notes.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.delete_outline_rounded,
-                      size: 64,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'Trash is empty',
-                      style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w800),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
+            return ListView(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+              children: const [
+                FeatureHero(
+                  icon: Icons.delete_outline_rounded,
+                  title: 'Trash is empty.',
+                  subtitle:
                       'Notes you move here can be restored or deleted forever.',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                  compact: true,
+                ),
+                SizedBox(height: 24),
+                NeoBrutalistPanel(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.delete_sweep_outlined,
+                        size: 64,
+                        color: AppTheme.primary,
+                      ),
+                      SizedBox(height: 12),
+                      Text(
+                        'Nothing to clean up right now.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -132,37 +138,44 @@ class TrashScreen extends ConsumerWidget {
             itemCount: notes.length + 1,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              final note = notes[index];
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 5),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Theme.of(context)
-                          .colorScheme
-                          .errorContainer,
-                      foregroundColor: Theme.of(context)
-                          .colorScheme
-                          .onErrorContainer,
-                      child: const Icon(Icons.delete_outline_rounded),
-                    ),
-                    title: Text(
-                      note.title.trim().isEmpty ? 'Untitled note' : note.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w800),
-                    ),
-                    subtitle: Text(
-                      note.documentContent.trim().isEmpty
-                          ? 'No additional content'
-                          : note.documentContent.trim(),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: PopupMenuButton<String>(
-                      tooltip: 'Trash actions',
-                      onSelected: (value) async {
-                        if (value == 'restore') {
+              if (index == 0) {
+                return const Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: FeatureHero(
+                    icon: Icons.delete_outline_rounded,
+                    title: 'Recently removed',
+                    subtitle: 'Restore a note to your archive or remove it permanently.',
+                    compact: true,
+                  ),
+                );
+              }
+              final note = notes[index - 1];
+              return NeoBrutalistPanel(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: ListTile(
+                  leading: const CircleAvatar(
+                    backgroundColor: AppTheme.pink,
+                    foregroundColor: AppTheme.ink,
+                    child: Icon(Icons.delete_outline_rounded),
+                  ),
+                  title: Text(
+                    note.title.trim().isEmpty ? 'Untitled note' : note.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                  subtitle: Text(
+                    note.documentContent.trim().isEmpty
+                        ? 'No additional content'
+                        : note.documentContent.trim(),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: PopupMenuButton<String>(
+                    tooltip: 'Trash actions',
+                    onSelected: (value) async {
+                      if (value == 'restore') {
+                        try {
                           await db.setDeleted(note.id, false);
                         } catch (_) {
                           if (!context.mounted) return;
