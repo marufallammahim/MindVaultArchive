@@ -44,10 +44,26 @@ class AppTheme {
   static const monochromeOutline = Color(0xFFBDBDBD);
 
   static const monochromeColorFilter = ColorFilter.matrix([
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0.2126, 0.7152, 0.0722, 0, 0,
-    0, 0, 0, 1, 0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0.2126,
+    0.7152,
+    0.0722,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
   ]);
 
   static ThemeData themeFor(AppThemePreset preset, Color accent) =>
@@ -245,7 +261,10 @@ class AppTheme {
           fontWeight: FontWeight.w800,
           letterSpacing: -0.55,
         ),
-        iconTheme: IconThemeData(color: dark ? scheme.onSurface : ink, size: 22),
+        iconTheme: IconThemeData(
+          color: dark ? scheme.onSurface : ink,
+          size: 22,
+        ),
       ),
       cardTheme: CardThemeData(
         color: cardColor,
@@ -424,7 +443,9 @@ class AppTheme {
             side: BorderSide(color: borderInk, width: 2),
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           ),
-      switchTheme: SwitchThemeData(trackOutlineColor: WidgetStatePropertyAll(outline)),
+      switchTheme: SwitchThemeData(
+        trackOutlineColor: WidgetStatePropertyAll(outline),
+      ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,
         linearTrackColor: scheme.primary.withValues(alpha: 0.2),

@@ -256,7 +256,7 @@ class SettingsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 DropdownButtonFormField<AppThemePreset>(
-                  value: preset,
+                  initialValue: preset,
                   decoration: const InputDecoration(labelText: 'Theme preset'),
                   items: [
                     for (final option in AppThemePreset.values)
@@ -266,9 +266,12 @@ class SettingsScreen extends ConsumerWidget {
                           children: [
                             Icon(
                               switch (option) {
-                                AppThemePreset.light => Icons.light_mode_outlined,
-                                AppThemePreset.dark => Icons.dark_mode_outlined,
-                                AppThemePreset.amoled => Icons.brightness_3_outlined,
+                                AppThemePreset.light =>
+                                  Icons.light_mode_outlined,
+                                AppThemePreset.dark =>
+                                  Icons.dark_mode_outlined,
+                                AppThemePreset.amoled =>
+                                  Icons.brightness_3_outlined,
                                 AppThemePreset.monochromeOled =>
                                   Icons.filter_b_and_w_outlined,
                               },
@@ -282,12 +285,17 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                   onChanged: (value) {
                     if (value != null) {
-                      ref.read(themePresetProvider.notifier).setPreset(value);
+                      ref
+                          .read(themePresetProvider.notifier)
+                          .setPreset(value);
                     }
                   },
                 ),
                 const SizedBox(height: 8),
-                Text(preset.description, style: Theme.of(context).textTheme.bodySmall),
+                Text(
+                  preset.description,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
                 if (preset.isMonochrome) ...[
                   const SizedBox(height: 12),
                   const Text(

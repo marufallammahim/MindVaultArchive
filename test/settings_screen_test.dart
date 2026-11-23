@@ -149,10 +149,15 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    expect(find.byType(DropdownButtonFormField<AppThemePreset>), findsOneWidget);
+    expect(
+      find.byType(DropdownButtonFormField<AppThemePreset>),
+      findsOneWidget,
+    );
     expect(find.text('Color mode'), findsNothing);
     expect(find.text('AMOLED black'), findsNothing);
-    await tester.tap(find.byType(DropdownButtonFormField<AppThemePreset>));
+    await tester.tap(
+      find.byType(DropdownButtonFormField<AppThemePreset>),
+    );
     await tester.pumpAndSettle();
     for (final label in ['Light', 'Dark', 'AMOLED', 'Monochrome OLED']) {
       expect(find.text(label), findsWidgets);

@@ -46,18 +46,22 @@ void main() {
     await tester.enterText(find.byType(TextField).at(1), 'Typed body content');
     for (var attempt = 0; attempt < 30; attempt++) {
       await tester.pump(const Duration(milliseconds: 50));
-      final note = await tester.runAsync(() async => (database.select(
-        database.notes,
-      )..where((item) => item.id.equals('editor-note'))).getSingle());
+      final note = await tester.runAsync(
+        () => (database.select(database.notes)
+              ..where((item) => item.id.equals('editor-note')))
+            .getSingle(),
+      );
       if (note?.title == 'Typed title' &&
           note?.documentContent == 'Typed body content') {
         break;
       }
     }
 
-    final saved = await tester.runAsync(() => (database.select(
-      database.notes,
-    )..where((item) => item.id.equals('editor-note'))).getSingle());
+    final saved = await tester.runAsync(
+      () => (database.select(database.notes)
+            ..where((item) => item.id.equals('editor-note')))
+          .getSingle(),
+    );
     expect(saved?.title, 'Typed title');
     expect(saved?.documentContent, 'Typed body content');
     expect(tester.takeException(), isNull);

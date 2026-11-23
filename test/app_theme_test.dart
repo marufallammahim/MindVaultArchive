@@ -43,10 +43,19 @@ void main() {
     test('text uses the brightness-correct foreground', () {
       for (final preset in AppThemePreset.values) {
         final theme = AppTheme.themeFor(preset, AppTheme.primary);
-        expect(theme.textTheme.bodyLarge?.color, theme.colorScheme.onSurface);
-        expect(theme.textTheme.titleLarge?.color, theme.colorScheme.onSurface);
+        expect(
+          theme.textTheme.bodyLarge?.color,
+          theme.colorScheme.onSurface,
+        );
+        expect(
+          theme.textTheme.titleLarge?.color,
+          theme.colorScheme.onSurface,
+        );
       }
-      expect(AppTheme.lightTheme.textTheme.bodyLarge?.color, AppTheme.ink);
+      expect(
+        AppTheme.lightTheme.textTheme.bodyLarge?.color,
+        AppTheme.ink,
+      );
       expect(
         AppTheme.darkTheme.textTheme.bodyLarge?.color,
         AppTheme.darkTheme.colorScheme.onSurface,
