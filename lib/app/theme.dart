@@ -107,7 +107,12 @@ class AppTheme {
       outline: const Color(0xFF51463F),
       outlineVariant: ink,
     );
-    return _build(scheme, lightBackground, dark: false, cardColor: lightSurface);
+    return _build(
+      scheme,
+      lightBackground,
+      dark: false,
+      cardColor: lightSurface,
+    );
   }
 
   static ThemeData get amoledTheme => amoledThemeFor(primary);
@@ -315,7 +320,10 @@ class AppTheme {
         filled: true,
         fillColor: cardColor,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 15,
+        ),
         hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         labelStyle: TextStyle(color: scheme.onSurfaceVariant),
         floatingLabelStyle: TextStyle(color: scheme.onSurface),
@@ -433,13 +441,14 @@ class AppTheme {
           side: BorderSide(color: borderInk, width: 2),
         ),
       ),
-      chipTheme:
-          ChipThemeData.fromDefaults(
+      chipTheme: ChipThemeData.fromDefaults(
             primaryColor: scheme.primary,
             secondaryColor: cardColor,
             labelStyle: TextStyle(color: scheme.onSurface),
           ).copyWith(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
             side: BorderSide(color: borderInk, width: 2),
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           ),

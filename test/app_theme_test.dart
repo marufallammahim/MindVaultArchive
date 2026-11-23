@@ -62,7 +62,9 @@ void main() {
       );
     });
 
-    test('semantic text has contrast on surface, card and accent containers', () {
+    test(
+      'semantic text has contrast on surface, card and accent containers',
+      () {
       for (final preset in AppThemePreset.values) {
         final theme = AppTheme.themeFor(preset, AppTheme.primary);
         final scheme = theme.colorScheme;
@@ -96,8 +98,8 @@ void main() {
           greaterThanOrEqualTo(4.5),
           reason: preset.label,
         );
-      }
-    });
+      },
+    );
 
     test('AMOLED has a black canvas and readable elevated cards', () {
       final theme = AppTheme.amoledTheme;

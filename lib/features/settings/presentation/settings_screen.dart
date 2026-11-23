@@ -357,7 +357,9 @@ class SettingsScreen extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: accent.toARGB32() == color.toARGB32()
-                                        ? Theme.of(context).colorScheme.onSurface
+                                        ? Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
                                         : Colors.transparent,
                                     width: 2.5,
                                   ),
