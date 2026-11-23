@@ -10,7 +10,8 @@ double _contrast(Color foreground, Color background) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-bool _isGray(Color color) => color.red == color.green && color.green == color.blue;
+bool _isGray(Color color) =>
+    color.red == color.green && color.green == color.blue;
 
 void main() {
   group('AppTheme', () {
@@ -56,12 +57,36 @@ void main() {
       for (final preset in AppThemePreset.values) {
         final theme = AppTheme.themeFor(preset, AppTheme.primary);
         final scheme = theme.colorScheme;
-        expect(_contrast(scheme.onPrimary, scheme.primary), greaterThanOrEqualTo(4.5), reason: preset.label);
-        expect(_contrast(scheme.onSecondary, scheme.secondary), greaterThanOrEqualTo(4.5), reason: preset.label);
-        expect(_contrast(scheme.onPrimaryContainer, scheme.primaryContainer), greaterThanOrEqualTo(4.5), reason: preset.label);
-        expect(_contrast(scheme.onSecondaryContainer, scheme.secondaryContainer), greaterThanOrEqualTo(4.5), reason: preset.label);
-        expect(_contrast(scheme.onSurface, scheme.surface), greaterThanOrEqualTo(4.5), reason: preset.label);
-        expect(_contrast(scheme.onSurface, theme.cardTheme.color!), greaterThanOrEqualTo(4.5), reason: preset.label);
+        expect(
+          _contrast(scheme.onPrimary, scheme.primary),
+          greaterThanOrEqualTo(4.5),
+          reason: preset.label,
+        );
+        expect(
+          _contrast(scheme.onSecondary, scheme.secondary),
+          greaterThanOrEqualTo(4.5),
+          reason: preset.label,
+        );
+        expect(
+          _contrast(scheme.onPrimaryContainer, scheme.primaryContainer),
+          greaterThanOrEqualTo(4.5),
+          reason: preset.label,
+        );
+        expect(
+          _contrast(scheme.onSecondaryContainer, scheme.secondaryContainer),
+          greaterThanOrEqualTo(4.5),
+          reason: preset.label,
+        );
+        expect(
+          _contrast(scheme.onSurface, scheme.surface),
+          greaterThanOrEqualTo(4.5),
+          reason: preset.label,
+        );
+        expect(
+          _contrast(scheme.onSurface, theme.cardTheme.color!),
+          greaterThanOrEqualTo(4.5),
+          reason: preset.label,
+        );
       }
     });
 
@@ -74,7 +99,10 @@ void main() {
     });
 
     test('Monochrome OLED is grayscale and ignores accents', () {
-      final first = AppTheme.themeFor(AppThemePreset.monochromeOled, AppTheme.primary);
+      final first = AppTheme.themeFor(
+        AppThemePreset.monochromeOled,
+        AppTheme.primary,
+      );
       final second = AppTheme.themeFor(
         AppThemePreset.monochromeOled,
         const Color(0xFF5A0719),
@@ -107,7 +135,8 @@ void main() {
       ]) {
         final theme = AppTheme.themeFor(preset, AppTheme.primary);
         final card = theme.cardTheme.shape as RoundedRectangleBorder;
-        final input = theme.inputDecorationTheme.enabledBorder as OutlineInputBorder;
+        final input =
+            theme.inputDecorationTheme.enabledBorder as OutlineInputBorder;
         expect(card.side.color, theme.colorScheme.outlineVariant);
         expect(input.borderSide.color, card.side.color);
       }

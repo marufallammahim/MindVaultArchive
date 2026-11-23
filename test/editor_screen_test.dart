@@ -49,17 +49,17 @@ void main() {
       final note = await tester.runAsync(() async => (database.select(
         database.notes,
       )..where((item) => item.id.equals('editor-note'))).getSingle());
-      if (note.title == 'Typed title' &&
+      if (note?.title == 'Typed title' &&
           note.documentContent == 'Typed body content') {
         break;
       }
     }
 
-    final saved = await (database.select(
+    final saved = await tester.runAsync(() => (database.select(
       database.notes,
-    )..where((item) => item.id.equals('editor-note'))).getSingle();
-    expect(saved.title, 'Typed title');
-    expect(saved.documentContent, 'Typed body content');
+    )..where((item) => item.id.equals('editor-note'))).getSingle());
+    expect(saved?.title, 'Typed title');
+    expect(saved?.documentContent, 'Typed body content');
     expect(tester.takeException(), isNull);
   });
 }
