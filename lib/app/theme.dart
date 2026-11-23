@@ -442,16 +442,16 @@ class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData.fromDefaults(
-            primaryColor: scheme.primary,
-            secondaryColor: cardColor,
-            labelStyle: TextStyle(color: scheme.onSurface),
-          ).copyWith(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
-            ),
-            side: BorderSide(color: borderInk, width: 2),
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-          ),
+        primaryColor: scheme.primary,
+        secondaryColor: cardColor,
+        labelStyle: TextStyle(color: scheme.onSurface),
+      ).copyWith(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        side: BorderSide(color: borderInk, width: 2),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      ),
       switchTheme: SwitchThemeData(
         trackOutlineColor: WidgetStatePropertyAll(outline),
       ),
