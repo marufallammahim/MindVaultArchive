@@ -47,8 +47,9 @@ void main() {
     for (var attempt = 0; attempt < 30; attempt++) {
       await tester.pump(const Duration(milliseconds: 50));
       final note = await tester.runAsync(() async {
-        return (database.select(database.notes)
-          ..where((item) => item.id.equals('editor-note'))).getSingle();
+        final query = database.select(database.notes)
+          ..where((item) => item.id.equals('editor-note'));
+        return query.getSingle();
       });
       if (note?.title == 'Typed title' &&
           note?.documentContent == 'Typed body content') {
@@ -57,8 +58,9 @@ void main() {
     }
 
     final saved = await tester.runAsync(() async {
-      return (database.select(database.notes)
-        ..where((item) => item.id.equals('editor-note'))).getSingle();
+      final query = database.select(database.notes)
+        ..where((item) => item.id.equals('editor-note'));
+      return query.getSingle();
     });
     expect(saved?.title, 'Typed title');
     expect(saved?.documentContent, 'Typed body content');
