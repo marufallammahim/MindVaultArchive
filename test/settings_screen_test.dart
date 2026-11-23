@@ -20,6 +20,48 @@ Future<void> _waitFor(
     if (await condition()) return;
   }
   fail('Timed out waiting for Settings to persist the requested change.');
+  testWidgets('Settings exposes one selector for the four presets', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final database = AppDatabase(NativeDatabase.memory());
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 1));
+      await database.close();
+    });
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [databaseProvider.overrideWithValue(database)],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme,
+          home: const SettingsScreen(),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.byType(DropdownButtonFormField<AppThemePreset>), findsOneWidget);
+    expect(find.text('Color mode'), findsNothing);
+    expect(find.text('AMOLED black'), findsNothing);
+    await tester.tap(find.byType(DropdownButtonFormField<AppThemePreset>));
+    await tester.pumpAndSettle();
+    for (final label in ['Light', 'Dark', 'AMOLED', 'Monochrome OLED']) {
+      expect(find.text(label), findsWidgets);
+    }
+    await tester.tap(find.text('Monochrome OLED').last);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final preferences = await tester.runAsync(SharedPreferences.getInstance);
+    expect(preferences?.getString('theme_preset'), 'monochromeOled');
+    expect(find.textContaining('Accent colors are ignored in this preset'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
 }
 
 void main() {
@@ -57,7 +99,7 @@ void main() {
 
       expect(find.byType(FeatureHero), findsOneWidget);
       expect(find.text('Your archive, your way'), findsOneWidget);
-      expect(find.byType(NeoBrutalistPanel), findsAtLeastNWidgets(5));
+      expect(find.byType(NeoBrutalistPanel), findsAtLeastNWidgets(2));
       expect(tester.takeException(), isNull);
 
       final cyanAccent = find.byTooltip('Use accent color #C0F7FE');

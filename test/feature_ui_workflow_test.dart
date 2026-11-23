@@ -122,7 +122,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     await tester.enterText(find.byType(TextField).at(0), 'Continue editing');
     await tester.enterText(find.byType(TextField).at(1), 'Captured body');
-    await tester.tap(find.text('Save and continue editing'));
+    final continueEditing = find.byKey(const ValueKey('quick-capture-save-edit'));
+    await tester.ensureVisible(continueEditing);
+    await tester.tap(continueEditing);
     await _pumpUntil(tester, () async {
       final notes =
           await tester.runAsync(() => database.select(database.notes).get()) ??

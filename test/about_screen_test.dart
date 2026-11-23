@@ -14,7 +14,7 @@ void main() {
     );
 
     expect(find.byType(FeatureHero), findsOneWidget);
-    expect(find.byType(NeoBrutalistPanel), findsNWidgets(3));
+    expect(find.byType(NeoBrutalistPanel), findsNWidgets(2));
     expect(find.text('MindVault Archive'), findsOneWidget);
     expect(find.text('Maruf Allam Mahim'), findsOneWidget);
     expect(
