@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindvault_archive/core/database/database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mindvault_archive/app/theme.dart';
 
 final databaseProvider = Provider<AppDatabase>((ref) {
   final database = AppDatabase();
@@ -11,71 +12,64 @@ final databaseProvider = Provider<AppDatabase>((ref) {
   return database;
 });
 
-class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.dark) {
-    _load();
+class ThemePresetNotifier extends StateNotifier<AppThemePreset> {
+  ThemePresetNotifier() : super(AppThemePreset.amoled) {
+    initialized = _load();
   }
 
-  static const _storageKey = 'theme_mode';
-
-  Future<void> _load() async {
-    try {
-      final preferences = await SharedPreferences.getInstance();
-      final stored = preferences.getString(_storageKey);
-      if (!mounted || stored == null) return;
-      final restored = ThemeMode.values.firstWhere(
-        (mode) => mode.name == stored,
-        orElse: () => ThemeMode.dark,
-      );
-      // System mode follows the phone and is intentionally not supported.
-      state = restored == ThemeMode.system ? ThemeMode.dark : restored;
-      if (restored == ThemeMode.system) {
-        await preferences.setString(_storageKey, ThemeMode.dark.name);
-      }
-    } catch (_) {}
-  }
-
-  Future<void> setThemeMode(ThemeMode mode) async {
-    final fixedMode = mode == ThemeMode.system ? ThemeMode.dark : mode;
-    state = fixedMode;
-    try {
-      final preferences = await SharedPreferences.getInstance();
-      await preferences.setString(_storageKey, fixedMode.name);
-    } catch (_) {}
-  }
-}
-
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>(
-  (ref) => ThemeModeNotifier(),
-);
-
-class AmoledThemeNotifier extends StateNotifier<bool> {
-  AmoledThemeNotifier() : super(true) {
-    _load();
-  }
-
-  static const _storageKey = 'amoled_theme_enabled';
+  static const _storageKey = 'theme_preset';
+  static const _legacyModeKey = 'theme_mode';
+  static const _legacyAmoledKey = 'amoled_theme_enabled';
+  late final Future<void> initialized;
 
   Future<void> _load() async {
     try {
       final preferences = await SharedPreferences.getInstance();
       if (!mounted) return;
-      state = preferences.getBool(_storageKey) ?? true;
+      final stored = preferences.getString(_storageKey);
+      final restored = AppThemePreset.values.where(
+        (preset) => preset.name == stored,
+      );
+      if (restored.isNotEmpty) {
+        state = restored.first;
+        await preferences.remove(_legacyModeKey);
+        await preferences.remove(_legacyAmoledKey);
+        return;
+      }
+      final oldMode = preferences.getString(_legacyModeKey);
+      final oldAmoled = preferences.getBool(_legacyAmoledKey);
+      if (oldMode == 'light') {
+        state = AppThemePreset.light;
+      } else if (oldMode == 'dark' && oldAmoled == false) {
+        state = AppThemePreset.dark;
+      } else if (oldMode == 'dark' && oldAmoled == true) {
+        state = AppThemePreset.amoled;
+      } else {
+        state = AppThemePreset.dark;
+      }
+      await preferences.setString(_storageKey, state.name);
+      await preferences.remove(_legacyModeKey);
+      await preferences.remove(_legacyAmoledKey);
     } catch (_) {}
   }
 
-  Future<void> setEnabled(bool enabled) async {
-    state = enabled;
+  Future<void> setPreset(AppThemePreset preset) async {
+    await initialized;
+    if (!mounted) return;
+    state = preset;
     try {
       final preferences = await SharedPreferences.getInstance();
-      await preferences.setBool(_storageKey, enabled);
+      await preferences.setString(_storageKey, preset.name);
+      await preferences.remove(_legacyModeKey);
+      await preferences.remove(_legacyAmoledKey);
     } catch (_) {}
   }
 }
 
-final amoledThemeProvider = StateNotifierProvider<AmoledThemeNotifier, bool>(
-  (ref) => AmoledThemeNotifier(),
-);
+final themePresetProvider =
+    StateNotifierProvider<ThemePresetNotifier, AppThemePreset>(
+      (ref) => ThemePresetNotifier(),
+    );
 
 class AccentColorNotifier extends StateNotifier<Color> {
   AccentColorNotifier() : super(const Color(0xFFF7CB46)) {

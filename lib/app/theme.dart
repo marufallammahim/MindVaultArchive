@@ -1,5 +1,31 @@
 import 'package:material_ui/material_ui.dart';
 
+enum AppThemePreset {
+  light,
+  dark,
+  amoled,
+  monochromeOled;
+
+  String get label => switch (this) {
+    light => 'Light',
+    dark => 'Dark',
+    amoled => 'AMOLED',
+    monochromeOled => 'Monochrome OLED',
+  };
+
+  String get description => switch (this) {
+    light => 'Warm cream surfaces and dark text.',
+    dark => 'Warm dark surfaces with readable foregrounds.',
+    amoled => 'Pure-black canvas with dark OLED-friendly cards.',
+    monochromeOled => 'Grayscale interface on a pure-black OLED canvas.',
+  };
+
+  Brightness get brightness =>
+      this == AppThemePreset.light ? Brightness.light : Brightness.dark;
+
+  bool get isMonochrome => this == AppThemePreset.monochromeOled;
+}
+
 /// Semantic, contrast-first palette shared by every MindVault screen.
 class AppTheme {
   static const primary = Color(0xFFF7CB46);
@@ -13,98 +39,185 @@ class AppTheme {
   static const darkSurface = Color(0xFF24211C);
   static const darkCard = Color(0xFF302B24);
   static const ink = Color(0xFF000000);
+  static const oledBlack = Color(0xFF000000);
+  static const monochromeCard = Color(0xFF171717);
+  static const monochromeOutline = Color(0xFFBDBDBD);
+
+  static const monochromeColorFilter = ColorFilter.matrix([
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0.2126, 0.7152, 0.0722, 0, 0,
+    0, 0, 0, 1, 0,
+  ]);
+
+  static ThemeData themeFor(AppThemePreset preset, Color accent) =>
+      switch (preset) {
+        AppThemePreset.light => lightThemeFor(accent),
+        AppThemePreset.dark => darkThemeFor(accent),
+        AppThemePreset.amoled => amoledThemeFor(accent),
+        AppThemePreset.monochromeOled => monochromeOledTheme,
+      };
 
   static ThemeData get lightTheme => lightThemeFor(primary);
+
   static ThemeData lightThemeFor(Color accent) {
-    final scheme =
-        ColorScheme.fromSeed(
-          seedColor: accent,
-          brightness: Brightness.light,
-          surface: lightSurface,
-        ).copyWith(
-          primary: accent,
-          onPrimary: ink,
-          primaryContainer: const Color(0xFFFFE8A6),
-          onPrimaryContainer: ink,
-          secondary: secondary,
-          onSecondary: ink,
-          secondaryContainer: const Color(0xFFE4F9FC),
-          onSecondaryContainer: ink,
-          tertiary: tertiary,
-          onTertiary: ink,
-          tertiaryContainer: const Color(0xFFE9F8E3),
-          onTertiaryContainer: ink,
-          error: const Color(0xFFB3261E),
-          onError: const Color(0xFFFFFFFF),
-          surface: lightSurface,
-          onSurface: ink,
-          surfaceContainerLowest: const Color(0xFFFFFFFF),
-          surfaceContainerLow: const Color(0xFFFFF5EC),
-          surfaceContainer: const Color(0xFFF4E9E1),
-          surfaceContainerHigh: const Color(0xFFEDE1D8),
-          onSurfaceVariant: const Color(0xFF49443F),
-          outline: ink,
-          outlineVariant: const Color(0xFF000000),
-        );
-    return _build(scheme, lightBackground, dark: false);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: accent,
+      brightness: Brightness.light,
+      surface: lightSurface,
+    ).copyWith(
+      primary: accent,
+      onPrimary: _contrastForeground(accent),
+      primaryContainer: const Color(0xFFFFE8A6),
+      onPrimaryContainer: ink,
+      secondary: secondary,
+      onSecondary: ink,
+      secondaryContainer: const Color(0xFFE4F9FC),
+      onSecondaryContainer: ink,
+      tertiary: tertiary,
+      onTertiary: ink,
+      tertiaryContainer: const Color(0xFFE9F8E3),
+      onTertiaryContainer: ink,
+      error: const Color(0xFFB3261E),
+      onError: const Color(0xFFFFFFFF),
+      surface: lightSurface,
+      onSurface: ink,
+      surfaceContainerLowest: const Color(0xFFFFFFFF),
+      surfaceContainerLow: const Color(0xFFFFF5EC),
+      surfaceContainer: const Color(0xFFF4E9E1),
+      surfaceContainerHigh: const Color(0xFFEDE1D8),
+      surfaceContainerHighest: const Color(0xFFE4D8CF),
+      onSurfaceVariant: const Color(0xFF49443F),
+      outline: const Color(0xFF51463F),
+      outlineVariant: ink,
+    );
+    return _build(scheme, lightBackground, dark: false, cardColor: lightSurface);
   }
 
   static ThemeData get amoledTheme => amoledThemeFor(primary);
+
   static ThemeData amoledThemeFor(Color accent) =>
       darkThemeFor(accent, amoled: true);
+
   static ThemeData get darkTheme => darkThemeFor(primary);
 
   static ThemeData darkThemeFor(Color accent, {bool amoled = false}) {
-    final scheme =
-        ColorScheme.fromSeed(
-          seedColor: accent,
-          brightness: Brightness.dark,
-          surface: darkSurface,
-        ).copyWith(
-          primary: accent,
-          onPrimary: ink,
-          primaryContainer: const Color(0xFF5A4717),
-          onPrimaryContainer: const Color(0xFFFFF1C7),
-          secondary: secondary,
-          onSecondary: ink,
-          secondaryContainer: const Color(0xFF21464B),
-          onSecondaryContainer: const Color(0xFFD9FAFF),
-          tertiary: tertiary,
-          onTertiary: ink,
-          tertiaryContainer: const Color(0xFF294B24),
-          onTertiaryContainer: const Color(0xFFE2FFDA),
-          error: const Color(0xFFFFB4AB),
-          onError: const Color(0xFF690005),
-          surface: darkSurface,
-          onSurface: const Color(0xFFF5F1EC),
-          surfaceContainerLowest: const Color(0xFF101114),
-          surfaceContainerLow: const Color(0xFF202329),
-          surfaceContainer: const Color(0xFF272B31),
-          surfaceContainerHigh: const Color(0xFF30353D),
-          onSurfaceVariant: const Color(0xFFD0CBC4),
-          outline: const Color(0xFFE7DFD3),
-          outlineVariant: const Color(0xFFE7DFD3),
-        );
+    final surface = amoled ? oledBlack : darkSurface;
+    final scheme = ColorScheme.fromSeed(
+      seedColor: accent,
+      brightness: Brightness.dark,
+      surface: surface,
+    ).copyWith(
+      primary: accent,
+      onPrimary: _contrastForeground(accent),
+      primaryContainer: const Color(0xFF5A4717),
+      onPrimaryContainer: const Color(0xFFFFF1C7),
+      secondary: secondary,
+      onSecondary: ink,
+      secondaryContainer: const Color(0xFF21464B),
+      onSecondaryContainer: const Color(0xFFD9FAFF),
+      tertiary: tertiary,
+      onTertiary: ink,
+      tertiaryContainer: const Color(0xFF294B24),
+      onTertiaryContainer: const Color(0xFFE2FFDA),
+      error: const Color(0xFFFFB4AB),
+      onError: const Color(0xFF690005),
+      surface: surface,
+      onSurface: const Color(0xFFF5F1EC),
+      surfaceContainerLowest: amoled
+          ? oledBlack
+          : const Color(0xFF151310),
+      surfaceContainerLow: amoled
+          ? const Color(0xFF0B0B0B)
+          : const Color(0xFF201D19),
+      surfaceContainer: amoled
+          ? const Color(0xFF141414)
+          : const Color(0xFF28241F),
+      surfaceContainerHigh: amoled
+          ? const Color(0xFF1E1E1E)
+          : const Color(0xFF302B24),
+      surfaceContainerHighest: amoled
+          ? const Color(0xFF262626)
+          : const Color(0xFF39332B),
+      onSurfaceVariant: const Color(0xFFD0CBC4),
+      outline: const Color(0xFFC8BFB2),
+      outlineVariant: const Color(0xFFE7DFD3),
+    );
     return _build(
       scheme,
-      amoled ? const Color(0xFF000000) : darkBackground,
+      amoled ? oledBlack : darkBackground,
       dark: true,
+      cardColor: amoled ? monochromeCard : darkCard,
     );
+  }
+
+  static ThemeData get monochromeOledTheme {
+    const black = Color(0xFF000000);
+    const white = Color(0xFFF2F2F2);
+    const mid = Color(0xFFBDBDBD);
+    const scheme = ColorScheme.dark(
+      primary: white,
+      onPrimary: black,
+      primaryContainer: Color(0xFF292929),
+      onPrimaryContainer: white,
+      secondary: mid,
+      onSecondary: black,
+      secondaryContainer: Color(0xFF292929),
+      onSecondaryContainer: Color(0xFFE8E8E8),
+      tertiary: Color(0xFFD8D8D8),
+      onTertiary: black,
+      tertiaryContainer: Color(0xFF343434),
+      onTertiaryContainer: white,
+      error: Color(0xFFE0E0E0),
+      onError: black,
+      surface: black,
+      onSurface: white,
+      surfaceContainerLowest: black,
+      surfaceContainerLow: Color(0xFF0D0D0D),
+      surfaceContainer: Color(0xFF171717),
+      surfaceContainerHigh: Color(0xFF242424),
+      surfaceContainerHighest: Color(0xFF303030),
+      onSurfaceVariant: mid,
+      outline: Color(0xFFBDBDBD),
+      outlineVariant: Color(0xFF8D8D8D),
+      inverseSurface: white,
+      onInverseSurface: black,
+      inversePrimary: Color(0xFF8C8C8C),
+      shadow: black,
+      scrim: black,
+      surfaceTint: white,
+    );
+    return _build(
+      scheme,
+      black,
+      dark: true,
+      cardColor: monochromeCard,
+      borderColor: monochromeOutline,
+    );
+  }
+
+  static Color _contrastForeground(Color background) {
+    final luminance = background.computeLuminance();
+    final blackContrast = (luminance + 0.05) / 0.05;
+    final whiteContrast = 1.05 / (luminance + 0.05);
+    return blackContrast >= whiteContrast ? ink : Colors.white;
   }
 
   static ThemeData _build(
     ColorScheme scheme,
     Color background, {
     required bool dark,
+    required Color cardColor,
+    Color? borderColor,
   }) {
-    final card = dark ? darkCard : lightSurface;
+    final borderInk = borderColor ?? scheme.outlineVariant;
     final outline = scheme.outlineVariant;
-    final borderInk = dark ? const Color(0xFFF5F1EC) : ink;
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(7),
       side: BorderSide(color: borderInk, width: 2.5),
     );
-    final text = dark ? scheme.onSurface : ink;
+    final typography = Typography.material2021();
+    final baseTextTheme = dark ? typography.white : typography.black;
 
     return ThemeData(
       useMaterial3: true,
@@ -114,12 +227,12 @@ class AppTheme {
       canvasColor: background,
       visualDensity: VisualDensity.standard,
       fontFamily: 'Roboto',
-      textTheme: Typography.material2021().black.apply(
-        bodyColor: text,
-        displayColor: text,
+      textTheme: baseTextTheme.apply(
+        bodyColor: scheme.onSurface,
+        displayColor: scheme.onSurface,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: dark ? darkSurface : primary,
+        backgroundColor: dark ? scheme.surface : primary,
         foregroundColor: dark ? scheme.onSurface : ink,
         surfaceTintColor: Colors.transparent,
         centerTitle: false,
@@ -132,13 +245,10 @@ class AppTheme {
           fontWeight: FontWeight.w800,
           letterSpacing: -0.55,
         ),
-        iconTheme: IconThemeData(
-          color: dark ? scheme.onSurface : ink,
-          size: 22,
-        ),
+        iconTheme: IconThemeData(color: dark ? scheme.onSurface : ink, size: 22),
       ),
       cardTheme: CardThemeData(
-        color: card,
+        color: cardColor,
         elevation: 0,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
@@ -184,12 +294,9 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: card,
+        fillColor: cardColor,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 15,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         hintStyle: TextStyle(color: scheme.onSurfaceVariant),
         labelStyle: TextStyle(color: scheme.onSurfaceVariant),
         floatingLabelStyle: TextStyle(color: scheme.onSurface),
@@ -209,7 +316,7 @@ class AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: card,
+        backgroundColor: cardColor,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
@@ -222,9 +329,9 @@ class AppTheme {
         ),
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: card,
+        backgroundColor: cardColor,
         surfaceTintColor: Colors.transparent,
-        modalBackgroundColor: card,
+        modalBackgroundColor: cardColor,
         showDragHandle: true,
         shape: RoundedRectangleBorder(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
@@ -232,7 +339,7 @@ class AppTheme {
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: card,
+        color: cardColor,
         surfaceTintColor: Colors.transparent,
         textStyle: TextStyle(color: scheme.onSurface),
         shape: RoundedRectangleBorder(
@@ -242,7 +349,7 @@ class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: card,
+        backgroundColor: cardColor,
         contentTextStyle: TextStyle(color: scheme.onSurface),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(7),
@@ -250,7 +357,7 @@ class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: dark ? darkSurface : lightSurface,
+        backgroundColor: dark ? scheme.surface : lightSurface,
         surfaceTintColor: Colors.transparent,
         indicatorColor: scheme.primary.withValues(alpha: 0.28),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
@@ -310,18 +417,14 @@ class AppTheme {
       chipTheme:
           ChipThemeData.fromDefaults(
             primaryColor: scheme.primary,
-            secondaryColor: card,
+            secondaryColor: cardColor,
             labelStyle: TextStyle(color: scheme.onSurface),
           ).copyWith(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
             side: BorderSide(color: borderInk, width: 2),
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
           ),
-      switchTheme: SwitchThemeData(
-        trackOutlineColor: WidgetStatePropertyAll(outline),
-      ),
+      switchTheme: SwitchThemeData(trackOutlineColor: WidgetStatePropertyAll(outline)),
       progressIndicatorTheme: ProgressIndicatorThemeData(
         color: scheme.primary,
         linearTrackColor: scheme.primary.withValues(alpha: 0.2),

@@ -192,8 +192,7 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
-    final amoledEnabled = ref.watch(amoledThemeProvider);
+    final preset = ref.watch(themePresetProvider);
     final accent = ref.watch(accentColorProvider);
     final profile = ref.watch(userProfileProvider);
     final db = ref.watch(databaseProvider);
@@ -253,46 +252,48 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           NeoBrutalistPanel(
             padding: const EdgeInsets.all(16),
-            child: Padding(
-              padding: EdgeInsets.zero,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Color mode',
-                    style: TextStyle(fontWeight: FontWeight.w700),
-                  ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DropdownButtonFormField<AppThemePreset>(
+                  value: preset,
+                  decoration: const InputDecoration(labelText: 'Theme preset'),
+                  items: [
+                    for (final option in AppThemePreset.values)
+                      DropdownMenuItem(
+                        value: option,
+                        child: Row(
+                          children: [
+                            Icon(
+                              switch (option) {
+                                AppThemePreset.light => Icons.light_mode_outlined,
+                                AppThemePreset.dark => Icons.dark_mode_outlined,
+                                AppThemePreset.amoled => Icons.brightness_3_outlined,
+                                AppThemePreset.monochromeOled =>
+                                  Icons.filter_b_and_w_outlined,
+                              },
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(option.label),
+                          ],
+                        ),
+                      ),
+                  ],
+                  onChanged: (value) {
+                    if (value != null) {
+                      ref.read(themePresetProvider.notifier).setPreset(value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 8),
+                Text(preset.description, style: Theme.of(context).textTheme.bodySmall),
+                if (preset.isMonochrome) ...[
                   const SizedBox(height: 12),
-                  SegmentedButton<ThemeMode>(
-                    showSelectedIcon: false,
-                    segments: const [
-                      ButtonSegment(
-                        value: ThemeMode.light,
-                        label: Text('Light'),
-                        icon: Icon(Icons.light_mode_outlined),
-                      ),
-                      ButtonSegment(
-                        value: ThemeMode.dark,
-                        label: Text('Dark'),
-                        icon: Icon(Icons.dark_mode_outlined),
-                      ),
-                    ],
-                    selected: {mode},
-                    onSelectionChanged: (selection) => ref
-                        .read(themeModeProvider.notifier)
-                        .setThemeMode(selection.first),
+                  const Text(
+                    'Accent colors are ignored in this preset. Your saved accent is kept for the other themes.',
                   ),
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('AMOLED black'),
-                    subtitle: const Text(
-                      'Pure black canvas with high-contrast cards',
-                    ),
-                    value: amoledEnabled,
-                    onChanged: (value) => ref
-                        .read(amoledThemeProvider.notifier)
-                        .setEnabled(value),
-                  ),
+                ] else ...[
                   const Divider(height: 24),
                   Row(
                     children: [
@@ -348,9 +349,7 @@ class SettingsScreen extends ConsumerWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: accent.toARGB32() == color.toARGB32()
-                                        ? Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
+                                        ? Theme.of(context).colorScheme.onSurface
                                         : Colors.transparent,
                                     width: 2.5,
                                   ),

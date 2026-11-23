@@ -13,23 +13,31 @@ class MindVaultArchiveApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
-    final amoled = ref.watch(amoledThemeProvider);
+    final preset = ref.watch(themePresetProvider);
     final accent = ref.watch(accentColorProvider);
+    final selectedTheme = AppTheme.themeFor(preset, accent);
     return MaterialApp.router(
       title: 'MindVault Archive',
-      themeMode: mode,
-      theme: AppTheme.lightThemeFor(accent),
-      darkTheme: amoled
-          ? AppTheme.amoledThemeFor(accent)
-          : AppTheme.darkThemeFor(accent),
+      theme: selectedTheme,
+      darkTheme: selectedTheme,
+      themeMode: preset.brightness == Brightness.light
+          ? ThemeMode.light
+          : ThemeMode.dark,
       routerConfig: appRouter,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const [Locale('en', 'US')],
-      builder: (context, child) => AppLockGate(
-        service: appLockService,
-        child: child ?? const SizedBox.shrink(),
-      ),
+      builder: (context, child) {
+        final gatedChild = AppLockGate(
+          service: appLockService,
+          child: child ?? const SizedBox.shrink(),
+        );
+        return preset.isMonochrome
+            ? ColorFiltered(
+                colorFilter: AppTheme.monochromeColorFilter,
+                child: gatedChild,
+              )
+            : gatedChild;
+      },
       debugShowCheckedModeBanner: false,
     );
   }
