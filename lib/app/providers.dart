@@ -38,11 +38,13 @@ class ThemePresetNotifier extends StateNotifier<AppThemePreset> {
       }
       final oldMode = preferences.getString(_legacyModeKey);
       final oldAmoled = preferences.getBool(_legacyAmoledKey);
-      if (oldMode == 'light') {
+      if (oldMode == null && oldAmoled == null) {
+        state = AppThemePreset.amoled;
+      } else if (oldMode == 'light') {
         state = AppThemePreset.light;
       } else if (oldMode == 'dark' && oldAmoled == false) {
         state = AppThemePreset.dark;
-      } else if (oldMode == 'dark' && oldAmoled == true) {
+      } else if (oldMode == 'dark' && oldAmoled != false) {
         state = AppThemePreset.amoled;
       } else {
         state = AppThemePreset.dark;

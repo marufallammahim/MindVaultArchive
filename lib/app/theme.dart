@@ -179,7 +179,7 @@ class AppTheme {
       surfaceContainerHighest: Color(0xFF303030),
       onSurfaceVariant: mid,
       outline: Color(0xFFBDBDBD),
-      outlineVariant: Color(0xFF8D8D8D),
+      outlineVariant: Color(0xFFBDBDBD),
       inverseSurface: white,
       onInverseSurface: black,
       inversePrimary: Color(0xFF8C8C8C),
