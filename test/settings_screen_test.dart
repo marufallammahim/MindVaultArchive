@@ -20,7 +20,6 @@ Future<void> _waitFor(
     if (await condition()) return;
   }
   fail('Timed out waiting for Settings to persist the requested change.');
-
 }
 
 void main() {
@@ -164,7 +163,10 @@ void main() {
 
     final preferences = await tester.runAsync(SharedPreferences.getInstance);
     expect(preferences?.getString('theme_preset'), 'monochromeOled');
-    expect(find.textContaining('Accent colors are ignored in this preset'), findsOneWidget);
+    expect(
+      find.textContaining('Accent colors are ignored in this preset'),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 

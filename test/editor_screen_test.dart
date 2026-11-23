@@ -50,7 +50,7 @@ void main() {
         database.notes,
       )..where((item) => item.id.equals('editor-note'))).getSingle());
       if (note?.title == 'Typed title' &&
-          note.documentContent == 'Typed body content') {
+          note?.documentContent == 'Typed body content') {
         break;
       }
     }
