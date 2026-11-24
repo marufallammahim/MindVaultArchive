@@ -11,7 +11,7 @@ double _contrast(Color foreground, Color background) {
 }
 
 bool _isGray(Color color) =>
-    color.red == color.green && color.green == color.blue;
+    color.r == color.g && color.g == color.b;
 
 void main() {
   group('AppTheme', () {
@@ -206,13 +206,13 @@ void main() {
           WidgetState.selected,
         })!.color!;
         final unselectedIcon = navigation.iconTheme!
-            .resolve(const <WidgetState>{})!
+            .resolve(const <WidgetState>{})
             .color!;
         final selectedLabel = navigation.labelTextStyle!.resolve(
           const <WidgetState>{WidgetState.selected},
         )!.color!;
         final unselectedLabel = navigation.labelTextStyle!
-            .resolve(const <WidgetState>{})!
+            .resolve(const <WidgetState>{})
             .color!;
 
         expect(
