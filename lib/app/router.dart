@@ -40,7 +40,7 @@ final appRouter = GoRouter(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.route_outlined,
               size: 52,
               color: theme.colorScheme.onSurfaceVariant,
