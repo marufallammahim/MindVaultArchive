@@ -178,25 +178,22 @@ void main() {
           reason: '${preset.label} snackbar',
         );
         expect(
-          _contrast(
-            scheme.onSurface,
-            theme.bottomSheetTheme.backgroundColor!,
-          ),
+          _contrast(scheme.onSurface, theme.bottomSheetTheme.backgroundColor!),
           greaterThanOrEqualTo(4.5),
           reason: '${preset.label} bottom sheet',
         );
 
         final navigation = theme.navigationBarTheme;
         final navigationBackground = navigation.backgroundColor!;
-        final selectedIcon = navigation.iconTheme!
-            .resolve(const <WidgetState>{WidgetState.selected})!
-            .color!;
+        final selectedIcon = navigation.iconTheme!.resolve(const <WidgetState>{
+          WidgetState.selected,
+        })!.color!;
         final unselectedIcon = navigation.iconTheme!
             .resolve(const <WidgetState>{})!
             .color!;
-        final selectedLabel = navigation.labelTextStyle!
-            .resolve(const <WidgetState>{WidgetState.selected})!
-            .color!;
+        final selectedLabel = navigation.labelTextStyle!.resolve(
+          const <WidgetState>{WidgetState.selected},
+        )!.color!;
         final unselectedLabel = navigation.labelTextStyle!
             .resolve(const <WidgetState>{})!
             .color!;
