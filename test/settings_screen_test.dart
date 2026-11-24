@@ -155,9 +155,7 @@ void main() {
     );
     expect(find.text('Color mode'), findsNothing);
     expect(find.text('AMOLED black'), findsNothing);
-    await tester.tap(
-      find.byType(DropdownButtonFormField<AppThemePreset>),
-    );
+    await tester.tap(find.byType(DropdownButtonFormField<AppThemePreset>));
     await tester.pumpAndSettle();
     for (final label in ['Light', 'Dark', 'AMOLED', 'Monochrome OLED']) {
       expect(find.text(label), findsWidgets);

@@ -77,36 +77,37 @@ class AppTheme {
   static ThemeData get lightTheme => lightThemeFor(primary);
 
   static ThemeData lightThemeFor(Color accent) {
-    final scheme = ColorScheme.fromSeed(
-      seedColor: accent,
-      brightness: Brightness.light,
-      surface: lightSurface,
-    ).copyWith(
-      primary: accent,
-      onPrimary: _contrastForeground(accent),
-      primaryContainer: const Color(0xFFFFE8A6),
-      onPrimaryContainer: ink,
-      secondary: secondary,
-      onSecondary: ink,
-      secondaryContainer: const Color(0xFFE4F9FC),
-      onSecondaryContainer: ink,
-      tertiary: tertiary,
-      onTertiary: ink,
-      tertiaryContainer: const Color(0xFFE9F8E3),
-      onTertiaryContainer: ink,
-      error: const Color(0xFFB3261E),
-      onError: const Color(0xFFFFFFFF),
-      surface: lightSurface,
-      onSurface: ink,
-      surfaceContainerLowest: const Color(0xFFFFFFFF),
-      surfaceContainerLow: const Color(0xFFFFF5EC),
-      surfaceContainer: const Color(0xFFF4E9E1),
-      surfaceContainerHigh: const Color(0xFFEDE1D8),
-      surfaceContainerHighest: const Color(0xFFE4D8CF),
-      onSurfaceVariant: const Color(0xFF49443F),
-      outline: const Color(0xFF51463F),
-      outlineVariant: ink,
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: accent,
+          brightness: Brightness.light,
+          surface: lightSurface,
+        ).copyWith(
+          primary: accent,
+          onPrimary: _contrastForeground(accent),
+          primaryContainer: const Color(0xFFFFE8A6),
+          onPrimaryContainer: ink,
+          secondary: secondary,
+          onSecondary: ink,
+          secondaryContainer: const Color(0xFFE4F9FC),
+          onSecondaryContainer: ink,
+          tertiary: tertiary,
+          onTertiary: ink,
+          tertiaryContainer: const Color(0xFFE9F8E3),
+          onTertiaryContainer: ink,
+          error: const Color(0xFFB3261E),
+          onError: const Color(0xFFFFFFFF),
+          surface: lightSurface,
+          onSurface: ink,
+          surfaceContainerLowest: const Color(0xFFFFFFFF),
+          surfaceContainerLow: const Color(0xFFFFF5EC),
+          surfaceContainer: const Color(0xFFF4E9E1),
+          surfaceContainerHigh: const Color(0xFFEDE1D8),
+          surfaceContainerHighest: const Color(0xFFE4D8CF),
+          onSurfaceVariant: const Color(0xFF49443F),
+          outline: const Color(0xFF51463F),
+          outlineVariant: ink,
+        );
     return _build(
       scheme,
       lightBackground,
@@ -124,46 +125,45 @@ class AppTheme {
 
   static ThemeData darkThemeFor(Color accent, {bool amoled = false}) {
     final surface = amoled ? oledBlack : darkSurface;
-    final scheme = ColorScheme.fromSeed(
-      seedColor: accent,
-      brightness: Brightness.dark,
-      surface: surface,
-    ).copyWith(
-      primary: accent,
-      onPrimary: _contrastForeground(accent),
-      primaryContainer: const Color(0xFF5A4717),
-      onPrimaryContainer: const Color(0xFFFFF1C7),
-      secondary: secondary,
-      onSecondary: ink,
-      secondaryContainer: const Color(0xFF21464B),
-      onSecondaryContainer: const Color(0xFFD9FAFF),
-      tertiary: tertiary,
-      onTertiary: ink,
-      tertiaryContainer: const Color(0xFF294B24),
-      onTertiaryContainer: const Color(0xFFE2FFDA),
-      error: const Color(0xFFFFB4AB),
-      onError: const Color(0xFF690005),
-      surface: surface,
-      onSurface: const Color(0xFFF5F1EC),
-      surfaceContainerLowest: amoled
-          ? oledBlack
-          : const Color(0xFF151310),
-      surfaceContainerLow: amoled
-          ? const Color(0xFF0B0B0B)
-          : const Color(0xFF201D19),
-      surfaceContainer: amoled
-          ? const Color(0xFF141414)
-          : const Color(0xFF28241F),
-      surfaceContainerHigh: amoled
-          ? const Color(0xFF1E1E1E)
-          : const Color(0xFF302B24),
-      surfaceContainerHighest: amoled
-          ? const Color(0xFF262626)
-          : const Color(0xFF39332B),
-      onSurfaceVariant: const Color(0xFFD0CBC4),
-      outline: const Color(0xFFC8BFB2),
-      outlineVariant: const Color(0xFFE7DFD3),
-    );
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: accent,
+          brightness: Brightness.dark,
+          surface: surface,
+        ).copyWith(
+          primary: accent,
+          onPrimary: _contrastForeground(accent),
+          primaryContainer: const Color(0xFF5A4717),
+          onPrimaryContainer: const Color(0xFFFFF1C7),
+          secondary: secondary,
+          onSecondary: ink,
+          secondaryContainer: const Color(0xFF21464B),
+          onSecondaryContainer: const Color(0xFFD9FAFF),
+          tertiary: tertiary,
+          onTertiary: ink,
+          tertiaryContainer: const Color(0xFF294B24),
+          onTertiaryContainer: const Color(0xFFE2FFDA),
+          error: const Color(0xFFFFB4AB),
+          onError: const Color(0xFF690005),
+          surface: surface,
+          onSurface: const Color(0xFFF5F1EC),
+          surfaceContainerLowest: amoled ? oledBlack : const Color(0xFF151310),
+          surfaceContainerLow: amoled
+              ? const Color(0xFF0B0B0B)
+              : const Color(0xFF201D19),
+          surfaceContainer: amoled
+              ? const Color(0xFF141414)
+              : const Color(0xFF28241F),
+          surfaceContainerHigh: amoled
+              ? const Color(0xFF1E1E1E)
+              : const Color(0xFF302B24),
+          surfaceContainerHighest: amoled
+              ? const Color(0xFF262626)
+              : const Color(0xFF39332B),
+          onSurfaceVariant: const Color(0xFFD0CBC4),
+          outline: const Color(0xFFC8BFB2),
+          outlineVariant: const Color(0xFFE7DFD3),
+        );
     return _build(
       scheme,
       amoled ? oledBlack : darkBackground,
@@ -441,17 +441,18 @@ class AppTheme {
           side: BorderSide(color: borderInk, width: 2),
         ),
       ),
-      chipTheme: ChipThemeData.fromDefaults(
-        primaryColor: scheme.primary,
-        secondaryColor: cardColor,
-        labelStyle: TextStyle(color: scheme.onSurface),
-      ).copyWith(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(5),
-        ),
-        side: BorderSide(color: borderInk, width: 2),
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-      ),
+      chipTheme:
+          ChipThemeData.fromDefaults(
+            primaryColor: scheme.primary,
+            secondaryColor: cardColor,
+            labelStyle: TextStyle(color: scheme.onSurface),
+          ).copyWith(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            side: BorderSide(color: borderInk, width: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+          ),
       switchTheme: SwitchThemeData(
         trackOutlineColor: WidgetStatePropertyAll(outline),
       ),

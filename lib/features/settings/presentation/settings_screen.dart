@@ -264,19 +264,14 @@ class SettingsScreen extends ConsumerWidget {
                         value: option,
                         child: Row(
                           children: [
-                            Icon(
-                              switch (option) {
-                                AppThemePreset.light =>
-                                  Icons.light_mode_outlined,
-                                AppThemePreset.dark =>
-                                  Icons.dark_mode_outlined,
-                                AppThemePreset.amoled =>
-                                  Icons.brightness_3_outlined,
-                                AppThemePreset.monochromeOled =>
-                                  Icons.filter_b_and_w_outlined,
-                              },
-                              size: 20,
-                            ),
+                            Icon(switch (option) {
+                              AppThemePreset.light => Icons.light_mode_outlined,
+                              AppThemePreset.dark => Icons.dark_mode_outlined,
+                              AppThemePreset.amoled =>
+                                Icons.brightness_3_outlined,
+                              AppThemePreset.monochromeOled =>
+                                Icons.filter_b_and_w_outlined,
+                            }, size: 20),
                             const SizedBox(width: 10),
                             Text(option.label),
                           ],
@@ -285,9 +280,7 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                   onChanged: (value) {
                     if (value != null) {
-                      ref
-                          .read(themePresetProvider.notifier)
-                          .setPreset(value);
+                      ref.read(themePresetProvider.notifier).setPreset(value);
                     }
                   },
                 ),
