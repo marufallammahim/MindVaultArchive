@@ -25,48 +25,48 @@ final appRouter = GoRouter(
   errorBuilder: (context, state) {
     final theme = Theme.of(context);
     return Scaffold(
-    backgroundColor: theme.scaffoldBackgroundColor,
-    appBar: AppBar(
-      title: const Text('Page unavailable'),
-      leading: IconButton(
-        tooltip: 'Go to Home',
-        onPressed: () => context.go('/home'),
-        icon: const Icon(Icons.home_rounded),
-      ),
-    ),
-    body: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.route_outlined,
-              size: 52,
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'This page could not be opened.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Your saved content is safe. Return home and try again.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: () => context.go('/home'),
-              icon: const Icon(Icons.home_rounded),
-              label: const Text('Back to Home'),
-            ),
-          ],
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: const Text('Page unavailable'),
+        leading: IconButton(
+          tooltip: 'Go to Home',
+          onPressed: () => context.go('/home'),
+          icon: const Icon(Icons.home_rounded),
         ),
       ),
-    ),
-  );
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.route_outlined,
+                size: 52,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'This page could not be opened.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Your saved content is safe. Return home and try again.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: () => context.go('/home'),
+                icon: const Icon(Icons.home_rounded),
+                label: const Text('Back to Home'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),

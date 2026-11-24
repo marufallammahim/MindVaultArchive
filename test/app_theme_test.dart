@@ -262,10 +262,7 @@ void main() {
       );
       expect(darkAccentTheme.appBarTheme.backgroundColor, darkAccent);
       expect(
-        _contrast(
-          darkAccentTheme.appBarTheme.foregroundColor!,
-          darkAccent,
-        ),
+        _contrast(darkAccentTheme.appBarTheme.foregroundColor!, darkAccent),
         greaterThanOrEqualTo(4.5),
       );
 
@@ -276,21 +273,15 @@ void main() {
       );
       expect(brightAccentTheme.appBarTheme.backgroundColor, brightAccent);
       expect(
-        _contrast(
-          brightAccentTheme.appBarTheme.foregroundColor!,
-          brightAccent,
-        ),
+        _contrast(brightAccentTheme.appBarTheme.foregroundColor!, brightAccent),
         greaterThanOrEqualTo(4.5),
       );
       final navigation = brightAccentTheme.navigationBarTheme;
-      final selectedNavigationColor = navigation.iconTheme!
-          .resolve(const <WidgetState>{WidgetState.selected})!
-          .color!;
+      final selectedNavigationColor = navigation.iconTheme!.resolve(
+        const <WidgetState>{WidgetState.selected},
+      )!.color!;
       expect(
-        _contrast(
-          selectedNavigationColor,
-          navigation.backgroundColor!,
-        ),
+        _contrast(selectedNavigationColor, navigation.backgroundColor!),
         greaterThanOrEqualTo(4.5),
       );
     });
