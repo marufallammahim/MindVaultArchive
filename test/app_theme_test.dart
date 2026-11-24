@@ -151,6 +151,23 @@ void main() {
         final scheme = theme.colorScheme;
         final cardColor = theme.cardTheme.color!;
         final input = theme.inputDecorationTheme;
+        final appBar = theme.appBarTheme;
+
+        expect(
+          _contrast(appBar.foregroundColor!, appBar.backgroundColor!),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} app bar foreground',
+        );
+        expect(
+          _contrast(appBar.titleTextStyle!.color!, appBar.backgroundColor!),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} app bar title',
+        );
+        expect(
+          _contrast(appBar.iconTheme!.color!, appBar.backgroundColor!),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} app bar icons',
+        );
 
         expect(
           _contrast(input.hintStyle!.color!, cardColor),
@@ -235,6 +252,47 @@ void main() {
           reason: '${preset.label} text cursor',
         );
       }
+    });
+
+    test('light theme keeps custom accent foregrounds readable', () {
+      const darkAccent = Color(0xFF5A0719);
+      final darkAccentTheme = AppTheme.themeFor(
+        AppThemePreset.light,
+        darkAccent,
+      );
+      expect(darkAccentTheme.appBarTheme.backgroundColor, darkAccent);
+      expect(
+        _contrast(
+          darkAccentTheme.appBarTheme.foregroundColor!,
+          darkAccent,
+        ),
+        greaterThanOrEqualTo(4.5),
+      );
+
+      const brightAccent = Color(0xFFC0F7FE);
+      final brightAccentTheme = AppTheme.themeFor(
+        AppThemePreset.light,
+        brightAccent,
+      );
+      expect(brightAccentTheme.appBarTheme.backgroundColor, brightAccent);
+      expect(
+        _contrast(
+          brightAccentTheme.appBarTheme.foregroundColor!,
+          brightAccent,
+        ),
+        greaterThanOrEqualTo(4.5),
+      );
+      final navigation = brightAccentTheme.navigationBarTheme;
+      final selectedNavigationColor = navigation.iconTheme!
+          .resolve(const <WidgetState>{WidgetState.selected})!
+          .color!;
+      expect(
+        _contrast(
+          selectedNavigationColor,
+          navigation.backgroundColor!,
+        ),
+        greaterThanOrEqualTo(4.5),
+      );
     });
   });
 }
