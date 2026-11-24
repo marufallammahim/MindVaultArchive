@@ -10,8 +10,7 @@ double _contrast(Color foreground, Color background) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-bool _isGray(Color color) =>
-    color.r == color.g && color.g == color.b;
+bool _isGray(Color color) => color.r == color.g && color.g == color.b;
 
 void main() {
   group('AppTheme', () {
