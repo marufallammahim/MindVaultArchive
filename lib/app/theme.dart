@@ -217,10 +217,28 @@ class AppTheme {
     );
   }
 
+  static double _contrastRatio(Color foreground, Color background) {
+    final first = foreground.computeLuminance();
+    final second = background.computeLuminance();
+    final lighter = first > second ? first : second;
+    final darker = first > second ? second : first;
+    return (lighter + 0.05) / (darker + 0.05);
+  }
+
+  static Color _contrastAwareAccent(
+    Color accent,
+    Color background,
+    Color fallback, {
+    double minimumContrast = 4.5,
+  }) {
+    return _contrastRatio(accent, background) >= minimumContrast
+        ? accent
+        : fallback;
+  }
+
   static Color _contrastForeground(Color background) {
-    final luminance = background.computeLuminance();
-    final blackContrast = (luminance + 0.05) / 0.05;
-    final whiteContrast = 1.05 / (luminance + 0.05);
+    final blackContrast = _contrastRatio(ink, background);
+    final whiteContrast = _contrastRatio(Colors.white, background);
     return blackContrast >= whiteContrast ? ink : Colors.white;
   }
 
@@ -233,6 +251,18 @@ class AppTheme {
   }) {
     final borderInk = borderColor ?? scheme.outlineVariant;
     final outline = scheme.outlineVariant;
+    final navigationBackground = dark ? scheme.surface : lightSurface;
+    final navigationAccent = _contrastAwareAccent(
+      scheme.primary,
+      navigationBackground,
+      scheme.onSurface,
+    );
+    final interactiveAccent = _contrastAwareAccent(
+      scheme.primary,
+      background,
+      scheme.onSurface,
+      minimumContrast: 3,
+    );
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(7),
       side: BorderSide(color: borderInk, width: 2.5),
@@ -312,9 +342,9 @@ class AppTheme {
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: scheme.primary,
+        cursorColor: interactiveAccent,
         selectionColor: scheme.primary.withValues(alpha: 0.28),
-        selectionHandleColor: scheme.primary,
+        selectionHandleColor: interactiveAccent,
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -384,15 +414,15 @@ class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: dark ? scheme.surface : lightSurface,
+        backgroundColor: navigationBackground,
         surfaceTintColor: Colors.transparent,
-        indicatorColor: scheme.primary.withValues(alpha: 0.28),
+        indicatorColor: navigationAccent.withValues(alpha: 0.18),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         height: 70,
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(WidgetState.selected)
-                ? scheme.primary
+                ? navigationAccent
                 : scheme.onSurfaceVariant,
           ),
         ),
@@ -403,7 +433,7 @@ class AppTheme {
                 ? FontWeight.w800
                 : FontWeight.w500,
             color: states.contains(WidgetState.selected)
-                ? scheme.primary
+                ? navigationAccent
                 : scheme.onSurfaceVariant,
           ),
         ),
@@ -457,7 +487,7 @@ class AppTheme {
         trackOutlineColor: WidgetStatePropertyAll(outline),
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: scheme.primary,
+        color: interactiveAccent,
         linearTrackColor: scheme.primary.withValues(alpha: 0.2),
       ),
     );
