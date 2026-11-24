@@ -22,8 +22,10 @@ import 'package:mindvault_archive/features/trash/presentation/delete_confirmatio
 
 final appRouter = GoRouter(
   initialLocation: '/',
-  errorBuilder: (context, state) => Scaffold(
-    backgroundColor: const Color(0xFF101014),
+  errorBuilder: (context, state) {
+    final theme = Theme.of(context);
+    return Scaffold(
+    backgroundColor: theme.scaffoldBackgroundColor,
     appBar: AppBar(
       title: const Text('Page unavailable'),
       leading: IconButton(
@@ -41,7 +43,7 @@ final appRouter = GoRouter(
             const Icon(
               Icons.route_outlined,
               size: 52,
-              color: Color(0xFFFFB36B),
+              color: theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 16),
             const Text(
@@ -64,7 +66,8 @@ final appRouter = GoRouter(
         ),
       ),
     ),
-  ),
+  );
+  },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
