@@ -684,3 +684,31 @@ These requirements have been added to the recurring implementation task. Current
 - All 19 routes remain partial for runtime control/state, accessibility/text-scale, responsive and screenshot acceptance. No emulator/physical-device screenshots were captured; pixel-identical UI is not claimed.
 - External cloud sync, AI, collaboration, OCR, biometrics, encryption, reminders, recurrence, calendar and habits remain not implemented/blocked until real providers/platform capability, consent and product decisions exist.
 - This checkpoint is documentation-only and does not close completion criteria. Latest exact-SHA validation and full regression evidence remain outstanding.
+
+## Theme contrast and CI follow-up — 2026-11-24
+
+### Verified source changes
+- The four-preset selector remains the single persisted appearance setting: Light, normal Dark, AMOLED and Monochrome OLED. Legacy theme_mode / amoled_theme_enabled values migrate to theme_preset; no separate AMOLED or high-contrast toggle is present.
+- Shared typography uses Typography.material2021().black for Light and .white for dark-brightness presets, with semantic foreground colors applied.
+- Corrected a light-theme navigation contrast defect: selected navigation icons/labels now use the saved accent only when it meets 4.5:1 contrast against the navigation surface; otherwise they fall back to the semantic foreground. Text cursor and progress-indicator accents use a 3:1 minimum and the same readable fallback.
+- Light AppBar surfaces now use the configured ColorScheme.primary with onPrimary foreground, so custom dark/bright accents remain readable. The router's Page Unavailable state now uses the active scaffold background and semantic icon color instead of fixed dark/orange colors.
+- test/app_theme_test.dart now asserts contrast for AppBar foreground/title/icons, input hints/labels, dialog title, popup menu, snackbar, bottom sheet, selected/unselected navigation icons/labels, progress indicator and text cursor across all four presets. It also checks dark and bright custom accent cases.
+- Existing provider and Settings tests continue to cover legacy preference migration, persisted restore, one selector, four choices and Monochrome OLED accent independence.
+- Source changes were committed on this branch; formatting-only commits include db9957cb50113f5c59e8689b96dc25419baf12fa, b8ac8b09d0bec0e45e2eb84c1b627ff2811b1a0d and 42761c63f827b275c5cce918f54775c2e692f0b3. The temporary feature-branch formatter trigger was restored to main-only in 2a92dfe72e91eadbd12965e9dc34236f3795fe9e; it is not left enabled on the feature branch.
+
+### Exact-SHA CI findings
+- Code Check run 45116434763, Regression Tests run 45116434616 and Android APK run 45116434676 all checked out SHA 0dbd7e5bbbc27413fb90534d0fb0bcd06483740f and failed at the Dart formatting gate. Their logs show the formatter changed lib/app/theme.dart, lib/features/settings/presentation/settings_screen.dart, test/app_theme_test.dart and test/settings_screen_test.dart; analyzer, Flutter tests and APK packaging were skipped. These are not test/build failures and are not PASS results.
+- The latest source formatter commit is 42761c63f827b275c5cce918f54775c2e692f0b3; the branch head immediately before this roadmap update was 2a92dfe72e91eadbd12965e9dc34236f3795fe9e (formatter-trigger restoration only).
+- The required Code Check, Regression Tests and Android APK workflows are configured for feature-branch pushes. The available GitHub connector exposes PR-associated workflow runs but not push-triggered run listings; combined commit status also does not expose the Actions check runs. Therefore exact-SHA run IDs, step logs and artifact metadata for the current push cannot be inspected through this connection. No current-head PASS is claimed. Verify all three workflows and their APK artifact in GitHub Actions before release.
+- The previous formatting logs also reported a Riverpod generator/analyzer language-version mismatch (analyzer 3.4.0 vs Dart 3.14.0) and Kotlin Gradle Plugin warnings from file_picker / share_plus; the full regression suite has not yet established whether the Drift multiple-database warning is actionable. These warnings remain open pending current-head logs and compatibility review.
+
+### Native Kotlin decision
+- Android manifest and Gradle configuration were inspected. No tracked app-owned MainActivity.kt / FlutterActivity source was found; tool/regenerate_platforms.sh creates missing Flutter Android scaffolding in a temporary project.
+- No current Android-only feature demonstrates a measurable performance or quality benefit from a Kotlin engine. Flutter/Dart remains the UI, shared domain and local database engine. No duplicate business logic or unbenchmarked MethodChannel was added; Kotlin integration remains deferred until a real Android platform feature is selected and can be tested.
+
+### Remaining acceptance gates
+- Run format verification, flutter analyze, the complete serial Flutter regression suite and debug APK build on one identical latest branch SHA; inspect all three job logs and artifact metadata/digest.
+- Resolve or justify the Riverpod/analyzer and plugin Gradle warnings; inspect Drift database/executor lifecycle warnings after the full test run.
+- Complete route-level runtime/error/empty/persistence and accessibility/text-scale checks. No emulator/physical-device screenshots were captured, so pixel-identical UI is not claimed.
+- AI, cloud sync, collaboration, OCR/PDF indexing, biometrics, database encryption, reminders, recurrence, calendar and habits remain partial/not implemented until real provider/platform support and explicit privacy consent exist.
+- This checkpoint does not close the definition of done and does not claim 100% completion.
