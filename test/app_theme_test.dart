@@ -206,13 +206,13 @@ void main() {
           WidgetState.selected,
         })!.color!;
         final unselectedIcon = navigation.iconTheme!
-            .resolve(const <WidgetState>{})
+            .resolve(const <WidgetState>{})!
             .color!;
         final selectedLabel = navigation.labelTextStyle!.resolve(
           const <WidgetState>{WidgetState.selected},
         )!.color!;
         final unselectedLabel = navigation.labelTextStyle!
-            .resolve(const <WidgetState>{})
+            .resolve(const <WidgetState>{})!
             .color!;
 
         expect(
