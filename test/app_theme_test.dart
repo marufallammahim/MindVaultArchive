@@ -144,5 +144,100 @@ void main() {
         expect(input.borderSide.color, card.side.color);
       }
     });
+
+    test('component foregrounds remain readable across all presets', () {
+      for (final preset in AppThemePreset.values) {
+        final theme = AppTheme.themeFor(preset, AppTheme.primary);
+        final scheme = theme.colorScheme;
+        final cardColor = theme.cardTheme.color!;
+        final input = theme.inputDecorationTheme;
+
+        expect(
+          _contrast(input.hintStyle!.color!, cardColor),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} input hint',
+        );
+        expect(
+          _contrast(input.labelStyle!.color!, cardColor),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} input label',
+        );
+        expect(
+          _contrast(theme.dialogTheme.titleTextStyle!.color!, cardColor),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} dialog title',
+        );
+        expect(
+          _contrast(theme.popupMenuTheme.textStyle!.color!, cardColor),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} popup menu',
+        );
+        expect(
+          _contrast(theme.snackBarTheme.contentTextStyle!.color!, cardColor),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} snackbar',
+        );
+        expect(
+          _contrast(
+            scheme.onSurface,
+            theme.bottomSheetTheme.backgroundColor!,
+          ),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} bottom sheet',
+        );
+
+        final navigation = theme.navigationBarTheme;
+        final navigationBackground = navigation.backgroundColor!;
+        final selectedIcon = navigation.iconTheme!
+            .resolve(const <WidgetState>{WidgetState.selected})!
+            .color!;
+        final unselectedIcon = navigation.iconTheme!
+            .resolve(const <WidgetState>{})!
+            .color!;
+        final selectedLabel = navigation.labelTextStyle!
+            .resolve(const <WidgetState>{WidgetState.selected})!
+            .color!;
+        final unselectedLabel = navigation.labelTextStyle!
+            .resolve(const <WidgetState>{})!
+            .color!;
+
+        expect(
+          _contrast(selectedIcon, navigationBackground),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} selected navigation icon',
+        );
+        expect(
+          _contrast(unselectedIcon, navigationBackground),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} unselected navigation icon',
+        );
+        expect(
+          _contrast(selectedLabel, navigationBackground),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} selected navigation label',
+        );
+        expect(
+          _contrast(unselectedLabel, navigationBackground),
+          greaterThanOrEqualTo(4.5),
+          reason: '${preset.label} unselected navigation label',
+        );
+        expect(
+          _contrast(
+            theme.progressIndicatorTheme.color!,
+            theme.scaffoldBackgroundColor,
+          ),
+          greaterThanOrEqualTo(3),
+          reason: '${preset.label} progress indicator',
+        );
+        expect(
+          _contrast(
+            theme.textSelectionTheme.cursorColor!,
+            theme.scaffoldBackgroundColor,
+          ),
+          greaterThanOrEqualTo(3),
+          reason: '${preset.label} text cursor',
+        );
+      }
+    });
   });
 }
