@@ -747,3 +747,51 @@ APK artifact: `MindVaultArchive-debug-292-72aaede1ff499fad3c591a7dffdc3bb8925731
 - Run the regression suite serially or with appropriate test isolation so it completes within the workflow limit; do not hide failures or increase timeouts without root-cause evidence.
 - Re-run Code Check, Regression Tests and Android APK Artifact on one identical new branch SHA; inspect every step/log and the resulting artifact metadata.
 - Continue route-by-route functionality and accessibility acceptance. Device screenshot and installation QA remain separate. No 100% completion or pixel-perfect claim is made.
+
+
+## Exact-SHA validation and regression failure triage — 2026-11-25
+
+- Latest branch head: `a94f61954abba087451ff593c386afddbc7d7898` (commit `docs: record exact-SHA CI and regression findings`; parent `72aaede1ff499fad3c591a7dffdc3bb892573162`). Recent commits inspected; this head is the validation target.
+- Read the feature specification, UI functionality audit, roadmap, and affected Trash, Editor, Quick Capture, Home and test source at this SHA before making changes. No source files were modified in this checkpoint.
+
+### Required workflows — identical SHA `a94f61954abba087451ff593c386afddbc7d7898`
+
+| Workflow | Run ID | Conclusion | Job evidence |
+|---|---:|---|---|
+| Feature Branch - Code Check | 45549197381 | PASS | Job 138986014973: dependency/codegen checks, generated-source checks, Dart formatting and static analysis all succeeded. |
+| Feature Branch - Regression Tests | 45549197325 | CANCELLED | Job 138986014922: setup, dependency/codegen and formatting passed; test step ran and was cancelled by GitHub after accumulated failures/timeouts. Not a pass. |
+| Feature Branch - Android APK Artifact | 45549197475 | PASS | Job 138986015044: scaffolding, dependencies, codegen, formatting, assembleDebug, APK metadata verification and upload all succeeded. |
+
+### Regression job failure evidence
+
+Inspected full job log for job `138986014922`. At least these independent problems are evidenced:
+- `test/trash_screen_test.dart:133`: expected confirmation dialog title `Delete permanently?` was not present after tapping the popup action; inspect popup menu selection and dialog timing/semantics. A later permanent-delete test timed out after 10 minutes, then produced a nested test-binding `!inTest` assertion as fallout.
+- `test/editor_screen_test.dart:65`: a guarded `WidgetTester.pump` remained unfinished when the test called `expect`; the log points to pump at line 25. Investigate the Editor widget's initial async/database loading and test synchronization; do not paper over the guarded-function conflict.
+- `test/home_screen_test.dart:61`: seeded saved note was not rendered at the bounded wait point.
+- Home Stats dock test timed out after 10 minutes; subsequent `!inTest` assertion is likely cascading from timeout, not independent proof of a production defect.
+- `test/feature_ui_workflow_test.dart:128`: finder for key `quick-capture-save-edit` returned no element at `ensureVisible`. The current Quick Capture source does define this key on the OutlinedButton, but it is conditional only through disabled `onPressed`; inspect actual test setup/rendered state and widget visibility before changing product UI.
+- Test run reached 67 passes and 10 failures in the visible log before cancellation; this is not the final suite count.
+
+The Trash source uses a live Drift stream and the test uses a popup menu followed by dialog interaction. The current Editor test polls database state using `tester.runAsync` while pumping the widget; this needs careful synchronization review. Quick Capture waits for SharedPreferences draft restoration before enabling controls; its key exists in source, so the test's missing finder may indicate restoration/pump sequencing or widget lifecycle. These are investigation leads, not confirmed root causes.
+
+### APK artifact evidence
+
+- Artifact listing for run `45549197475` was retrieved; see GitHub Actions run artifact metadata. The APK workflow's explicit verification and upload steps passed on this SHA.
+- The artifact ZIP and APK checksums/metadata must be recorded from the returned artifact/metadata files before release; do not reuse the prior SHA's artifact digest.
+
+### Warning status / outstanding work
+
+- Drift multi-AppDatabase lifecycle warnings: still not resolved/verified; regression run does not complete.
+- Riverpod generator language-version and Kotlin Gradle Plugin warnings: remain pending a coordinated compatibility review; this run's successful status does not prove warning-free logs.
+- Node 20/setup-java/cp portability warnings: previous roadmap entries describe earlier upgrades, but inspect this exact run's logs before marking resolved.
+- No Kotlin engine added: no measured Android-only capability justifies an arbitrary channel or duplicate domain logic.
+- All route-level runtime/accessibility/screenshot acceptance and physical-device QA remain open. External sync/AI/collaboration/OCR/biometrics/encryption/reminders/calendar/recurrence/habits remain blocked or partial as previously specified.
+
+### Next source-repair priority
+
+1. Reproduce and fix the Trash dialog/action test without changing permanent-delete safety.
+2. Correct Editor test pump/database synchronization and determine why initial editor render stalls.
+3. Fix Home stream/test synchronization and investigate Stats navigation teardown.
+4. Reconcile Quick Capture draft-restoration state with the missing keyed action in the widget test.
+5. Run each failing test in isolation first, then full serial suite; only then run all three workflows on one new exact SHA and inspect all logs/artifact metadata.
+- This checkpoint does not meet completion criteria and makes no 100% completion claim.
