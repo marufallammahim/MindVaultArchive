@@ -712,3 +712,38 @@ These requirements have been added to the recurring implementation task. Current
 - Complete route-level runtime/error/empty/persistence and accessibility/text-scale checks. No emulator/physical-device screenshots were captured, so pixel-identical UI is not claimed.
 - AI, cloud sync, collaboration, OCR/PDF indexing, biometrics, database encryption, reminders, recurrence, calendar and habits remain partial/not implemented until real provider/platform support and explicit privacy consent exist.
 - This checkpoint does not close the definition of done and does not claim 100% completion.
+
+
+## Latest branch validation review — 2026-11-25
+
+- Branch head resolved from GitHub: `72aaede1ff499fad3c591a7dffdc3bb892573162` (commit: `style: fix Dart 3.14 theme test formatting`). Recent history includes theme assertion compatibility fixes, test color-channel getter updates, and roadmap metadata synchronization.
+- Reviewed `docs/FEATURE_SPECIFICATION.md`, `docs/UI_FUNCTIONALITY_AUDIT.md`, this roadmap, current Home/Quick Capture/theme/provider/router/database source, and the corresponding widget/theme tests at this branch head.
+
+### Required workflows on the same SHA
+
+| Workflow | Run | Result | Evidence |
+|---|---:|---|---|
+| Feature Branch - Code Check | 45345527147 | PASS | Format step: 58 files, 0 changed. `flutter analyze`: `No issues found!` |
+| Feature Branch - Regression Tests | 45345527095 | CANCELLED | Format gate passed; test execution started. Logs show Home saved-note assertion failure, Home Stats widget test timeout, and Quick Capture save-and-open test could not find the keyed action. The job was later cancelled by GitHub; it is not a pass. |
+| Feature Branch - Android APK Artifact | 45345527158 | PASS | `assembleDebug`, APK verification/metadata and artifact upload all succeeded. |
+
+APK artifact: `MindVaultArchive-debug-292-72aaede1ff499fad3c591a7dffdc3bb892573162`, artifact ID `14896989828`, 100,772,773 bytes, SHA-256 `1808b2bc21ee37eaee668ce3b911569df9aaefb832a61c38dd6940d729d5d6fd`, expires 2026-12-24. CI metadata marks it installable, but no device install was performed; the ZIP digest is the artifact archive digest, not a separately verified APK-file digest.
+
+### Regression issues requiring source-level repair
+
+- `test/home_screen_test.dart`: the seeded note is not visible to Home within the test's bounded pumps; inspect async database initialization/stream subscription and use deterministic test synchronization rather than loosening the assertion.
+- `test/home_screen_test.dart`: the Stats navigation widget test exceeded its 10-minute test timeout. Investigate route/database stream teardown and ensure the test unmounts/disposes resources without hanging.
+- `test/feature_ui_workflow_test.dart`: the “Quick Capture saves and opens the canonical editor route” test cannot find `quick-capture-save-edit` before calling `ensureVisible`. Inspect the remaining Quick Capture widget tree and correct the test's control lookup or the actual missing UI action based on rendered behavior.
+- Regression logs reached 65 passed and 10 failed before cancellation, so this is a material unresolved acceptance gate. Do not infer the final suite count from the cancelled run.
+
+### Kotlin and scope status
+
+- Recursive repository tree inspection found no tracked `.kt` source under `android/`. No measured Android-only feature justifies introducing a Kotlin business-logic engine or an arbitrary MethodChannel. Keep Flutter/Dart as the application engine; revisit Kotlin only for a concrete platform capability with integration tests and measurable value.
+- The feature specification and UI audit continue to classify AI, cloud sync, collaboration, OCR/PDF indexing, biometric unlock, database encryption, reminders, recurrence, calendar and habits as partial/not implemented. No mock success behavior was introduced.
+
+### Next required work
+
+- Repair the three concrete Home/Quick Capture widget-test failures above and investigate the remaining failed tests from the complete job log.
+- Run the regression suite serially or with appropriate test isolation so it completes within the workflow limit; do not hide failures or increase timeouts without root-cause evidence.
+- Re-run Code Check, Regression Tests and Android APK Artifact on one identical new branch SHA; inspect every step/log and the resulting artifact metadata.
+- Continue route-by-route functionality and accessibility acceptance. Device screenshot and installation QA remain separate. No 100% completion or pixel-perfect claim is made.
