@@ -795,3 +795,43 @@ The Trash source uses a live Drift stream and the test uses a popup menu followe
 4. Reconcile Quick Capture draft-restoration state with the missing keyed action in the widget test.
 5. Run each failing test in isolation first, then full serial suite; only then run all three workflows on one new exact SHA and inspect all logs/artifact metadata.
 - This checkpoint does not meet completion criteria and makes no 100% completion claim.
+
+
+## Exact-SHA validation and regression investigation — 2026-11-26
+
+Branch head inspected: `abfd8079e796c4f0d374b695b84d1d7630743a6a`
+Parent: `a94f61954abba087451ff593c386afddbc7d7898`
+Latest commit is documentation-only; it records the previous CI checkpoint.
+
+### Required workflows on the same SHA
+
+| Workflow | Run | Result | Verified evidence |
+|---|---:|---|---|
+| Feature Branch - Code Check | 45567745816 | PASS | Job 139046589107; generated sources verified committed, Dart format reports 58 files / 0 changed, `flutter analyze` reports `No issues found!` |
+| Feature Branch - Regression Tests | 45567745797 | CANCELLED | Job 139046589030; test step started but the run was cancelled after long-running/failing tests. Not a pass. |
+| Feature Branch - Android APK Artifact | 45567745955 | PASS | Job 139046589320; debug APK built, metadata marked `installable=true`, artifact upload succeeded. |
+
+All three runs checked out exactly `abfd8079e796c4f0d374b695b84d1d7630743a6a`.
+
+APK artifact: `MindVaultArchive-debug-294-abfd8079e796c4f0d374b695b84d1d7630743a6a`, ID `15001520785`, size 100,772,777 bytes, not expired at review time. Artifact ZIP SHA-256: `c1ecc5c55cddd05be447cd8c30cf27e15a398d2aad61661adb40a50e8737dfbb`. This is the uploaded ZIP digest, not the APK's standalone digest. The workflow verifies a non-empty APK and writes build metadata; no physical-device installation was performed.
+
+### Regression evidence and next fixes
+
+The regression job log shows:
+- Editor title/body autosave widget test reached its 10-minute test timeout. The subsequent guarded-function conflict occurs in teardown while pumping the widget tree and should be treated as a teardown/lifecycle symptom, not as proof that the note write itself failed.
+- Quick Capture save-and-open-editor test fails at `tester.ensureVisible` for the keyed `quick-capture-save-edit` action (test file `test/feature_ui_workflow_test.dart`). The source currently defines that key; investigate why the action is not visible/laid out at the test viewport and whether the widget tree is still in its restoring state.
+- The run had recorded 67 passing and 10 failing tests by the visible log tail before GitHub cancelled the job. This is partial output, not a final suite count.
+- Drift code generation emits a compatibility warning: analyzer 6.4.1 language version 3.4.0 while Dart SDK language version is 3.14.0. Dependency upgrade requires a coordinated review of build_runner, drift_dev, Riverpod generator/lint and lockfile compatibility; do not upgrade analyzer alone.
+- Android build warns about Kotlin Gradle Plugin application in the app and transitive `file_picker` / `share_plus` plugins. APK still builds successfully. Check plugin releases and Flutter's built-in Kotlin migration compatibility before changing Android scaffolding.
+
+### Source review performed
+
+Reviewed the feature specification, UI audit, roadmap, editor provider/screen, Quick Capture screen, Home screen, database schema/migrations, provider/theme state, relevant widget tests, pubspec and Android app Gradle file. Current source confirms the four-preset theme and legacy preference migration. No source edit was made in this run because the regression causes need a controlled reproduction before changing application behavior or weakening assertions.
+
+### Next execution priority
+
+1. Reproduce the Editor test timeout with instrumentation around editor load, debounce timer, serialized save queue and widget disposal; make teardown deterministic without masking pending saves.
+2. Diagnose Quick Capture button visibility/scroll constraints at the failing test size; preserve the save-and-open route assertion.
+3. Re-run the complete regression workflow on a single exact branch SHA and inspect all failures, not only the final log tail.
+4. Review Drift analyzer/build-generator compatibility and Kotlin Gradle Plugin migration warnings separately; retain Flutter/Dart as the app engine unless a concrete Android-only capability justifies Kotlin.
+5. Continue route-by-route behavior/accessibility and physical-device screenshot QA. Do not claim pixel identity or release readiness until the definition of done above is met.
