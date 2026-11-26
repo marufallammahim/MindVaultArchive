@@ -835,3 +835,41 @@ Reviewed the feature specification, UI audit, roadmap, editor provider/screen, Q
 3. Re-run the complete regression workflow on a single exact branch SHA and inspect all failures, not only the final log tail.
 4. Review Drift analyzer/build-generator compatibility and Kotlin Gradle Plugin migration warnings separately; retain Flutter/Dart as the app engine unless a concrete Android-only capability justifies Kotlin.
 5. Continue route-by-route behavior/accessibility and physical-device screenshot QA. Do not claim pixel identity or release readiness until the definition of done above is met.
+
+
+## Follow-up source inspection — 2026-11-26
+
+The previous cancelled regression run was rechecked against its job log and the current source files on `feature/ultimate-all-in-one-mindvault`. This is a source-inspection checkpoint, not a repair or passing-test claim.
+
+### Exact source snapshots inspected
+
+| File | Blob SHA | Review note |
+|---|---|---|
+| `test/trash_screen_test.dart` | `36971eaa2fea62fbe3f46b6d5038d336d5a4ecdd` | Menu/dialog interaction and permanent-delete persistence assertions reviewed. |
+| `lib/features/trash/presentation/trash_screen.dart` | `ed86a9552335a049f03bc7211d2c081840081bbd` | Confirmation dialog is invoked from the PopupMenuButton selection callback; deletion occurs only after an explicit true result. |
+| `test/editor_screen_test.dart` | `096578b8ef7cba4f8cfceb4e2aee1a8db18dc203` | Test interleaves fake-clock pumping with asynchronous Drift reads while autosave is pending. |
+| `lib/features/editor/presentation/editor_screen.dart` | `befb2046f6f5e9054a4d0b21f8254c15e34b2421` | Editor waits for its Riverpod state to load before constructing the text fields; provider and DB initialization remain the next dependency to inspect. |
+| `test/home_screen_test.dart` | `40daf41b699546ffc1ab002313ebe678aa1e9078` | Seed note is written through `tester.runAsync` before the Home stream is mounted; test remounts the same database across viewport/theme cases. |
+| `test/feature_ui_workflow_test.dart` | `bb265e83b2e7d562f012623cd20f1e8444781b5e` | Quick Capture action is searched immediately after the initial fixed-duration pumps. |
+| `lib/features/capture/presentation/quick_capture_screen.dart` | `80e480232729dd4879d21ab0e7caedb0db60d5a8` | Save/edit key exists in source; both action and fields are disabled until asynchronous draft restoration finishes. |
+
+### Confirmed observations, not assumed root causes
+
+- The Trash UI does present a confirmation dialog only after its popup selection callback receives the delete value. The regression log's missing dialog means the test interaction path must be reproduced; it does not justify weakening or removing confirmation.
+- Editor's initial loading is controlled by `editorProvider(noteId)`; the widget test's guarded-pump failure occurs while waiting for fields. Inspect provider initialization and the exact log context before changing either widget or test.
+- Home's data source is a Drift `StreamBuilder` over non-deleted notes. The current test writes the seed before mounting that stream. The failed expectation is therefore not explained by a simple missing seed operation; inspect provider identity, database stream emission and test binding timing.
+- Quick Capture's key is present in the fetched source. Its `onPressed` is null during draft restoration, so the test should await the restoration-ready state before trying to interact. Do not remove the loading guard to satisfy the test.
+- The Stats dock destination is Archive Insights in the current route implementation. The 10-minute timeout and following `!inTest` assertion need isolation; the latter may be a cascading timeout artifact.
+
+### CI state retained
+
+The inspected run set belongs to validation commit `a94f61954abba087451ff593c386afddbc7d7898`:
+- Code Check `45549197381`: PASS (job `138986014973`).
+- Regression Tests `45549197325`: CANCELLED (job `138986014922`); the test step did not complete successfully.
+- Android APK Artifact `45549197475`: PASS (job `138986015044`).
+
+The GitHub connector's commit-runs wrapper only exposes pull-request-triggered runs, so it returned no run list for documentation commit `abfd8079e796c4f0d374b695b84d1d7630743a6a`. Consequently, the three results above must not be represented as validation of that documentation commit. A fresh workflow result set for one common newer branch head remains required.
+
+### Next safe action
+
+Reproduce each failure in isolation with the same app/provider setup and retain the existing user-visible behavior and data-safety guarantees. Then fix the first confirmed production or test-harness defect, rerun that focused test, and only afterward rerun the serial suite. No source code was changed in this inspection checkpoint.
