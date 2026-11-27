@@ -873,3 +873,51 @@ The GitHub connector's commit-runs wrapper only exposes pull-request-triggered r
 ### Next safe action
 
 Reproduce each failure in isolation with the same app/provider setup and retain the existing user-visible behavior and data-safety guarantees. Then fix the first confirmed production or test-harness defect, rerun that focused test, and only afterward rerun the serial suite. No source code was changed in this inspection checkpoint.
+
+## Scheduled validation — 2026-11-26 exact-head review
+
+Reviewed branch head `aa1c52552688a16beb1682e2d8cf10b8bb8edb95` and the three push-triggered workflows attached to that exact SHA. No source files were changed during this review.
+
+| Required workflow | Run ID | Result | Evidence |
+|---|---:|---|---|
+| Feature Branch - Code Check | 45774064574 | PASS | Job 139753334372; formatted 58 files with 0 changes; `flutter analyze` reported `No issues found!` |
+| Feature Branch - Regression Tests | 45774064375 | CANCELLED | Job 139753334088; test step was cancelled after running for approximately 30 minutes. The suite is not green. |
+| Feature Branch - Android APK Artifact | 45774064661 | PASS | Job 139753334641; assembleDebug, APK metadata and artifact upload all succeeded. |
+
+### Regression log evidence (job 139753334088)
+
+Before cancellation, the log showed 67 passed and 10 failed at the point of interruption; this is not a final suite count. Confirmed failures include:
+
+- `test/trash_screen_test.dart`: cancelling permanent deletion failed; the subsequent confirmation/deletion test timed out and produced a Flutter test binding `!inTest` assertion. The safety confirmation must remain intact.
+- `test/editor_screen_test.dart`: autosave widget test timed out. Flutter reported a guarded-function conflict: a pending `WidgetTester.pump` at line 25 overlapped an `expect` at line 65. This is a test synchronization defect to isolate before changing editor behavior.
+- `test/home_screen_test.dart`: saved-note rendering assertion failed at line 61. Stats dock test later timed out and hit the same `!inTest` assertion.
+- `test/feature_ui_workflow_test.dart`: Quick Capture canonical editor-route test failed because `ensureVisible` could not find the `quick-capture-save-edit` element at line 128. The production control is intentionally disabled during draft restoration; the test must wait for the restore state to finish before interacting.
+
+### APK evidence
+
+- Artifact ID: `15095023227`
+- Artifact name: `MindVaultArchive-debug-296-aa1c52552688a16beb1682e2d8cf10b8bb8edb95`
+- ZIP size: 100,772,769 bytes
+- Artifact SHA-256: `1e7f4f6c21fd085abc1e5e5957f8b07d099002f12faac9eb15c5d196e7a91a39`
+- Artifact is not expired; expiry shown by GitHub: 2026-12-26.
+- Build log confirms Flutter 3.50.0, Java 17.0.21, `assembleDebug`, APK copy, SHA-256 manifest, branch/commit/version metadata and successful `actions/upload-artifact@v6`.
+- The build log still warns that the app module and `file_picker` / `share_plus` apply Kotlin Gradle Plugin and will need Built-in Kotlin compatibility for future Flutter versions.
+
+### Warning status after this exact-head run
+
+- Drift multiple-`AppDatabase` lifecycle warning: NOT VERIFIED AS RESOLVED; regression suite was cancelled.
+- GitHub Actions action versions: the checked workflow uses `actions/upload-artifact@v6`; setup-java/checkout compatibility should continue to be checked in workflow source and runner logs.
+- Riverpod analyzer language mismatch and older dependency constraints: NOT RESOLVED; dependency resolution lists 64 packages with newer versions incompatible with current constraints. No broad dependency upgrade was attempted.
+- Android Kotlin Gradle Plugin warning: STILL PRESENT for app module, file_picker and share_plus. No unsafe AGP 9 migration or plugin upgrade was attempted.
+- Shell portability: previous `cp -n` remediation is recorded above, but no dedicated cross-shell/OS validation was performed in this run.
+
+### Next repair order
+
+1. Correct the editor widget test's outstanding asynchronous pump before assertions; preserve actual autosave and database behavior.
+2. Wait for Quick Capture draft restoration explicitly in the workflow test; do not remove the production loading guard.
+3. Trace Trash confirmation dialog state and test teardown/async work; retain confirmation and verify cancel leaves all records intact.
+4. Inspect Home stream/provider identity and seeded database visibility; do not hide the saved-note assertion.
+5. Run focused tests, then the full serial regression suite with a workflow timeout appropriate to the observed duration.
+6. Re-run all three required workflows on one exact latest SHA and update this roadmap with their final results.
+
+Completion remains blocked by regression tests, all-route runtime review, unresolved Android/Kotlin warnings and physical-device QA.
