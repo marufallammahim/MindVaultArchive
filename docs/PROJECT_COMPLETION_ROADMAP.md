@@ -921,3 +921,31 @@ Before cancellation, the log showed 67 passed and 10 failed at the point of inte
 6. Re-run all three required workflows on one exact latest SHA and update this roadmap with their final results.
 
 Completion remains blocked by regression tests, all-route runtime review, unresolved Android/Kotlin warnings and physical-device QA.
+
+
+## Scheduled repair — 2026-11-28 Quick Capture workflow test
+
+Latest branch source commit before this note: `2b34573b0420411fe817ecc126461f15181daced`.
+
+### Confirmed source state
+
+- The current branch version of `lib/features/trash/presentation/trash_screen.dart` is syntactically valid. Its list deliberately uses `itemCount: notes.length + 1` for a leading hero row and reads `notes[index - 1]`; the historical parser error reported against the older `dc5711...` merge snapshot is not present in the current branch file. No Trash source change was warranted.
+- The permanent-delete flow still requires an explicit confirmation and the Trash widget tests verify cancellation and linked-record cleanup. That safety gate was preserved.
+- Quick Capture's `quick-capture-save-edit` button is below the initial viewport inside a lazily built ListView. The test used `ensureVisible`, which cannot reveal a child that has not yet been built. The test now waits for asynchronous draft restoration to enable the input, then uses `scrollUntilVisible` before tapping the action. Production loading guards and save behavior are unchanged.
+
+### Change committed
+
+- `test/feature_ui_workflow_test.dart`: wait for the title field to become enabled after draft restoration; scroll the ListView until the save-and-edit action is built and visible.
+- Commit: `2b34573b0420411fe817ecc126461f15181daced`.
+- No database records, user data, secrets, or main-branch content were changed.
+
+### Exact-SHA validation limitation
+
+The GitHub connector can resolve the branch ref to the exact commit and fetch commit/status metadata. For this commit, the combined commit-status endpoint returned no status contexts, and the available commit-workflow-runs wrapper is explicitly limited to pull-request-triggered runs; it returned no push-run records. Therefore Code Check, Regression Tests, and Android APK results for `2b34573...` cannot be independently confirmed from the connected Actions interface in this run. Do not treat an empty status response as a pass.
+
+### Next priority
+
+1. Verify all three push-triggered workflows on the same latest branch SHA and inspect job steps/logs.
+2. Run the focused Quick Capture test and then the full serial regression suite.
+3. Continue isolating Editor autosave, Trash confirmation test teardown, Home saved-note stream and Stats navigation test issues without weakening assertions or removing safety confirmation.
+4. Continue the route-by-route UI/functionality and accessibility review; physical-device screenshot QA remains separate.
