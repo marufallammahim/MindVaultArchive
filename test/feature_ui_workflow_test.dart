@@ -120,12 +120,23 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
+    await _pumpUntil(tester, () async {
+      final titleField = find.byKey(
+        const ValueKey('quick-capture-title'),
+      );
+      return titleField.evaluate().isNotEmpty &&
+          tester.widget<TextField>(titleField).enabled;
+    });
     await tester.enterText(find.byType(TextField).at(0), 'Continue editing');
     await tester.enterText(find.byType(TextField).at(1), 'Captured body');
     final continueEditing = find.byKey(
       const ValueKey('quick-capture-save-edit'),
     );
-    await tester.ensureVisible(continueEditing);
+    await tester.scrollUntilVisible(
+      continueEditing,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.tap(continueEditing);
     await _pumpUntil(tester, () async {
       final notes =
